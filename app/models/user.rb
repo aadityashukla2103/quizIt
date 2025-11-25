@@ -6,6 +6,7 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
     :recoverable, :trackable, :validatable, :rememberable
   has_many :notes, dependent: :delete_all
+  belongs_to :organization
 
   validates :email, uniqueness: true
   validates :password_confirmation, presence: true, on: :create
