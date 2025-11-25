@@ -17,7 +17,9 @@ namespace :api, defaults: { format: :json } do
    resources :cypress_runs, only: [:create]
 
    resources :quizzes, only: [:index, :show, :create, :update, :destroy]
-   resources :questions, only: [:index, :show, :create, :update, :destroy]
+   resources :questions, only: [:index, :show, :create, :update, :destroy] do
+    resources :options, only: [:index, :show, :create, :update, :destroy]
+  end
 
  end
 end
