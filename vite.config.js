@@ -26,6 +26,10 @@ const baseConfig = {
       include: "**/*.svg",
     }),
   ],
+  //added to exclude neetoui from dependency optimization
+  optimizeDeps: {
+    exclude: ["@bigbinary/neetoui"],
+  },
 };
 
 const viteConfig = mergeDeepRight(baseConfig, {
