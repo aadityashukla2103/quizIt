@@ -20,6 +20,6 @@ namespace :api, defaults: { format: :json } do
    resources :questions, only: [:index, :show, :create, :update, :destroy] do
     resources :options, only: [:index, :show, :create, :update, :destroy]
   end
-
+   resources :organizations, only: [:index, :show, :create, :update, :destroy]
  end
 end
