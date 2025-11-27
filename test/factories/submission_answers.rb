@@ -2,9 +2,9 @@
 
 FactoryBot.define do
   factory :submission_answer do
-    submission { "" }
-    question { "" }
-    selected_option { "" }
-    is_correct { false }
+    association :submission
+    association :question
+    association :selected_option, factory: :option
+    is_correct { Faker::Boolean.boolean }
   end
 end

@@ -2,9 +2,9 @@
 
 FactoryBot.define do
   factory :quiz do
-    name { "MyString" }
-    status { 1 }
-    organization_id { "" }
-    category_id { "" }
+    name { Faker::Lorem.sentence }
+    status { :draft }
+    association :organization
+    association :category
   end
 end

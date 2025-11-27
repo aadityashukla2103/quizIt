@@ -2,8 +2,8 @@
 
 FactoryBot.define do
   factory :option do
-    question { "" }
-    content { "MyString" }
-    is_correct { false }
+    association :question
+    content { Faker::Lorem.sentence }
+    is_correct { Faker::Boolean.boolean }
   end
 end

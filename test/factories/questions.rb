@@ -2,8 +2,8 @@
 
 FactoryBot.define do
   factory :question do
-    quiz { nil }
-    content { "MyText" }
-    position { 1 }
+    association :quiz
+    content { Faker::Lorem.sentence }
+    position { Faker::Number }
   end
 end
