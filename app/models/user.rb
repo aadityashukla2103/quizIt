@@ -7,6 +7,7 @@ class User < ApplicationRecord
     :recoverable, :trackable, :validatable, :rememberable
   has_many :notes, dependent: :delete_all
   belongs_to :organization
+  has_many :submissions, dependent: :destroy
 
   validates :email, uniqueness: true
   validates :password_confirmation, presence: true, on: :create
