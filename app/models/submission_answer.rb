@@ -1,0 +1,7 @@
+# frozen_string_literal: true
+
+class SubmissionAnswer < ApplicationRecord
+  belongs_to :submission
+  belongs_to :question
+  belongs_to :selected_option, class_name: "Option"
+end
