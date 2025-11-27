@@ -2,12 +2,13 @@
 
 FactoryBot.define do
   factory :submission do
-    user_id { "" }
-    quiz_id { "" }
-    correct_answers { 1 }
-    wrong_answers { 1 }
-    total_questions { 1 }
-    status { 1 }
-    submitted_at { "2025-11-27 03:39:37" }
+    association :user
+    association :quiz
+
+    correct_answers { Faker::Number }
+    wrong_answers { Faker::Number }
+    total_questions { Faker::Number }
+    status { :completed }
+    submitted_at { Faker::Time.backward(days: 3) }
   end
 end
