@@ -5,6 +5,7 @@ require "test_helper"
 class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
   def setup
     @admin = create(:user, :admin)
+    @organization = @admin.organization
   end
 
   def test_show_for_a_valid_user
@@ -35,7 +36,8 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
       last_name: "Smith",
       password: "welcome",
       password_confirmation: "welcome",
-      phone_number: "1(555)555-5555"
+      phone_number: "1(555)555-5555",
+      organization_id: @organization.id
     }
 
     # Ensure that there are no users with this email in db
@@ -56,7 +58,8 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
       first_name: "John",
       last_name: "Smith",
       password: nil,
-      password_confirmation: nil
+      password_confirmation: nil,
+      organization_id: @organization.id
     }
 
     # Ensure that there are no users with this email in db
