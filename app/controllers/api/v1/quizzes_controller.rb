@@ -1,22 +1,23 @@
 # frozen_string_literal: true
 
-class Api::V1::QuizzesController < ApplicationController
+class Api::V1::QuizzesController < Api::V1::BaseController
+  before_action :ensure_current_user_is_superadmin!, only: [:create, :update, :destroy]
   before_action :set_quiz, only: [:show, :update, :destroy]
 
   def index
     quizzes = Quiz.all
-    render json: quizzes
+    render_json(quizzes)
   end
 
   def show
-    render json: @quiz
+    render_json(@quiz)
   end
 
   def create
     quiz = Quiz.new(quiz_params)
 
     if quiz.save
-      render json: quiz, status: :created
+      render_json(quiz, :created)
     else
       render json: { errors: quiz.errors.full_messages }, status: :unprocessable_entity
     end
@@ -24,7 +25,7 @@ class Api::V1::QuizzesController < ApplicationController
 
   def update
     if @quiz.update(quiz_params)
-      render json: @quiz
+      render_json(@quiz)
     else
       render json: { errors: @quiz.errors.full_messages }, status: :unprocessable_entity
     end
@@ -42,6 +43,16 @@ class Api::V1::QuizzesController < ApplicationController
     end
 
     def quiz_params
-      params.require(:quiz).permit(:name, :status)
+      params.require(:quiz).permit(:name, :status, :organization_id, :category_id)
+    end
+
+    def ensure_current_user_is_superadmin!
+      user_email = request.headers["X-Auth-Email"].presence
+      user = user_email && User.find_by(email: user_email)
+
+      unless user&.super_admin?
+        render_error("Unauthorized Access!", :forbidden)
+        nil
+      end
     end
 end

@@ -2,7 +2,7 @@ import Login from "components/Authentication/Login";
 import PasswordReset from "components/Authentication/ResetPassword";
 import Signup from "components/Authentication/Signup";
 import Dashboard from "components/Dashboard";
-import Notes from "components/Dashboard/Notes";
+import Quizzes from "components/Dashboard/Quizzes";
 import Settings from "components/Dashboard/Settings";
 
 export const DASHBOARD_PATH = "/";
@@ -34,7 +34,7 @@ export const PRIVATE_ROUTES = [{ path: DASHBOARD_PATH, component: Dashboard }];
 export const DASHBOARD_ROUTES = [
   {
     path: NOTES_PATH,
-    component: Notes,
+    component: Quizzes,
   },
   {
     path: SETTINGS_PATH,
