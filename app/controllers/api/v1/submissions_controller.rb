@@ -1,22 +1,22 @@
 # frozen_string_literal: true
 
-class SubmissionsController < ApplicationController
+class Api::V1::SubmissionsController < Api::V1::BaseController
   before_action :set_submission, only: [:show, :update, :destroy]
 
   def index
     submissions = Submission.all
-    render json: submissions
+    render_json(submissions)
   end
 
   def show
-    render json: @submission
+    render_json(@submission)
   end
 
   def create
     submission = Submission.new(submission_params)
 
     if submission.save
-      render json: submission, status: :created
+      render_json(submission, :created)
     else
       render json: { errors: submission.errors.full_messages }, status: :unprocessable_entity
     end
@@ -24,7 +24,7 @@ class SubmissionsController < ApplicationController
 
   def update
     if @submission.update(submission_params)
-      render json: @submission
+      render_json(@submission)
     else
       render json: { errors: @submission.errors.full_messages }, status: :unprocessable_entity
     end
@@ -32,7 +32,7 @@ class SubmissionsController < ApplicationController
 
   def destroy
     @submission.destroy
-    render json: { message: "Deleted successfully" }
+    head :no_content
   end
 
   private
