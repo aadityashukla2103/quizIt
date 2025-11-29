@@ -1,21 +1,21 @@
 # frozen_string_literal: true
 
-class Api::V1::OptionsController < ApplicationController
+class Api::V1::OptionsController < Api::V1::BaseController
   before_action :set_question
   before_action :set_option, only: [:show, :update, :destroy]
 
   def index
-    render json: @question.options
+    render_json(@question.options)
   end
 
   def show
-    render json: @option
+    render_json(@option)
   end
 
   def create
     option = @question.options.build(option_params)
     if option.save
-      render json: option, status: :created
+      render_json(option, :created)
     else
       render json: { errors: option.errors.full_messages }, status: :unprocessable_entity
     end
@@ -23,7 +23,7 @@ class Api::V1::OptionsController < ApplicationController
 
   def update
     if @option.update(option_params)
-      render json: @option
+      render_json(@option)
     else
       render json: { errors: @option.errors.full_messages }, status: :unprocessable_entity
     end
