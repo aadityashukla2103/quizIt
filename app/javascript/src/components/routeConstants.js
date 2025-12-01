@@ -2,7 +2,7 @@ import Login from "components/Authentication/Login";
 import PasswordReset from "components/Authentication/ResetPassword";
 import Signup from "components/Authentication/Signup";
 import Dashboard from "components/Dashboard";
-import Quizzes from "components/Dashboard/Quizzes";
+import Quizzes from "components/Dashboard/Notes";
 import Settings from "components/Dashboard/Settings";
 
 export const DASHBOARD_PATH = "/";
