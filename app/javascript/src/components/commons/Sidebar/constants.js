@@ -1,6 +1,9 @@
-import { Notes, Settings } from "neetoicons";
+import { Settings } from "neetoicons";
 
-export const APP_NAME = "Wheel";
+import { GlobeIcon } from "../../../assets/icons";
+import allQuizIcon from "../../../assets/icons/allQuizIcon";
+
+export const APP_NAME = "QuizIt";
 
 export const PASSWORD_PATH = "/my/password/edit";
 export const PROFILE_PATH = "/my/profile";
@@ -10,11 +13,16 @@ export const SIDENAV_LINKS = [
   {
     label: "Notes",
     to: "/notes",
-    icon: Notes,
+    icon: allQuizIcon,
   },
   {
     label: "Settings",
     to: "/settings",
     icon: Settings,
+  },
+  {
+    label: "Explore",
+    to: "/explore",
+    icon: GlobeIcon,
   },
 ];

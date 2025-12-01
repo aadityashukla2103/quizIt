@@ -1,8 +1,5 @@
 import React from "react";
 
-import { Sidebar as NeetoUISidebar } from "neetoui/layouts";
-import { useHistory } from "react-router-dom";
-
 import authenticationApi from "apis/authentication";
 import {
   PROFILE_PATH,
@@ -11,6 +8,8 @@ import {
 } from "components/routeConstants";
 import { useAuthDispatch } from "contexts/auth";
 import { useUserState } from "contexts/user";
+import { Sidebar as NeetoUISidebar } from "neetoui/layouts";
+import { useHistory } from "react-router-dom";
 
 import { APP_NAME, SIDENAV_LINKS } from "./constants";
 
@@ -47,12 +46,8 @@ const Sidebar = () => {
   return (
     <NeetoUISidebar
       appName={APP_NAME}
-      changelogProps={{ id: "neetochangelog-trigger" }}
+      isCollapsed={false}
       navLinks={SIDENAV_LINKS}
-      organizationInfo={{
-        name: "Wheel",
-        subdomain: "bigbinary.com",
-      }}
       profileInfo={{
         name: `${user.first_name} ${user.last_name}`,
         imageUrl: user.profile_image_path,
