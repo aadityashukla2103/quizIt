@@ -1,56 +1,71 @@
 import React, { useState, useEffect } from "react";
 
 import quizzesApi from "apis/quizzes";
-import EmptyNotesListImage from "assets/images/EmptyNotesList";
+import EmptyQuizzesListImage from "assets/images/EmptyQuizzesList";
 import EmptyState from "components/commons/EmptyState";
 import Logger from "js-logger";
-import { Delete } from "neetoicons";
-import { Button, PageLoader } from "neetoui";
-import { Container, Header, SubHeader } from "neetoui/layouts";
+import { Filter } from "neetoicons";
+import { Button, PageLoader, Pagination } from "neetoui";
+import { Container, Header } from "neetoui/layouts";
+import { useHistory, useLocation } from "react-router-dom";
 
 import DeleteAlert from "./DeleteAlert";
 import NewNotePane from "./Pane/Create";
 import Table from "./Table";
 
-const Notes = () => {
+import ColumnIcon from "../../../assets/icons/column";
+import useDebounce from "../../../hooks/useDebounce";
+
+const Quizzes = () => {
+  const history = useHistory();
+  const location = useLocation();
+
+  const queryParams = new URLSearchParams(location.search);
+  const initialQuery = queryParams.get("query") || "";
+
   const [loading, setLoading] = useState(true);
-  const [showNewNotePane, setShowNewNotePane] = useState(false);
+  const [showNewQuizPane, setShowNewQuizPane] = useState(false);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(initialQuery);
   const [selectedNoteIds, setSelectedNoteIds] = useState([]);
-  const [notes, setNotes] = useState([]);
+  const [quizzes, setQuizzes] = useState([]);
+  const [pageTitle, setPageTitle] = useState("All Quizzes");
+
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   useEffect(() => {
-    fetchNotes();
-  }, []);
+    fetchQuizzes(debouncedSearchTerm);
+    const params = new URLSearchParams();
+    if (debouncedSearchTerm) {
+      params.set("query", debouncedSearchTerm);
+    }
+    history.replace({ search: params.toString() });
+  }, [debouncedSearchTerm]);
 
-  const fetchNotes = async () => {
+  const fetchQuizzes = async (search = "") => {
     try {
       setLoading(true);
-      const { data } = await quizzesApi.fetch();
-      Logger.info("Fetched notes: ", data);
-      setNotes(data || []);
+      const { data } = await quizzesApi.fetch({ query: search });
+      Logger.info("Fetched quizzes:", data);
+      setQuizzes(data.quizzes || []);
+      setPageTitle(data.title || "All Quizzes");
     } catch (error) {
-      logger.error(error);
+      Logger.error(error);
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) {
-    return <PageLoader />;
-  }
-
   return (
-    <Container>
+    <Container isHeaderFixed className="overflow-x-auto">
       <Header
-        title="Quizzes"
+        title={pageTitle}
         actionBlock={
           <Button
             icon="ri-add-line"
-            label="Add new note"
+            label="Add new quiz"
             size="small"
-            onClick={() => setShowNewNotePane(true)}
+            onClick={() => setShowNewQuizPane(true)}
           />
         }
         searchProps={{
@@ -58,42 +73,50 @@ const Notes = () => {
           onChange: e => setSearchTerm(e.target.value),
         }}
       />
-      {notes.length ? (
+      {loading && <PageLoader />}
+      {quizzes.length ? (
         <>
-          <SubHeader
-            rightActionBlock={
-              <Button
-                disabled={!selectedNoteIds.length}
-                icon={Delete}
-                label="Delete"
-                size="small"
-                onClick={() => setShowDeleteAlert(true)}
-              />
+          <Header
+            title={`${quizzes.length} quizzes`}
+            actionBlock={
+              <div className="flex">
+                <ColumnIcon height={20} width={30} />
+                <Filter className="ml-2" size={20} />
+              </div>
             }
           />
-          <Table
-            fetchNotes={fetchNotes}
-            notes={notes}
-            selectedNoteIds={selectedNoteIds}
-            setSelectedNoteIds={setSelectedNoteIds}
-          />
+          <div className="w-full overflow-x-auto">
+            <Table
+              fetchQuizzes={fetchQuizzes}
+              quizzes={quizzes}
+              selectedNoteIds={selectedNoteIds}
+              setSelectedNoteIds={setSelectedNoteIds}
+            />
+          </div>
+          <div className="p-4">
+            <Pagination
+              count={500}
+              navigate={() => {}}
+              pageNo={3}
+              pageSize={100}
+            />
+          </div>
         </>
       ) : (
         <EmptyState
-          image={<EmptyNotesListImage />}
-          primaryAction={() => setShowNewNotePane(true)}
-          primaryActionLabel="Add new note"
-          title="Looks like you don't have any notes!"
+          image={<EmptyQuizzesListImage />}
+          primaryActionLabel="Add new quiz"
+          title="No quiz found!"
         />
       )}
       <NewNotePane
-        fetchNotes={fetchNotes}
-        setShowPane={setShowNewNotePane}
-        showPane={showNewNotePane}
+        fetchQuizzes={fetchQuizzes}
+        setShowPane={setShowNewQuizPane}
+        showPane={showNewQuizPane}
       />
       {showDeleteAlert && (
         <DeleteAlert
-          refetch={fetchNotes}
+          refetch={fetchQuizzes}
           selectedNoteIds={selectedNoteIds}
           setSelectedNoteIds={setSelectedNoteIds}
           onClose={() => setShowDeleteAlert(false)}
@@ -103,4 +126,4 @@ const Notes = () => {
   );
 };
 
-export default Notes;
+export default Quizzes;

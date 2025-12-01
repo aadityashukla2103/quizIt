@@ -7,24 +7,18 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
-# Create one organization
-org = Organization.create!(
-  name: "Main Organization"
-)
+puts "Creating default organization..."
+organization = Organization.find_or_create_by!(name: "Default Organization")
+puts "Organization ready: #{organization.name}"
 
-# Create one category
-cat = Category.create!(
-  name: "General Category"
-)
-
-# Create 15 quizzes
-15.times do |i|
-  Quiz.create!(
-    name: "Quiz #{i + 1}",
-    status: 0,
-    organization_id: org.id,
-    category_id: cat.id
-  )
+puts "Creating default user..."
+User.find_or_create_by!(email: "oliver@example.com") do |u|
+  u.password = "welcome"
+  u.password_confirmation = "welcome"
+  u.first_name = "Oliver"
+  u.last_name = "Smith"
+  u.role = "admin"
+  u.organization = organization
 end
 
-puts "✔ 15 quizzes created!"
+puts "User created!"

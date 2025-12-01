@@ -37,11 +37,4 @@ export const NOTES_TABLE_COLUMN_DATA = [
     key: "submission_count",
     width: "20%",
   },
-  // {
-  //     title: "Actions",
-  //     dataIndex: "actions",
-  //     key: "actions",
-  //     width: "10%",
-  //     render:()=>(<Tag label="View Submissions" />  ),
-  // }
 ];

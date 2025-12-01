@@ -5,14 +5,19 @@ class Api::V1::QuizzesController < Api::V1::BaseController
   before_action :set_quiz, only: [:show, :update, :destroy]
 
   def index
-    quizzes = Quiz.includes(:category, :submissions).all
+    quizzes = Quiz.includes(:category, :submissions)
+    if params[:query].present?
+      search_term = "%#{params[:query]}%"
+      quizzes = quizzes.where("quizzes.name ILIKE ?", search_term)
+    end
     quizzes_data = quizzes.map do |quiz|
       quiz.as_json.merge(
         category_name: quiz.category&.name,
         submission_count: quiz.submissions.count
       )
     end
-    render_json(quizzes_data)
+    title = params[:query].present? ? "Results for \"#{params[:query]}\"" : "All Quizzes"
+    render json: { quizzes: quizzes_data, title: title }
   end
 
   def show
