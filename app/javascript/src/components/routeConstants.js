@@ -2,11 +2,11 @@ import Login from "components/Authentication/Login";
 import PasswordReset from "components/Authentication/ResetPassword";
 import Signup from "components/Authentication/Signup";
 import Dashboard from "components/Dashboard";
-import Quizzes from "components/Dashboard/Notes";
+import Quizzes from "components/Dashboard/Quizzes";
 import Settings from "components/Dashboard/Settings";
 
 export const DASHBOARD_PATH = "/";
-export const NOTES_PATH = "/notes";
+export const NOTES_PATH = "/quizzes";
 export const CHANGE_PASSWORD_PATH = "/settings?tab=password";
 export const PROFILE_PATH = "/settings?tab=profile";
 export const SETTINGS_PATH = "/settings";

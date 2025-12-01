@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 
-import { Alert } from "neetoui";
-
 import notesApi from "apis/notes";
+import { Alert } from "neetoui";
 
 const DeleteAlert = ({
   refetch,

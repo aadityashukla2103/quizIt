@@ -5,8 +5,14 @@ class Api::V1::QuizzesController < Api::V1::BaseController
   before_action :set_quiz, only: [:show, :update, :destroy]
 
   def index
-    quizzes = Quiz.all
-    render_json(quizzes)
+    quizzes = Quiz.includes(:category, :submissions).all
+    quizzes_data = quizzes.map do |quiz|
+      quiz.as_json.merge(
+        category_name: quiz.category&.name,
+        submission_count: quiz.submissions.count
+      )
+    end
+    render_json(quizzes_data)
   end
 
   def show

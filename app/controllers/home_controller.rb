@@ -2,6 +2,9 @@
 
 class HomeController < ApplicationController
   def index
-    render
-  end
+    respond_to do |format|
+      format.html
+      format.any { head :ok }
+    end
+end
 end

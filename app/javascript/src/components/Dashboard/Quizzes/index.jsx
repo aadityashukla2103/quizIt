@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 
-import notesApi from "apis/notes";
+import quizzesApi from "apis/quizzes";
 import EmptyNotesListImage from "assets/images/EmptyNotesList";
 import EmptyState from "components/commons/EmptyState";
+import Logger from "js-logger";
 import { Delete } from "neetoicons";
 import { Button, PageLoader } from "neetoui";
 import { Container, Header, SubHeader } from "neetoui/layouts";
@@ -26,10 +27,9 @@ const Notes = () => {
   const fetchNotes = async () => {
     try {
       setLoading(true);
-      const {
-        data: { notes },
-      } = await notesApi.fetch();
-      setNotes(notes);
+      const { data } = await quizzesApi.fetch();
+      Logger.info("Fetched notes: ", data);
+      setNotes(data || []);
     } catch (error) {
       logger.error(error);
     } finally {
@@ -44,7 +44,7 @@ const Notes = () => {
   return (
     <Container>
       <Header
-        title="Notes"
+        title="Quizzes"
         actionBlock={
           <Button
             icon="ri-add-line"
@@ -83,7 +83,6 @@ const Notes = () => {
           image={<EmptyNotesListImage />}
           primaryAction={() => setShowNewNotePane(true)}
           primaryActionLabel="Add new note"
-          subtitle="Add your notes to send customized emails to them."
           title="Looks like you don't have any notes!"
         />
       )}

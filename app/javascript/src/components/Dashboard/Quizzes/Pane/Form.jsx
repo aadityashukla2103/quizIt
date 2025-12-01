@@ -1,10 +1,9 @@
 import React from "react";
 
+import notesApi from "apis/notes";
 import { Formik, Form as FormikForm } from "formik";
 import { Pane } from "neetoui";
 import { ActionBlock, Input, Textarea } from "neetoui/formik";
-
-import notesApi from "apis/notes";
 
 import { NOTES_FORM_VALIDATION_SCHEMA } from "../constants";
 
