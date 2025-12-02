@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 
-import quizzesApi from "apis/quizzes";
 import EmptyQuizzesListImage from "assets/images/EmptyQuizzesList";
 import EmptyState from "components/commons/EmptyState";
-import Logger from "js-logger";
+import { useQuizzes } from "contexts/QuizzesContext";
 import { Filter } from "neetoicons";
 import { Button, PageLoader, Pagination } from "neetoui";
 import { Container, Header } from "neetoui/layouts";
@@ -19,17 +18,14 @@ import useDebounce from "../../../hooks/useDebounce";
 const Quizzes = () => {
   const history = useHistory();
   const location = useLocation();
-
   const queryParams = new URLSearchParams(location.search);
   const initialQuery = queryParams.get("query") || "";
 
-  const [loading, setLoading] = useState(true);
+  const { quizzes, fetchQuizzes, loading, pageTitle } = useQuizzes();
   const [showNewQuizPane, setShowNewQuizPane] = useState(false);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [searchTerm, setSearchTerm] = useState(initialQuery);
   const [selectedNoteIds, setSelectedNoteIds] = useState([]);
-  const [quizzes, setQuizzes] = useState([]);
-  const [pageTitle, setPageTitle] = useState("All Quizzes");
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -41,20 +37,6 @@ const Quizzes = () => {
     }
     history.replace({ search: params.toString() });
   }, [debouncedSearchTerm]);
-
-  const fetchQuizzes = async (search = "") => {
-    try {
-      setLoading(true);
-      const { data } = await quizzesApi.fetch({ query: search });
-      Logger.info("Fetched quizzes:", data);
-      setQuizzes(data.quizzes || []);
-      setPageTitle(data.title || "All Quizzes");
-    } catch (error) {
-      Logger.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <Container isHeaderFixed className="overflow-x-auto">

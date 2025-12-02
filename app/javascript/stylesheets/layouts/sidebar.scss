@@ -1,4 +1,4 @@
-$sidebar-width: 72px;
+$sidebar-width: 70px !important;
 
 .nh-sidebar {
   display: flex;
@@ -17,6 +17,6 @@ $sidebar-width: 72px;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  border-bottom: thin solid theme("colors.gray.300");
+  border-bottom: thin solid theme("colors.gray.600");
   padding: 8px 12px;
 }

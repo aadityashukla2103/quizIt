@@ -1,61 +1,46 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 
-import authenticationApi from "apis/authentication";
-import {
-  PROFILE_PATH,
-  CHANGE_PASSWORD_PATH,
-  LOGIN_PATH,
-} from "components/routeConstants";
-import { useAuthDispatch } from "contexts/auth";
-import { useUserState } from "contexts/user";
-import { Sidebar as NeetoUISidebar } from "neetoui/layouts";
-import { useHistory } from "react-router-dom";
+import NewSidebar from "./NewSidebar";
+import OldSidebar from "./OldSidebar";
 
-import { APP_NAME, SIDENAV_LINKS } from "./constants";
+const SIDEBAR_TRIGGERS = ["Notes", "Settings", "Explore"];
 
-const Sidebar = () => {
-  const history = useHistory();
-  const authDispatch = useAuthDispatch();
-  const { user } = useUserState();
+const SidebarWrapper = () => {
+  const [activeSidebar, setActiveSidebar] = useState("old");
+  const wrapperRef = useRef();
 
-  const handleLogout = async () => {
-    try {
-      await authenticationApi.logout();
-      authDispatch({ type: "LOGOUT" });
-      window.location.href = LOGIN_PATH;
-    } catch (error) {
-      logger.error(error);
+  useEffect(() => {
+    const handleClickOutside = event => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        setActiveSidebar("old");
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleNavClick = label => {
+    if (SIDEBAR_TRIGGERS.includes(label)) {
+      setActiveSidebar("new");
+    } else {
+      setActiveSidebar("old");
     }
   };
 
-  const bottomLinks = [
-    {
-      label: "My profile",
-      onClick: () => history.push(PROFILE_PATH, { resetTab: true }),
-    },
-    {
-      label: "Change password",
-      onClick: () => history.push(CHANGE_PASSWORD_PATH, { resetTab: true }),
-    },
-    {
-      label: "Logout",
-      onClick: handleLogout,
-    },
-  ];
-
   return (
-    <NeetoUISidebar
-      appName={APP_NAME}
-      isCollapsed={false}
-      navLinks={SIDENAV_LINKS}
-      profileInfo={{
-        name: `${user.first_name} ${user.last_name}`,
-        imageUrl: user.profile_image_path,
-        email: user.email,
-        bottomLinks,
-      }}
-    />
+    <div className="flex">
+      <div style={{ display: activeSidebar === "old" ? "block" : "none" }}>
+        <OldSidebar onNavClick={handleNavClick} />
+      </div>
+      <div
+        ref={wrapperRef}
+        style={{ display: activeSidebar === "new" ? "block" : "none" }}
+      >
+        <NewSidebar onNavClick={handleNavClick} />
+      </div>
+    </div>
   );
 };
 
-export default Sidebar;
+export default React.memo(SidebarWrapper);
