@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const fetch = params => axios.get("api/v1/quizzes", { params });
-const create = payload => axios.post("api/v1/quizzes", payload);
+const create = payload => axios.post("api/v1/quizzes", { quiz: payload });
 const update = (id, payload) => axios.put(`api/v1/quizzes/${id}`, payload);
 const destroy = payload => axios.post("api/v1/quizzes/bulk_destroy", payload);
 

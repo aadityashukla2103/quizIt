@@ -12,6 +12,7 @@ class Api::V1::UsersController < Api::V1::BaseController
 
   def create
     user = User.create!(user_params)
+    user.role = "admin"
     render_message(
       t("signup_successful"),
       :ok,

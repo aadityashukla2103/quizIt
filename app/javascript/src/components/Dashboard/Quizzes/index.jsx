@@ -9,7 +9,7 @@ import { Container, Header } from "neetoui/layouts";
 import { useHistory, useLocation } from "react-router-dom";
 
 import DeleteAlert from "./DeleteAlert";
-import NewNotePane from "./Pane/Create";
+import NewQuizPane from "./Pane/Create";
 import Table from "./Table";
 
 import ColumnIcon from "../../../assets/icons/column";
@@ -91,7 +91,7 @@ const Quizzes = () => {
           title="No quiz found!"
         />
       )}
-      <NewNotePane
+      <NewQuizPane
         fetchQuizzes={fetchQuizzes}
         setShowPane={setShowNewQuizPane}
         showPane={showNewQuizPane}
