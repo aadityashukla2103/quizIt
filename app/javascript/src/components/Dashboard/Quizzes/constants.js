@@ -1,15 +1,13 @@
 import * as yup from "yup";
 
-export const NOTES_FORM_INITIAL_FORM_VALUES = {
+export const QUIZZES_FORM_INITIAL_FORM_VALUES = {
   name: "",
-  status: "",
-  category_id: "",
+  category: "",
 };
 
-export const NOTES_FORM_VALIDATION_SCHEMA = yup.object().shape({
+export const QUIZZES_FORM_VALIDATION_SCHEMA = yup.object().shape({
   name: yup.string().required("Name is required"),
-  status: yup.string().required("Status is required"),
-  category_id: yup.string().required("Category is required"),
+  category: yup.string().required("Category is required"),
 });
 
 export const NOTES_TABLE_COLUMN_DATA = [

@@ -1,16 +1,19 @@
 # frozen_string_literal: true
 
 class Api::V1::QuizzesController < Api::V1::BaseController
-  before_action :ensure_current_user_is_superadmin!, only: [:create, :update, :destroy]
+  before_action :ensure_current_user_is_admin!, only: [:create, :update, :destroy]
   before_action :set_quiz, only: [:show, :update, :destroy]
 
   def index
     quizzes = Quiz.includes(:category, :submissions)
+      .where(organization_id: @current_user.organization_id)
 
     if params[:query].present?
       search_term = "%#{params[:query]}%"
       quizzes = quizzes.where("quizzes.name ILIKE ?", search_term)
     end
+
+    quizzes = quizzes.order(created_at: :desc)
 
     if params[:status].present? && params[:status] != "all"
       quizzes = quizzes.where(status: params[:status])
@@ -26,9 +29,9 @@ class Api::V1::QuizzesController < Api::V1::BaseController
     render json: {
       quizzes: quizzes_data,
       title: params[:query].present? ? "Results for \"#{params[:query]}\"" : "All Quizzes",
-      total_quiz_count: Quiz.count,
-      total_published_quiz_count: Quiz.where(status: "published").count,
-      total_draft_quiz_count: Quiz.where(status: "draft").count
+      total_quiz_count: Quiz.where(organization_id: @current_user.organization_id).count,
+      total_published_quiz_count: Quiz.where(organization_id: @current_user.organization_id, status: "published").count,
+      total_draft_quiz_count: Quiz.where(organization_id: @current_user.organization_id, status: "draft").count
     }
   end
 
@@ -38,6 +41,8 @@ class Api::V1::QuizzesController < Api::V1::BaseController
 
   def create
     quiz = Quiz.new(quiz_params)
+    quiz.organization_id = @current_user.organization_id
+    quiz.status = "draft" # default status
 
     if quiz.save
       render_json(quiz, :created)
@@ -47,7 +52,9 @@ class Api::V1::QuizzesController < Api::V1::BaseController
   end
 
   def update
-    if @quiz.update(quiz_params)
+    safe_params = quiz_params
+
+    if @quiz.update(safe_params)
       render_json(@quiz)
     else
       render json: { errors: @quiz.errors.full_messages }, status: :unprocessable_entity
@@ -66,14 +73,14 @@ class Api::V1::QuizzesController < Api::V1::BaseController
     end
 
     def quiz_params
-      params.require(:quiz).permit(:name, :status, :organization_id, :category_id)
+      params.require(:quiz).permit(:name, :category_id)
     end
 
-    def ensure_current_user_is_superadmin!
+    def ensure_current_user_is_admin!
       user_email = request.headers["X-Auth-Email"].presence
-      user = user_email && User.find_by(email: user_email)
+      @current_user = user_email && User.find_by(email: user_email)
 
-      unless user&.super_admin?
+      unless @current_user&.admin?
         render_error("Unauthorized Access!", :forbidden)
         nil
       end

@@ -10,6 +10,7 @@ const signup = ({
   lastName: last_name,
   password,
   passwordConfirmation: password_confirmation,
+  organizationId: organization_id,
 }) =>
   axios.post("api/v1/users", {
     user: {
@@ -18,6 +19,7 @@ const signup = ({
       last_name,
       password,
       password_confirmation,
+      organization_id,
     },
   });
 

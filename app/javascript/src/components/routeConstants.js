@@ -6,7 +6,7 @@ import Quizzes from "components/Dashboard/Quizzes";
 import Settings from "components/Dashboard/Settings";
 
 export const DASHBOARD_PATH = "/";
-export const NOTES_PATH = "/quizzes";
+export const QUIZZES_PATH = "/quizzes";
 export const CHANGE_PASSWORD_PATH = "/settings?tab=password";
 export const PROFILE_PATH = "/settings?tab=profile";
 export const SETTINGS_PATH = "/settings";
@@ -33,7 +33,7 @@ export const PRIVATE_ROUTES = [{ path: DASHBOARD_PATH, component: Dashboard }];
 
 export const DASHBOARD_ROUTES = [
   {
-    path: NOTES_PATH,
+    path: QUIZZES_PATH,
     component: Quizzes,
   },
   {

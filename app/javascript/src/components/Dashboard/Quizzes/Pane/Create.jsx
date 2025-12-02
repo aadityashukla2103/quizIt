@@ -4,22 +4,21 @@ import { Pane, Typography } from "neetoui";
 
 import Form from "./Form";
 
-import { NOTES_FORM_INITIAL_FORM_VALUES } from "../constants";
+import { QUIZZES_FORM_INITIAL_FORM_VALUES } from "../constants";
 
-const Create = ({ fetchNotes, showPane, setShowPane }) => {
+const Create = ({ fetchQuizzes, showPane, setShowPane }) => {
   const onClose = () => setShowPane(false);
 
   return (
     <Pane isOpen={showPane} onClose={onClose}>
       <Pane.Header>
         <Typography style="h2" weight="semibold">
-          Create a new note
+          Create a new quiz
         </Typography>
       </Pane.Header>
       <Form
-        isEdit={false}
-        note={NOTES_FORM_INITIAL_FORM_VALUES}
-        refetch={fetchNotes}
+        quiz={QUIZZES_FORM_INITIAL_FORM_VALUES}
+        refetchQuizzes={fetchQuizzes}
         onClose={onClose}
       />
     </Pane>

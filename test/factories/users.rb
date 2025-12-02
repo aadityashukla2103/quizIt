@@ -11,7 +11,7 @@ FactoryBot.define do
     password_confirmation { "welcome" }
 
     trait :admin do
-      role { "super_admin" }
+      role { "admin" }
     end
   end
 end

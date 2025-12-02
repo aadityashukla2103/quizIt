@@ -8,7 +8,7 @@ class UserTest < ActiveSupport::TestCase
   end
 
   def test_admin_is_indeed_super_admin
-    assert @user.super_admin?
+    assert @user.admin?
   end
 
   def test_email_cannot_be_blank

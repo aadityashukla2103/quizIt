@@ -19,8 +19,8 @@ class User < ApplicationRecord
     [first_name, last_name].join(" ").strip
   end
 
-  def super_admin?
-    role == "super_admin"
+  def admin?
+    role == "admin"
   end
 
   def as_json(options = {})

@@ -7,6 +7,6 @@ class Quiz < ApplicationRecord
   has_many :questions, dependent: :destroy
   belongs_to :organization
 
-  validates :name, presence: true
+  validates :name, presence: true, uniqueness: { scope: :organization_id }
   validates :status, presence: true
 end

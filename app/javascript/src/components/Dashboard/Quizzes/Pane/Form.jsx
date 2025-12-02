@@ -1,60 +1,85 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-import notesApi from "apis/notes";
+import categoriesApi from "apis/categories";
+import quizzesApi from "apis/quizzes";
 import { Formik, Form as FormikForm } from "formik";
 import { Pane } from "neetoui";
-import { ActionBlock, Input, Textarea } from "neetoui/formik";
+import { ActionBlock, Input, Select } from "neetoui/formik";
+import { useHistory } from "react-router-dom";
 
-import { NOTES_FORM_VALIDATION_SCHEMA } from "../constants";
+import { QUIZZES_FORM_VALIDATION_SCHEMA } from "../constants";
 
-const Form = ({ onClose, refetch, note, isEdit }) => {
-  const handleSubmit = async values => {
+const Form = ({ refetchQuizzes, onClose, quiz }) => {
+  const [categories, setCategories] = useState([]);
+  const history = useHistory();
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const data = await categoriesApi.fetch();
+      setCategories(data);
+    };
+    fetchCategories();
+  }, []);
+
+  const options = categories.map(category => ({
+    label: category.name,
+    value: category.id,
+  }));
+
+  const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      if (isEdit) {
-        await notesApi.update(note.id, values);
-      } else {
-        await notesApi.create(values);
-      }
-      refetch();
+      const payload = {
+        ...values,
+        category_id: values.category,
+        status: "draft",
+      };
+      await quizzesApi.create(payload);
+      await refetchQuizzes();
+      history.push("/quizzes");
       onClose();
     } catch (err) {
       logger.error(err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
     <Formik
-      initialValues={note}
-      validationSchema={NOTES_FORM_VALIDATION_SCHEMA}
+      initialValues={quiz}
+      validationSchema={QUIZZES_FORM_VALIDATION_SCHEMA}
       onSubmit={handleSubmit}
     >
-      <FormikForm className="w-full">
-        <Pane.Body className="space-y-6">
-          <Input
-            required
-            className="w-full flex-grow-0"
-            label="Title"
-            name="title"
-          />
-          <Textarea
-            required
-            className="w-full flex-grow-0"
-            label="Description"
-            name="description"
-            rows={8}
-          />
-        </Pane.Body>
-        <Pane.Footer>
-          <ActionBlock
-            cancelButtonProps={{
-              onClick: onClose,
-            }}
-            submitButtonProps={{
-              className: "mr-3",
-            }}
-          />
-        </Pane.Footer>
-      </FormikForm>
+      {({ setFieldValue }) => (
+        <FormikForm className="w-full">
+          <Pane.Body className="space-y-6">
+            <Input
+              required
+              className="w-full flex-grow-0"
+              label="Name"
+              name="name"
+            />
+            <Select
+              required
+              className="w-full flex-grow-0"
+              label="Category"
+              name="category"
+              options={options}
+              placeholder="Select Category"
+              onChange={option => setFieldValue("category", option.value)}
+            />
+          </Pane.Body>
+          <Pane.Footer>
+            <ActionBlock
+              cancelButtonProps={{ onClick: onClose }}
+              submitButtonProps={{
+                className: "mr-3",
+                label: "Create Quiz",
+              }}
+            />
+          </Pane.Footer>
+        </FormikForm>
+      )}
     </Formik>
   );
 };
