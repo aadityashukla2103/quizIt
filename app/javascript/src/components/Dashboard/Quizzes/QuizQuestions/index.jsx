@@ -6,7 +6,7 @@ import InlineEdit from "components/commons/InlineEdit";
 import { LeftArrow } from "neetoicons";
 import { Button, PageLoader, Typography, Tab, NoData } from "neetoui";
 import { SubHeader } from "neetoui/layouts";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useHistory, Link } from "react-router-dom";
 
 const QuizShow = () => {
   const { id: quizId } = useParams();
@@ -46,10 +46,6 @@ const QuizShow = () => {
     }
   };
 
-  const handleAddQuestion = () => {
-    window.location.href = `/quizzes/${quizId}/questions/new`;
-  };
-
   useEffect(() => {
     fetchQuiz();
     fetchQuestions();
@@ -79,7 +75,9 @@ const QuizShow = () => {
       <SubHeader
         className="p-4"
         rightActionBlock={
-          <Button primary label="Add Question" onClick={handleAddQuestion} />
+          <Link to={`/quizzes/${quizId}/questions/new`}>
+            <Button primary label="Add Question" />
+          </Link>
         }
       />
       {questions.length === 0 ? (
