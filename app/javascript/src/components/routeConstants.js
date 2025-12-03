@@ -3,10 +3,12 @@ import PasswordReset from "components/Authentication/ResetPassword";
 import Signup from "components/Authentication/Signup";
 import Dashboard from "components/Dashboard";
 import Quizzes from "components/Dashboard/Quizzes";
+import QuizQuestions from "components/Dashboard/Quizzes/QuizQuestions";
 import Settings from "components/Dashboard/Settings";
 
 export const DASHBOARD_PATH = "/";
 export const QUIZZES_PATH = "/quizzes";
+export const QUIZ_QUESTIONS_PATH = "/quizzes/:id/questions";
 export const CHANGE_PASSWORD_PATH = "/settings?tab=password";
 export const PROFILE_PATH = "/settings?tab=profile";
 export const SETTINGS_PATH = "/settings";
@@ -39,5 +41,9 @@ export const DASHBOARD_ROUTES = [
   {
     path: SETTINGS_PATH,
     component: Settings,
+  },
+  {
+    path: QUIZ_QUESTIONS_PATH,
+    component: QuizQuestions,
   },
 ];
