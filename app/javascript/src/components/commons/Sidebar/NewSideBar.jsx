@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 
 import authenticationApi from "apis/authentication";
 import { LOGIN_PATH } from "components/routeConstants";
@@ -13,17 +13,20 @@ const NewSidebar = () => {
   const authDispatch = useAuthDispatch();
   const { fetchQuizzes, totalQuizCount, totalPublishedCount, totalDraftCount } =
     useQuizzes();
-
-  const [activeFilter, setActiveFilter] = useState("all");
   const history = useHistory();
 
-  const handleFilter = status => {
-    setActiveFilter(status);
-    fetchQuizzes("", status);
-    history.push("/quizzes");
-  };
+  const [activeFilter, setActiveFilter] = useState("all");
 
-  const handleLogout = async () => {
+  const handleFilter = useCallback(
+    status => {
+      setActiveFilter(status);
+      fetchQuizzes("", status);
+      history.push("/quizzes");
+    },
+    [fetchQuizzes, history]
+  );
+
+  const handleLogout = useCallback(async () => {
     try {
       await authenticationApi.logout();
       authDispatch({ type: "LOGOUT" });
@@ -31,7 +34,7 @@ const NewSidebar = () => {
     } catch (err) {
       logger.error(err);
     }
-  };
+  }, [authDispatch]);
 
   return (
     <aside className="flex h-full w-64 flex-col justify-between border-r border-gray-200 bg-white px-4 py-6">

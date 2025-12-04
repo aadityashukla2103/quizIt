@@ -13,8 +13,14 @@
       end
 
       def create
-        question = @quiz.questions.build(question_params)
+        question = @quiz.questions.build(content: question_params[:content])
+
         if question.save
+          if question_params[:options]
+            question_params[:options].each do |opt|
+              question.options.create(content: opt[:content], is_correct: opt[:isCorrect])
+            end
+          end
           render json: question, status: :created
         else
           render json: { errors: question.errors.full_messages }, status: :unprocessable_entity
@@ -45,6 +51,6 @@
         end
 
         def question_params
-          params.require(:question).permit(:content, :position)
+          params.require(:question).permit(:content, options: [:content, :isCorrect])
         end
     end

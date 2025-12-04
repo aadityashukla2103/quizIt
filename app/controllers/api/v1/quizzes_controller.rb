@@ -36,7 +36,8 @@ class Api::V1::QuizzesController < Api::V1::BaseController
   end
 
   def show
-    render_json(@quiz)
+    @quiz = Quiz.includes(:questions).find(params[:id])
+    render json: @quiz, include: :questions
   end
 
   def create
