@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 
 import NewSidebar from "./NewSidebar";
 import OldSidebar from "./OldSidebar";
@@ -20,25 +20,22 @@ const SidebarWrapper = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleNavClick = label => {
+  const handleNavClick = useCallback(label => {
     if (SIDEBAR_TRIGGERS.includes(label)) {
       setActiveSidebar("new");
     } else {
       setActiveSidebar("old");
     }
-  };
+  }, []);
 
   return (
     <div className="flex">
-      <div style={{ display: activeSidebar === "old" ? "block" : "none" }}>
-        <OldSidebar onNavClick={handleNavClick} />
-      </div>
-      <div
-        ref={wrapperRef}
-        style={{ display: activeSidebar === "new" ? "block" : "none" }}
-      >
-        <NewSidebar onNavClick={handleNavClick} />
-      </div>
+      {activeSidebar === "old" && <OldSidebar onNavClick={handleNavClick} />}
+      {activeSidebar === "new" && (
+        <div ref={wrapperRef}>
+          <NewSidebar onNavClick={handleNavClick} />
+        </div>
+      )}
     </div>
   );
 };

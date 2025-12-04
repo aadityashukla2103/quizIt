@@ -3,7 +3,7 @@
     "editor.autoClosingBrackets": "beforeWhitespace",
     "editor.semanticHighlighting.enabled": true,
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "Shopify.ruby-lsp"
+    "editor.defaultFormatter": "rubocop.vscode-rubocop"
   },
   "files.trimTrailingWhitespace": true,
   "files.trimFinalNewlines": true,
