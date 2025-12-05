@@ -3,21 +3,36 @@
 class Api::V1::QuizzesController < Api::V1::BaseController
   before_action :ensure_current_user_is_admin!, only: [:create, :update, :destroy]
   before_action :set_quiz, only: [:show, :update, :destroy]
-
   def index
     quizzes = Quiz.includes(:category, :submissions)
       .where(organization_id: @current_user.organization_id)
 
     if params[:query].present?
-      search_term = "%#{params[:query]}%"
+      search_term = "%#{params[:query].strip}%"
       quizzes = quizzes.where("quizzes.name ILIKE ?", search_term)
     end
 
+    if params[:status].present? && params[:status] != "all"
+      allowed_statuses = %w[draft published]
+      if allowed_statuses.include?(params[:status])
+        quizzes = quizzes.where(status: params[:status])
+      end
+    end
+
+    total_count = quizzes.count
+    total_published_count = Quiz.where(
+      organization_id: @current_user.organization_id, status: "published"
+    ).count
+    total_draft_count = Quiz.where(
+      organization_id: @current_user.organization_id, status: "draft"
+    ).count
+
     quizzes = quizzes.order(created_at: :desc)
 
-    if params[:status].present? && params[:status] != "all"
-      quizzes = quizzes.where(status: params[:status])
-    end
+    page = params[:page].to_i > 0 ? params[:page].to_i : 1
+    page_size = params[:pageSize].to_i > 0 ? params[:pageSize].to_i : 10
+
+    quizzes = quizzes.offset((page - 1) * page_size).limit(page_size)
 
     quizzes_data = quizzes.map do |quiz|
       quiz.as_json.merge(
@@ -26,12 +41,23 @@ class Api::V1::QuizzesController < Api::V1::BaseController
       )
     end
 
+    # Optional title based on status
+    title =
+      case params[:status]
+      when "published" then "Published Quizzes"
+      when "draft" then "Draft Quizzes"
+      else "All Quizzes"
+      end
+
+    # Return paginated response with extra counts
     render json: {
       quizzes: quizzes_data,
-      title: params[:query].present? ? "Results for \"#{params[:query]}\"" : "All Quizzes",
-      total_quiz_count: Quiz.where(organization_id: @current_user.organization_id).count,
-      total_published_quiz_count: Quiz.where(organization_id: @current_user.organization_id, status: "published").count,
-      total_draft_quiz_count: Quiz.where(organization_id: @current_user.organization_id, status: "draft").count
+      totalCount: total_count,
+      total_published_quiz_count: total_published_count,
+      total_draft_quiz_count: total_draft_count,
+      page: page,
+      pageSize: page_size,
+      title: title
     }
   end
 
@@ -62,7 +88,7 @@ end
   def create
     quiz = Quiz.new(quiz_params)
     quiz.organization_id = @current_user.organization_id
-    quiz.status = "draft" # default status
+    quiz.status = "draft"
 
     if quiz.save
       render_json(quiz, :created)
@@ -85,6 +111,22 @@ end
     @quiz.destroy
     head :no_content
   end
+
+  def clone
+    original_quiz = Quiz.find(params[:id])
+    cloned_quiz = original_quiz.clone_with_questions!
+
+    render json: {
+      id: cloned_quiz.id,
+      name: cloned_quiz.name,
+      status: cloned_quiz.status,
+      category_name: cloned_quiz.category&.name,
+      created_at: cloned_quiz.created_at,
+      submission_count: 0
+    }, status: :created
+  rescue ActiveRecord::RecordInvalid => e
+    render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
+ end
 
   private
 
