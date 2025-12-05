@@ -35,7 +35,8 @@ const InlineEdit = ({ value, onSave }) => {
         />
       ) : (
         <span
-          className="inline-flex cursor-pointer items-center rounded px-2 text-xl font-semibold"
+          className="inline-flex max-w-[300px] cursor-pointer items-center truncate rounded px-2 text-xl font-semibold"
+          title={text}
           style={{
             height: "32px",
             lineHeight: "32px",

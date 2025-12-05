@@ -11,19 +11,25 @@ import { useHistory } from "react-router-dom";
 const NewSidebar = () => {
   const { user } = useUserState();
   const authDispatch = useAuthDispatch();
-  const { fetchQuizzes, totalQuizCount, totalPublishedCount, totalDraftCount } =
-    useQuizzes();
+  const {
+    fetchQuizzes,
+    totalQuizCount,
+    totalPublishedCount,
+    totalDraftCount,
+    setStatus,
+  } = useQuizzes();
   const history = useHistory();
 
   const [activeFilter, setActiveFilter] = useState("all");
 
   const handleFilter = useCallback(
-    status => {
+    async status => {
       setActiveFilter(status);
-      fetchQuizzes("", status);
+      setStatus(status);
+      await fetchQuizzes("", 1, 10, status);
       history.push("/quizzes");
     },
-    [fetchQuizzes, history]
+    [fetchQuizzes, history, setStatus]
   );
 
   const handleLogout = useCallback(async () => {

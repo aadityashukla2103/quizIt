@@ -4,7 +4,7 @@ import EmptyQuizzesListImage from "assets/images/EmptyQuizzesList";
 import EmptyState from "components/commons/EmptyState";
 import { useQuizzes } from "contexts/QuizzesContext";
 import { Filter } from "neetoicons";
-import { Button, PageLoader, Pagination } from "neetoui";
+import { Button, PageLoader } from "neetoui";
 import { Container, Header } from "neetoui/layouts";
 import { useHistory, useLocation } from "react-router-dom";
 
@@ -21,22 +21,40 @@ const Quizzes = () => {
   const queryParams = new URLSearchParams(location.search);
   const initialQuery = queryParams.get("query") || "";
 
-  const { quizzes, fetchQuizzes, loading, pageTitle } = useQuizzes();
+  const {
+    quizzes,
+    fetchQuizzes,
+    loading,
+    pageTitle,
+    setQuizzes,
+    totalQuizCount,
+    status,
+  } = useQuizzes();
+
   const [showNewQuizPane, setShowNewQuizPane] = useState(false);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [searchTerm, setSearchTerm] = useState(initialQuery);
   const [selectedNoteIds, setSelectedNoteIds] = useState([]);
-
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
   useEffect(() => {
-    fetchQuizzes(debouncedSearchTerm);
+    fetchQuizzes(debouncedSearchTerm, page, pageSize, status);
+
     const params = new URLSearchParams();
-    if (debouncedSearchTerm) {
-      params.set("query", debouncedSearchTerm);
-    }
+    if (debouncedSearchTerm) params.set("query", debouncedSearchTerm);
+    params.set("status", status);
+    params.set("page", page);
+    params.set("pageSize", pageSize);
     history.replace({ search: params.toString() });
-  }, [debouncedSearchTerm]);
+  }, [debouncedSearchTerm, page, pageSize, status]);
+
+  const handlePageChange = (newPage, newPageSize) => {
+    setPage(newPage);
+    setPageSize(newPageSize);
+  };
 
   return (
     <Container isHeaderFixed className="overflow-x-auto">
@@ -69,18 +87,15 @@ const Quizzes = () => {
           />
           <div className="w-full overflow-x-auto">
             <Table
-              fetchQuizzes={fetchQuizzes}
+              currentPageNumber={page}
+              defaultPageSize={pageSize}
+              handlePageChange={handlePageChange}
+              loading={loading}
               quizzes={quizzes}
               selectedNoteIds={selectedNoteIds}
+              setQuizzes={setQuizzes}
               setSelectedNoteIds={setSelectedNoteIds}
-            />
-          </div>
-          <div className="p-4">
-            <Pagination
-              count={500}
-              navigate={() => {}}
-              pageNo={3}
-              pageSize={100}
+              totalQuizCount={totalQuizCount}
             />
           </div>
         </>

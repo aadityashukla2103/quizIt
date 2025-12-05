@@ -102,4 +102,8 @@ group :test do
   gem "ffi", github: "ffi/ffi", submodules: true
 end
 
+# for cloning quiz and question
 gem "deep_cloneable"
+
+# for pagination
+gem "pagy"
