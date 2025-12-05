@@ -146,6 +146,8 @@ GEM
     crass (1.0.6)
     csv (3.3.2)
     date (3.4.1)
+    deep_cloneable (3.2.1)
+      activerecord (>= 3.1.0, < 9)
     devise (4.9.4)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
@@ -440,6 +442,7 @@ DEPENDENCIES
   bootsnap (>= 1.9.4)
   bullet
   bundler-audit
+  deep_cloneable
   devise (~> 4.7)
   email_prefixer
   email_validator

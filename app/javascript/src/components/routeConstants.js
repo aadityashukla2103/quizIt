@@ -2,6 +2,7 @@ import Login from "components/Authentication/Login";
 import PasswordReset from "components/Authentication/ResetPassword";
 import Signup from "components/Authentication/Signup";
 import Dashboard from "components/Dashboard";
+import EditQuestion from "components/Dashboard/Questions/EditQuestion";
 import QuestionBuilder from "components/Dashboard/Questions/QuestionCreate";
 import QuizQuestions from "components/Dashboard/Questions/QuizQuestions";
 import Quizzes from "components/Dashboard/Quizzes";
@@ -11,6 +12,7 @@ export const DASHBOARD_PATH = "/";
 export const QUIZZES_PATH = "/quizzes";
 export const QUIZ_QUESTIONS_PATH = "/quizzes/:id/questions";
 export const QUESTION_CREATE_PATH = "/quizzes/:id/questions/new";
+export const QUESTION_EDIT_PATH = "/quizzes/:quizId/question/:questionId/edit";
 export const CHANGE_PASSWORD_PATH = "/settings?tab=password";
 export const PROFILE_PATH = "/settings?tab=profile";
 export const SETTINGS_PATH = "/settings";
@@ -51,5 +53,9 @@ export const DASHBOARD_ROUTES = [
   {
     path: QUESTION_CREATE_PATH,
     component: QuestionBuilder,
+  },
+  {
+    path: QUESTION_EDIT_PATH,
+    component: EditQuestion,
   },
 ];

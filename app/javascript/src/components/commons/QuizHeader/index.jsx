@@ -1,16 +1,43 @@
 import React from "react";
 
+import quizzesApi from "apis/quizzes";
 import InlineEdit from "components/commons/InlineEdit";
-import { LeftArrow } from "neetoicons";
-import { Tab } from "neetoui";
+import { LeftArrow, ExternalLink, Link } from "neetoicons";
+import { Tab, Button, Tooltip } from "neetoui";
 import { useHistory } from "react-router-dom";
 
-const QuizHeader = ({ quizId, quizName, onTitleChange }) => {
+const QuizHeader = ({
+  quizId,
+  quizName,
+  onTitleChange,
+  lastSavedAt,
+  status,
+  reloadQuizData,
+  isQuestionBuilder,
+}) => {
   const history = useHistory();
   const path = history.location.pathname;
 
   const onLeftArrowClick = () => {
-    history.goBack();
+    if (isQuestionBuilder) {
+      history.goBack();
+    } else {
+      history.push("/quizzes");
+    }
+  };
+
+  const onPublish = async () => {
+    await quizzesApi.update(quizId, {
+      quiz: { status: "published" },
+    });
+
+    reloadQuizData();
+  };
+
+  const onCopyLink = () => {
+    const publicLink = `${window.location.origin}/public/${quizId}`;
+    navigator.clipboard.writeText(publicLink);
+    logger.log(publicLink);
   };
 
   return (
@@ -20,7 +47,6 @@ const QuizHeader = ({ quizId, quizName, onTitleChange }) => {
           <LeftArrow className="cursor-pointer" onClick={onLeftArrowClick} />
           <InlineEdit value={quizName} onSave={onTitleChange} />
         </div>
-        {/* Tabs */}
         <div className="flex justify-center gap-4">
           <Tab.Item
             active={path.includes("questions")}
@@ -35,6 +61,19 @@ const QuizHeader = ({ quizId, quizName, onTitleChange }) => {
             Submissions
           </Tab.Item>
         </div>
+        {!isQuestionBuilder && (
+          <div className="flex items-center justify-end gap-4 text-xs text-gray-600">
+            {status === "draft" && lastSavedAt && (
+              <p>Draft saved at {lastSavedAt}</p>
+            )}
+            <Button icon={ExternalLink} label="Publish" onClick={onPublish} />
+            {status === "published" && (
+              <Tooltip content="Copy quiz link">
+                <Link className="cursor-pointer" onClick={onCopyLink} />
+              </Tooltip>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
