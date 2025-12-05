@@ -36,9 +36,28 @@ class Api::V1::QuizzesController < Api::V1::BaseController
   end
 
   def show
-    @quiz = Quiz.includes(:questions).find(params[:id])
-    render json: @quiz, include: :questions
-  end
+    @quiz = Quiz.includes(questions: :options).find(params[:id])
+
+    latest_time = [
+      @quiz.updated_at,
+      @quiz.questions.maximum(:updated_at),
+      Option.where(question_id: @quiz.question_ids).maximum(:updated_at)
+    ].compact.max
+
+    latest_time_ist = latest_time.in_time_zone("Asia/Kolkata")
+    last_saved_at =
+      if latest_time > @quiz.created_at
+        latest_time_ist.strftime("%I:%M%p, %d %B %Y")
+      else
+        nil
+      end
+
+    render json: {
+      quiz: @quiz.as_json,
+      questions: @quiz.questions.as_json(include: :options),
+      last_saved_at: last_saved_at
+    }
+end
 
   def create
     quiz = Quiz.new(quiz_params)
@@ -74,7 +93,7 @@ class Api::V1::QuizzesController < Api::V1::BaseController
     end
 
     def quiz_params
-      params.require(:quiz).permit(:name, :category_id)
+      params.require(:quiz).permit(:name, :category_id, :status)
     end
 
     def ensure_current_user_is_admin!

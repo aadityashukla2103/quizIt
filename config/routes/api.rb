@@ -18,6 +18,9 @@ namespace :api, defaults: { format: :json } do
 
    resources :quizzes, only: [:index, :show, :create, :update, :destroy] do
     resources :questions, only: [:index, :show, :create, :update, :destroy] do
+      member do
+         post :clone
+       end
       resources :options, only: [:index, :show, :create, :update, :destroy]
     end
   end

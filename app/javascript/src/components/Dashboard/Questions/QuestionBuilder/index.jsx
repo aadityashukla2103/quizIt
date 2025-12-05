@@ -6,11 +6,17 @@ import { Form, Input, Button } from "neetoui/formik";
 
 import { INITIAL_VALUES, QUESTION_SCHEMA, isValidQuestion } from "./constants";
 
-const QuestionBuilderNeetoUI = ({ onSave, onSubmitAndNew, onSubmit }) => (
+const QuestionBuilderNeetoUI = ({
+  initialValues,
+  onSave,
+  onSubmitAndNew,
+  onSubmit,
+  isEdit,
+}) => (
   <div>
     <Form
       formikProps={{
-        initialValues: INITIAL_VALUES,
+        initialValues: initialValues || INITIAL_VALUES,
         validationSchema: QUESTION_SCHEMA,
         onSubmit: values => onSave && onSave(values),
       }}
@@ -81,21 +87,23 @@ const QuestionBuilderNeetoUI = ({ onSave, onSubmitAndNew, onSubmit }) => (
             <div className="mt-4 flex gap-3">
               <Button
                 disabled={!valid}
-                label="Save"
+                label={isEdit ? "Update" : "Save"}
                 style="primary"
                 type="submit"
                 onClick={() => onSubmit(values)}
               />
-              <Button
-                disabled={!valid}
-                label="Save & add new question"
-                style="secondary"
-                type="submit"
-                onClick={() => {
-                  onSubmitAndNew(values);
-                  resetForm();
-                }}
-              />
+              {!isEdit && (
+                <Button
+                  disabled={!valid}
+                  label="Save & add new question"
+                  style="secondary"
+                  type="submit"
+                  onClick={() => {
+                    onSubmitAndNew(values);
+                    resetForm();
+                  }}
+                />
+              )}
             </div>
           </>
         );

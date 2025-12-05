@@ -84,6 +84,7 @@ const QuestionCreate = () => {
     <div className="w-full">
       <div className="w-full ">
         <QuizHeader
+          isQuestionBuilder
           quizId={quizId}
           quizName={quizName}
           onTitleChange={updateQuizName}

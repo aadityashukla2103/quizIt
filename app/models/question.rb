@@ -10,6 +10,18 @@ class Question < ApplicationRecord
 
   before_create :set_position
 
+  def clone_question!
+    cloned_question = deep_clone include: :options
+    base = "#{content} (Copy)"
+    copy_number = 1
+    while Question.exists?(quiz_id: quiz_id, content: "#{base} #{copy_number}")
+      copy_number += 1
+    end
+    cloned_question.content = "#{base} #{copy_number}"
+    cloned_question.save!
+    cloned_question
+  end
+
   private
 
     def set_position

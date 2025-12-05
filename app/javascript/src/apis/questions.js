@@ -1,13 +1,11 @@
 import axios from "axios";
 
-// Fetch all questions for a quiz
 const fetch = async quizId => {
   const response = await axios.get(`/api/v1/quizzes/${quizId}/questions`);
 
   return response.data;
 };
 
-// Fetch single question
 const show = async (quizId, questionId) => {
   const response = await axios.get(
     `/api/v1/quizzes/${quizId}/questions/${questionId}`
@@ -16,7 +14,6 @@ const show = async (quizId, questionId) => {
   return response.data;
 };
 
-// Create a question inside a quiz
 const create = async (quizId, payload) => {
   const response = await axios.post(`/api/v1/quizzes/${quizId}/questions`, {
     question: payload,
@@ -25,7 +22,6 @@ const create = async (quizId, payload) => {
   return response.data;
 };
 
-// Update a question
 const update = async (quizId, questionId, payload) => {
   const response = await axios.put(
     `/api/v1/quizzes/${quizId}/questions/${questionId}`,
@@ -35,16 +31,27 @@ const update = async (quizId, questionId, payload) => {
   return response.data;
 };
 
-// Delete a question
-const destroy = async (quizId, questionId) =>
-  axios.delete(`/api/v1/quizzes/${quizId}/questions/${questionId}`);
+const destroy = async (quizId, questionId) => {
+  const response = await axios.delete(
+    `/api/v1/quizzes/${quizId}/questions/${questionId}`
+  );
 
-const questionsApi = {
+  return response.data;
+};
+
+const clone = async (quizId, questionId) => {
+  const response = await axios.post(
+    `/api/v1/quizzes/${quizId}/questions/${questionId}/clone`
+  );
+
+  return response.data;
+};
+
+export default {
   fetch,
   show,
   create,
   update,
   destroy,
+  clone,
 };
-
-export default questionsApi;
