@@ -8,24 +8,20 @@ class Api::V1::QuizzesController < Api::V1::BaseController
     quizzes = Quiz.includes(:category, :submissions)
       .where(organization_id: @current_user.organization_id)
 
-    # 🔍 filter by search text
     if params[:query].present?
       search_term = "%#{params[:query].strip}%"
       quizzes = quizzes.where("quizzes.name ILIKE ?", search_term)
     end
 
-    # 🏷 filter by category
     if params[:category].present?
       quizzes = quizzes.where(category_id: params[:category])
     end
 
-    # 📌 filter by status
     allowed_statuses = %w[draft published]
     if params[:status].present? && allowed_statuses.include?(params[:status])
       quizzes = quizzes.where(status: params[:status])
     end
 
-    # Counts before pagination
     total_count = quizzes.count
     total_published_count = Quiz.where(
       organization_id: @current_user.organization_id, status: "published"
@@ -34,7 +30,6 @@ class Api::V1::QuizzesController < Api::V1::BaseController
       organization_id: @current_user.organization_id, status: "draft"
     ).count
 
-    # pagination
     page = params[:page].to_i > 0 ? params[:page].to_i : 1
     page_size = params[:pageSize].to_i > 0 ? params[:pageSize].to_i : 10
 

@@ -3,17 +3,16 @@ import React, { useState, useEffect } from "react";
 import EmptyQuizzesListImage from "assets/images/EmptyQuizzesList";
 import EmptyState from "components/commons/EmptyState";
 import { useQuizzes } from "contexts/QuizzesContext";
-import { Filter } from "neetoicons";
 import { Button, PageLoader, Typography } from "neetoui";
 import { Container, Header, SubHeader } from "neetoui/layouts";
 import { useHistory, useLocation } from "react-router-dom";
 
+import ColumnAndFilterDropdown from "./columnVisiblity";
 import DeleteAlert from "./DeleteAlert";
 import FilterPane from "./FilterPane/Create";
 import NewQuizPane from "./Pane/Create";
 import Table from "./Table";
 
-import ColumnIcon from "../../../assets/icons/column";
 import useDebounce from "../../../hooks/useDebounce";
 
 const Quizzes = () => {
@@ -21,6 +20,20 @@ const Quizzes = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const initialQuery = queryParams.get("query") || "";
+  const [visibleColumns, setVisibleColumns] = useState({
+    name: true,
+    category: true,
+    status: true,
+    submissions: true,
+    createdAt: true,
+  });
+
+  const toggleColumnVisibility = column => {
+    setVisibleColumns(prev => ({
+      ...prev,
+      [column]: !prev[column],
+    }));
+  };
 
   const {
     quizzes,
@@ -144,14 +157,11 @@ const Quizzes = () => {
           <Header
             title={`${quizzes.length} quizzes`}
             actionBlock={
-              <div className="flex">
-                <ColumnIcon height={20} width={30} />
-                <Filter
-                  className="ml-2"
-                  size={20}
-                  onClick={() => setShowFilterPane(true)}
-                />
-              </div>
+              <ColumnAndFilterDropdown
+                toggleColumnVisibility={toggleColumnVisibility}
+                visibleColumns={visibleColumns}
+                onFilterClick={() => setShowFilterPane(true)}
+              />
             }
           />
           {filtersApplied && (
@@ -186,6 +196,7 @@ const Quizzes = () => {
               setQuizzes={setQuizzes}
               setSelectedNoteIds={setSelectedNoteIds}
               totalQuizCount={totalQuizCount}
+              visibleColumns={visibleColumns}
             />
           </div>
         </>
