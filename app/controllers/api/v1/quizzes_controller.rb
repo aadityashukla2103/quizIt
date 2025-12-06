@@ -3,22 +3,29 @@
 class Api::V1::QuizzesController < Api::V1::BaseController
   before_action :ensure_current_user_is_admin!, only: [:create, :update, :destroy]
   before_action :set_quiz, only: [:show, :update, :destroy]
+
   def index
     quizzes = Quiz.includes(:category, :submissions)
       .where(organization_id: @current_user.organization_id)
 
+    # 🔍 filter by search text
     if params[:query].present?
       search_term = "%#{params[:query].strip}%"
       quizzes = quizzes.where("quizzes.name ILIKE ?", search_term)
     end
 
-    if params[:status].present? && params[:status] != "all"
-      allowed_statuses = %w[draft published]
-      if allowed_statuses.include?(params[:status])
-        quizzes = quizzes.where(status: params[:status])
-      end
+    # 🏷 filter by category
+    if params[:category].present?
+      quizzes = quizzes.where(category_id: params[:category])
     end
 
+    # 📌 filter by status
+    allowed_statuses = %w[draft published]
+    if params[:status].present? && allowed_statuses.include?(params[:status])
+      quizzes = quizzes.where(status: params[:status])
+    end
+
+    # Counts before pagination
     total_count = quizzes.count
     total_published_count = Quiz.where(
       organization_id: @current_user.organization_id, status: "published"
@@ -27,21 +34,21 @@ class Api::V1::QuizzesController < Api::V1::BaseController
       organization_id: @current_user.organization_id, status: "draft"
     ).count
 
-    quizzes = quizzes.order(created_at: :desc)
-
+    # pagination
     page = params[:page].to_i > 0 ? params[:page].to_i : 1
     page_size = params[:pageSize].to_i > 0 ? params[:pageSize].to_i : 10
 
-    quizzes = quizzes.offset((page - 1) * page_size).limit(page_size)
+    quizzes = quizzes.order(created_at: :desc)
+      .offset((page - 1) * page_size)
+      .limit(page_size)
 
     quizzes_data = quizzes.map do |quiz|
       quiz.as_json.merge(
         category_name: quiz.category&.name,
-        submission_count: quiz.submissions.count
+        submission_count: quiz.submissions.size
       )
     end
 
-    # Optional title based on status
     title =
       case params[:status]
       when "published" then "Published Quizzes"
@@ -49,7 +56,6 @@ class Api::V1::QuizzesController < Api::V1::BaseController
       else "All Quizzes"
       end
 
-    # Return paginated response with extra counts
     render json: {
       quizzes: quizzes_data,
       totalCount: total_count,
@@ -59,7 +65,7 @@ class Api::V1::QuizzesController < Api::V1::BaseController
       pageSize: page_size,
       title: title
     }
-  end
+ end
 
   def show
     @quiz = Quiz.includes(questions: :options).find(params[:id])
