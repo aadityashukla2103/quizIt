@@ -20,6 +20,11 @@ namespace :api, defaults: { format: :json } do
     member do
          post :clone
        end
+    collection do
+        put :bulk_update
+        delete :bulk_delete
+
+      end
     resources :questions, only: [:index, :show, :create, :update, :destroy] do
       member do
          post :clone

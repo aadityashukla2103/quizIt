@@ -17,15 +17,15 @@ const { Button: MenuItemButton } = MenuItem;
 
 const Table = ({
   quizzes = [],
-  selectedNoteIds,
-  setSelectedNoteIds,
+  selectedQuizIds,
+  setSelectedQuizIds,
   setQuizzes,
   currentPageNumber,
   defaultPageSize,
   handlePageChange,
   totalQuizCount,
   loading,
-  visibleColumns, // <-- add this
+  visibleColumns,
 }) => {
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
   const [selectedQuizId, setSelectedQuizId] = useState(null);
@@ -170,7 +170,7 @@ const Table = ({
         </div>
       ),
     },
-  ].filter(col => col.show !== false); // <-- filter hidden columns
+  ].filter(col => col.show !== false);
 
   return (
     <div className="w-full">
@@ -192,9 +192,9 @@ const Table = ({
         handlePageChange={handlePageChange}
         loading={loading}
         rowData={quizzes}
-        selectedRowKeys={selectedNoteIds}
+        selectedRowKeys={selectedQuizIds}
         totalCount={totalQuizCount}
-        onRowSelect={setSelectedNoteIds}
+        onRowSelect={setSelectedQuizIds}
       />
     </div>
   );
