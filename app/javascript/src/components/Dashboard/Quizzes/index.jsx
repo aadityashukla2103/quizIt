@@ -7,11 +7,11 @@ import { Button, PageLoader, Typography } from "neetoui";
 import { Container, Header, SubHeader } from "neetoui/layouts";
 import { useHistory, useLocation } from "react-router-dom";
 
-import ColumnAndFilterDropdown from "./columnVisiblity";
 import DeleteAlert from "./DeleteAlert";
 import FilterPane from "./FilterPane/Create";
 import NewQuizPane from "./Pane/Create";
 import Table from "./Table";
+import TableHeader from "./TableHeader";
 
 import useDebounce from "../../../hooks/useDebounce";
 
@@ -51,7 +51,7 @@ const Quizzes = () => {
   const [searchTerm, setSearchTerm] = useState(initialQuery);
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-  const [selectedNoteIds, setSelectedNoteIds] = useState([]);
+  const [selectedQuizIds, setSelectedQuizIds] = useState([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -97,7 +97,7 @@ const Quizzes = () => {
   };
 
   const handleFilterSubmit = filters => {
-    const newPage = 1; // reset page when filters change
+    const newPage = 1;
     setPage(newPage);
 
     fetchQuizzes({ ...filters, page: newPage, pageSize });
@@ -154,15 +154,14 @@ const Quizzes = () => {
       {loading && <PageLoader />}
       {quizzes.length ? (
         <>
-          <Header
-            title={`${quizzes.length} quizzes`}
-            actionBlock={
-              <ColumnAndFilterDropdown
-                toggleColumnVisibility={toggleColumnVisibility}
-                visibleColumns={visibleColumns}
-                onFilterClick={() => setShowFilterPane(true)}
-              />
-            }
+          <TableHeader
+            quizzesLength={quizzes.length}
+            selectedQuizIds={selectedQuizIds}
+            setQuizzes={setQuizzes}
+            setSelectedQuizId={setSelectedQuizIds}
+            toggleColumnVisibility={toggleColumnVisibility}
+            visibleColumns={visibleColumns}
+            onFilterClick={() => setShowFilterPane(true)}
           />
           {filtersApplied && (
             <SubHeader
@@ -192,9 +191,9 @@ const Quizzes = () => {
               handlePageChange={handlePageChange}
               loading={loading}
               quizzes={quizzes}
-              selectedNoteIds={selectedNoteIds}
+              selectedQuizIds={selectedQuizIds}
               setQuizzes={setQuizzes}
-              setSelectedNoteIds={setSelectedNoteIds}
+              setSelectedQuizIds={setSelectedQuizIds}
               totalQuizCount={totalQuizCount}
               visibleColumns={visibleColumns}
             />
@@ -220,8 +219,6 @@ const Quizzes = () => {
       {showDeleteAlert && (
         <DeleteAlert
           refetch={fetchQuizzes}
-          selectedNoteIds={selectedNoteIds}
-          setSelectedNoteIds={setSelectedNoteIds}
           onClose={() => setShowDeleteAlert(false)}
         />
       )}

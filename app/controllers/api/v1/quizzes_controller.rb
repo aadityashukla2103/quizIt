@@ -129,6 +129,33 @@ end
     render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
  end
 
+  def bulk_update
+    data = bulk_params
+
+    quiz_ids = data[:ids]
+    updates = data[:updates].to_h
+
+    if updates.blank?
+      return render json: { error: "No fields to update" }, status: :bad_request
+    end
+
+    Quiz.where(id: quiz_ids).update_all(updates)
+
+    render json: { message: "Quizzes updated" }
+  end
+
+  def bulk_delete
+    quiz_ids = bulk_params[:ids]
+
+    if quiz_ids.blank?
+      return render json: { error: "No quizzes selected" }, status: :bad_request
+    end
+
+    Quiz.where(id: quiz_ids).destroy_all
+
+    render json: { message: "Quizzes deleted successfully" }
+end
+
   private
 
     def set_quiz
@@ -137,6 +164,12 @@ end
 
     def quiz_params
       params.require(:quiz).permit(:name, :category_id, :status)
+    end
+
+    def bulk_params
+      params.require(:quiz).permit(
+        ids: [],
+        updates: {})
     end
 
     def ensure_current_user_is_admin!
