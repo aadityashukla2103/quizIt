@@ -31,8 +31,6 @@ export const QuizzesProvider = ({ children }) => {
         pageSize,
       };
 
-      logger.log("params", params);
-
       const { data } = await quizzesApi.fetch(params);
 
       setQuizzes(data.quizzes || []);

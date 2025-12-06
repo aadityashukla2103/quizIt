@@ -25,6 +25,7 @@ const Table = ({
   handlePageChange,
   totalQuizCount,
   loading,
+  visibleColumns, // <-- add this
 }) => {
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
   const [selectedQuizId, setSelectedQuizId] = useState(null);
@@ -78,6 +79,7 @@ const Table = ({
           </div>
         </Tooltip>
       ),
+      ...(visibleColumns.name ? {} : { show: false }),
     },
     {
       title: "Submission Count",
@@ -86,6 +88,7 @@ const Table = ({
       width: "15%",
       className: "text-center",
       render: text => <div className="text-center">{text}</div>,
+      ...(visibleColumns.submissions ? {} : { show: false }),
     },
     {
       title: "Created On",
@@ -106,6 +109,7 @@ const Table = ({
           </div>
         );
       },
+      ...(visibleColumns.createdAt ? {} : { show: false }),
     },
     {
       title: "Category",
@@ -114,6 +118,7 @@ const Table = ({
       width: "15%",
       className: "text-center",
       render: text => <div className="text-center">{text}</div>,
+      ...(visibleColumns.category ? {} : { show: false }),
     },
     {
       title: "Status",
@@ -128,6 +133,7 @@ const Table = ({
           </Tag>
         </div>
       ),
+      ...(visibleColumns.status ? {} : { show: false }),
     },
     {
       title: "More Actions",
@@ -164,7 +170,7 @@ const Table = ({
         </div>
       ),
     },
-  ];
+  ].filter(col => col.show !== false); // <-- filter hidden columns
 
   return (
     <div className="w-full">
