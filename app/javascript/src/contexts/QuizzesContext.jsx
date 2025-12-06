@@ -12,22 +12,29 @@ export const QuizzesProvider = ({ children }) => {
   const [totalQuizCount, setTotalQuizCount] = useState(0);
   const [totalPublishedCount, setTotalPublishedCount] = useState(0);
   const [totalDraftCount, setTotalDraftCount] = useState(0);
-  const [status, setStatus] = useState("all"); // all, draft, published
+  const [status, setStatus] = useState("all");
 
   const fetchQuizzes = async (
-    query = "",
+    filters = {},
     page = 1,
     pageSize = 10,
     currentStatus = status
   ) => {
     try {
       setLoading(true);
-      const { data } = await quizzesApi.fetch({
-        query,
-        status: currentStatus,
+
+      const params = {
+        query: filters.query || "",
+        category: filters.category || "",
+        status: filters.status || currentStatus,
         page,
         pageSize,
-      });
+      };
+
+      logger.log("params", params);
+
+      const { data } = await quizzesApi.fetch(params);
+
       setQuizzes(data.quizzes || []);
       setPageTitle(data.title || "All Quizzes");
       setTotalQuizCount(data.totalCount || 0);
@@ -39,7 +46,7 @@ export const QuizzesProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    fetchQuizzes();
+    fetchQuizzes({}, 1, 10, status);
   }, []);
 
   return (

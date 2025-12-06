@@ -1,17 +1,14 @@
 import React, { useEffect, useState } from "react";
 
 import categoriesApi from "apis/categories";
-import quizzesApi from "apis/quizzes";
 import { Formik, Form as FormikForm } from "formik";
 import { Pane } from "neetoui";
 import { ActionBlock, Input, Select } from "neetoui/formik";
-import { useHistory } from "react-router-dom";
 
-import { QUIZZES_FORM_VALIDATION_SCHEMA } from "../../Quizzes/constants";
+import { validationSchema } from "./constants";
 
-const Form = ({ refetchQuizzes, onClose, quiz }) => {
+const Form = ({ refetchQuizzes, onClose, filters }) => {
   const [categories, setCategories] = useState([]);
-  const history = useHistory();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -21,24 +18,29 @@ const Form = ({ refetchQuizzes, onClose, quiz }) => {
     fetchCategories();
   }, []);
 
-  const options = categories.map(category => ({
+  const categoryOptions = categories.map(category => ({
     label: category.name,
     value: category.id,
   }));
 
+  const statusOptions = [
+    { label: "Draft", value: "draft" },
+    { label: "Published", value: "published" },
+  ];
+
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const payload = {
-        ...values,
-        category_id: values.category,
-        status: "draft",
+      const filters = {
+        query: values.name || "",
+        category: values.category || "",
+        category_name: values.category_name || "",
+        status: values.status || "all",
       };
-      await quizzesApi.create(payload);
-      await refetchQuizzes();
-      history.push("/quizzes");
+
+      await refetchQuizzes(filters);
       onClose();
-    } catch (err) {
-      logger.error(err);
+    } catch (error) {
+      logger.log(error);
     } finally {
       setSubmitting(false);
     }
@@ -46,35 +48,48 @@ const Form = ({ refetchQuizzes, onClose, quiz }) => {
 
   return (
     <Formik
-      initialValues={quiz}
-      validationSchema={QUIZZES_FORM_VALIDATION_SCHEMA}
+      initialValues={filters}
+      validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
       {({ setFieldValue }) => (
         <FormikForm className="w-full">
           <Pane.Body className="space-y-6">
             <Input
-              required
               className="w-full flex-grow-0"
               label="Name"
               name="name"
+              placeholder="Search by name"
             />
             <Select
-              required
               className="w-full flex-grow-0"
               label="Category"
               name="category"
-              options={options}
-              placeholder="Select Category"
-              onChange={option => setFieldValue("category", option.value)}
+              options={categoryOptions}
+              placeholder="Search category"
+              onChange={option => {
+                setFieldValue("category", option.value);
+                setFieldValue("category_name", option.label);
+              }}
+            />
+            <Select
+              className="w-full flex-grow-0"
+              label="Status"
+              name="status"
+              options={statusOptions}
+              placeholder="Select status"
+              onChange={option => setFieldValue("status", option.value)}
             />
           </Pane.Body>
           <Pane.Footer>
             <ActionBlock
-              cancelButtonProps={{ onClick: onClose }}
+              cancelButtonProps={{
+                label: "Clear Filters",
+                onClick: onClose,
+              }}
               submitButtonProps={{
                 className: "mr-3",
-                label: "Create Quiz",
+                label: "Done",
               }}
             />
           </Pane.Footer>

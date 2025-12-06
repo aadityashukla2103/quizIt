@@ -10,33 +10,30 @@ export const QUIZZES_FORM_VALIDATION_SCHEMA = yup.object().shape({
   category: yup.string().required("Category is required"),
 });
 
-// export const NOTES_TABLE_COLUMN_DATA = [
-//   {
-//   title: "Quiz Name",
-//   dataIndex: "name",
-//   key: "name",
-//   width: "30%",
-//   render: (text, record) => (
-//     <a href={`/quizzes/${record.id}`}>{text}</a>
-//   ),
-// }
-// ,
-//   {
-//     title: "Category",
-//     dataIndex: "category_name",
-//     key: "category_name",
-//     width: "30%",
-//   },
-//   {
-//     title: "Status",
-//     dataIndex: "status",
-//     key: "status",
-//     width: "20%",
-//   },
-//   {
-//     title: "Submissions",
-//     dataIndex: "submission_count",
-//     key: "submission_count",
-//     width: "20%",
-//   },
-// ];
+export const DEFAULT_PAGE = 1;
+export const DEFAULT_PAGE_SIZE = 10;
+
+export const QUERY_PARAM_KEYS = {
+  QUERY: "query",
+  STATUS: "status",
+  PAGE: "page",
+  PAGE_SIZE: "pageSize",
+};
+
+export const INITIAL_FILTERS = {
+  query: "",
+  categoryName: "",
+  status: "",
+};
+
+export const EMPTY_FILTERS = {
+  query: "",
+  category: "",
+  status: "all",
+};
+
+export const INITIAL_PANE_STATE = {
+  newQuiz: false,
+  filter: false,
+  delete: false,
+};

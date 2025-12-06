@@ -4,11 +4,12 @@ import EmptyQuizzesListImage from "assets/images/EmptyQuizzesList";
 import EmptyState from "components/commons/EmptyState";
 import { useQuizzes } from "contexts/QuizzesContext";
 import { Filter } from "neetoicons";
-import { Button, PageLoader } from "neetoui";
-import { Container, Header } from "neetoui/layouts";
+import { Button, PageLoader, Typography } from "neetoui";
+import { Container, Header, SubHeader } from "neetoui/layouts";
 import { useHistory, useLocation } from "react-router-dom";
 
 import DeleteAlert from "./DeleteAlert";
+import FilterPane from "./FilterPane/Create";
 import NewQuizPane from "./Pane/Create";
 import Table from "./Table";
 
@@ -32,28 +33,92 @@ const Quizzes = () => {
   } = useQuizzes();
 
   const [showNewQuizPane, setShowNewQuizPane] = useState(false);
+  const [showFilterPane, setShowFilterPane] = useState(false);
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [searchTerm, setSearchTerm] = useState(initialQuery);
-  const [selectedNoteIds, setSelectedNoteIds] = useState([]);
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
+  const [selectedNoteIds, setSelectedNoteIds] = useState([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  useEffect(() => {
-    fetchQuizzes(debouncedSearchTerm, page, pageSize, status);
+  const [filtersApplied, setFiltersApplied] = useState(false);
+  const [selectedFilters, setSelectedFilters] = useState({
+    query: "",
+    categoryName: "",
+    status: "",
+  });
 
+  const updateURL = (currentPage = page, currentPageSize = pageSize) => {
     const params = new URLSearchParams();
     if (debouncedSearchTerm) params.set("query", debouncedSearchTerm);
     params.set("status", status);
-    params.set("page", page);
-    params.set("pageSize", pageSize);
+    params.set("page", currentPage);
+    params.set("pageSize", currentPageSize);
     history.replace({ search: params.toString() });
+  };
+
+  useEffect(() => {
+    fetchQuizzes(
+      { query: debouncedSearchTerm, category: "", status },
+      page,
+      pageSize
+    );
+
+    updateURL();
   }, [debouncedSearchTerm, page, pageSize, status]);
 
-  const handlePageChange = (newPage, newPageSize) => {
-    setPage(newPage);
+  const handlePageChange = (currentPage, newPageSize) => {
+    setPage(currentPage);
     setPageSize(newPageSize);
+
+    fetchQuizzes({
+      query: debouncedSearchTerm,
+      category: "",
+      status,
+      page: currentPage,
+      pageSize: newPageSize,
+    });
+
+    updateURL(currentPage, newPageSize);
+  };
+
+  const handleFilterSubmit = filters => {
+    const newPage = 1; // reset page when filters change
+    setPage(newPage);
+
+    fetchQuizzes({ ...filters, page: newPage, pageSize });
+
+    const applied =
+      filters.query !== "" ||
+      filters.category !== "" ||
+      filters.status !== "all";
+    setFiltersApplied(applied);
+
+    setSelectedFilters({
+      query: filters.query || "",
+      categoryName: filters.category_name || "",
+      status: filters.status || "",
+    });
+
+    updateURL(newPage, pageSize);
+  };
+
+  const handleClearFilters = () => {
+    const newPage = 1;
+    setPage(newPage);
+
+    fetchQuizzes({
+      query: "",
+      category: "",
+      status: "all",
+      page: newPage,
+      pageSize,
+    });
+    setFiltersApplied(false);
+    setSelectedFilters({ query: "", categoryName: "", status: "" });
+
+    updateURL(newPage, pageSize);
   };
 
   return (
@@ -81,10 +146,35 @@ const Quizzes = () => {
             actionBlock={
               <div className="flex">
                 <ColumnIcon height={20} width={30} />
-                <Filter className="ml-2" size={20} />
+                <Filter
+                  className="ml-2"
+                  size={20}
+                  onClick={() => setShowFilterPane(true)}
+                />
               </div>
             }
           />
+          {filtersApplied && (
+            <SubHeader
+              leftActionBlock={
+                <div className="flex items-center gap-3">
+                  <Typography className="flex gap-2" component="h4" style="h4">
+                    Category:
+                    {selectedFilters.categoryName && (
+                      <Typography className="text-gray-400">
+                        {selectedFilters.categoryName}
+                      </Typography>
+                    )}
+                  </Typography>
+                  <Button
+                    label="Clear filters"
+                    style="secondary"
+                    onClick={handleClearFilters}
+                  />
+                </div>
+              }
+            />
+          )}
           <div className="w-full overflow-x-auto">
             <Table
               currentPageNumber={page}
@@ -110,6 +200,11 @@ const Quizzes = () => {
         fetchQuizzes={fetchQuizzes}
         setShowPane={setShowNewQuizPane}
         showPane={showNewQuizPane}
+      />
+      <FilterPane
+        fetchQuizzes={handleFilterSubmit}
+        setShowPane={setShowFilterPane}
+        showPane={showFilterPane}
       />
       {showDeleteAlert && (
         <DeleteAlert
