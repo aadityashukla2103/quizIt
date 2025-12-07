@@ -13,6 +13,7 @@ namespace :api, defaults: { format: :json } do
        post "bulk_destroy"
      end
    end
+   post "guest_registrations", to: "guest_registrations#create"
 
    resources :cypress_runs, only: [:create]
 

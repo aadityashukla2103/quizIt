@@ -3,11 +3,11 @@ import React, { useEffect, useState } from "react";
 import { setAuthHeaders, registerIntercepts } from "apis/axios";
 import { initializeLogger } from "common/logger";
 import PrivateRoute from "components/commons/PrivateRoute";
-import PublicDashboard from "components/PublicDashboard";
 import {
   AUTH_ROUTES,
   PRIVATE_ROUTES,
   LOGIN_PATH,
+  PUBLIC_ROUTES,
 } from "components/routeConstants";
 import { useAuthState, useAuthDispatch } from "contexts/auth";
 import { useUserDispatch, useUserState } from "contexts/user";
@@ -66,8 +66,14 @@ const Main = props => {
             path={route.path}
           />
         ))}
-        <Route exact component={PublicDashboard} path="/publicdashboard" />
-        {/* {!isLoggedIn && <Route exact component={PublicDashboard} path={DASHBOARD_PATH} />} */}
+        {PUBLIC_ROUTES.map(route => (
+          <Route
+            exact
+            component={route.component}
+            key={route.path}
+            path={route.path}
+          />
+        ))}
         {PRIVATE_ROUTES.map(route => (
           <PrivateRoute
             component={route.component}
