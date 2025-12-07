@@ -15,8 +15,10 @@ class Api::V1::SubmissionsController < Api::V1::BaseController
   def create
     submission = Submission.new(submission_params)
 
+    submission.submitted_at ||= Time.current
+
     if submission.save
-      render_json(submission, :created)
+      render json: { submission: submission }, status: :created
     else
       render json: { errors: submission.errors.full_messages }, status: :unprocessable_entity
     end
@@ -49,7 +51,9 @@ class Api::V1::SubmissionsController < Api::V1::BaseController
         :wrong_answers,
         :total_questions,
         :status,
-        :submitted_at
+        :submitted_at,
+        :guest_name,
+        :guest_email
       )
-    end
+end
 end

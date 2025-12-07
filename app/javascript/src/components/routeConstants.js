@@ -7,8 +7,13 @@ import QuestionBuilder from "components/Dashboard/Questions/QuestionCreate";
 import QuizQuestions from "components/Dashboard/Questions/QuizQuestions";
 import Quizzes from "components/Dashboard/Quizzes";
 import Settings from "components/Dashboard/Settings";
+import PublicDashboard from "components/PublicDashboard";
+
+import UserRegistrationForm from "./PublicDashboard/UserRegistration";
 
 export const PUBLIC_DASHBOARD_PATH = "/publicdashboard";
+export const PUBLIC_REGISTER_PATH = "/publicdashboard/register/:quizId";
+export const PUBLIC_QUIZ_PATH = "/publicdashboard/quizzes/:quizId";
 
 export const DASHBOARD_PATH = "/";
 export const QUIZZES_PATH = "/quizzes";
@@ -59,5 +64,20 @@ export const DASHBOARD_ROUTES = [
   {
     path: QUESTION_EDIT_PATH,
     component: EditQuestion,
+  },
+];
+
+export const PUBLIC_ROUTES = [
+  {
+    path: PUBLIC_DASHBOARD_PATH,
+    component: PublicDashboard,
+  },
+  // {
+  //   path: PUBLIC_QUIZ_PATH,
+  //   component: QuizSlider,
+  // },
+  {
+    path: PUBLIC_REGISTER_PATH,
+    component: UserRegistrationForm,
   },
 ];

@@ -1,6 +1,7 @@
 import React from "react";
 
 import { Button, Tag } from "neetoui";
+import { Link } from "react-router-dom";
 
 const QuizCard = ({ quiz }) => (
   <div className="flex h-56 flex-col justify-between rounded-lg border bg-white p-6 shadow-sm">
@@ -14,12 +15,14 @@ const QuizCard = ({ quiz }) => (
       <span className="mb-2 block text-sm text-gray-600">
         {quiz.question_count} Questions
       </span>
-      <Button
-        className="w-full"
-        label="Start Quiz"
-        size="large"
-        style="primary"
-      />
+      <Link className="block" to={`/publicdashboard/register/${quiz.id}`}>
+        <Button
+          className="w-full"
+          label="Start Quiz"
+          size="large"
+          style="primary"
+        />
+      </Link>
     </div>
   </div>
 );
