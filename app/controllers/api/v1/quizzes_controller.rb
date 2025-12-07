@@ -5,30 +5,34 @@ class Api::V1::QuizzesController < Api::V1::BaseController
   before_action :set_quiz, only: [:show, :update, :destroy]
 
   def index
-    quizzes = Quiz.includes(:category, :submissions)
-      .where(organization_id: @current_user.organization_id)
+    if @current_user
+      quizzes = Quiz.includes(:category, :submissions)
+        .where(organization_id: @current_user.organization_id)
+    else
+      quizzes = Quiz.includes(:category, :submissions)
+        .where(status: "published")
+    end
 
     if params[:query].present?
       search_term = "%#{params[:query].strip}%"
       quizzes = quizzes.where("quizzes.name ILIKE ?", search_term)
     end
 
-    if params[:category].present?
-      quizzes = quizzes.where(category_id: params[:category])
+    if params[:category].present? && params[:category].downcase != "all"
+      category = Category.find_by("LOWER(name) = ?", params[:category].downcase)
+      quizzes = quizzes.where(category_id: category.id) if category
     end
 
     allowed_statuses = %w[draft published]
-    if params[:status].present? && allowed_statuses.include?(params[:status])
+    if @current_user && params[:status].present? && allowed_statuses.include?(params[:status])
       quizzes = quizzes.where(status: params[:status])
     end
 
     total_count = quizzes.count
-    total_published_count = Quiz.where(
-      organization_id: @current_user.organization_id, status: "published"
-    ).count
-    total_draft_count = Quiz.where(
-      organization_id: @current_user.organization_id, status: "draft"
-    ).count
+    total_published_count = Quiz.where(status: "published").count
+    total_draft_count = @current_user ? Quiz.where(
+      organization_id: @current_user.organization_id,
+      status: "draft").count : 0
 
     page = params[:page].to_i > 0 ? params[:page].to_i : 1
     page_size = params[:pageSize].to_i > 0 ? params[:pageSize].to_i : 10
@@ -40,7 +44,9 @@ class Api::V1::QuizzesController < Api::V1::BaseController
     quizzes_data = quizzes.map do |quiz|
       quiz.as_json.merge(
         category_name: quiz.category&.name,
-        submission_count: quiz.submissions.size
+        submission_count: quiz.submissions.size,
+        question_count: quiz.questions.count,
+        organization_name: quiz.organization.name
       )
     end
 
@@ -60,7 +66,7 @@ class Api::V1::QuizzesController < Api::V1::BaseController
       pageSize: page_size,
       title: title
     }
- end
+  end
 
   def show
     @quiz = Quiz.includes(questions: :options).find(params[:id])
