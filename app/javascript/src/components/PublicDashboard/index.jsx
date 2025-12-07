@@ -1,0 +1,119 @@
+import React, { useEffect, useState } from "react";
+
+import categoriesApi from "apis/categories";
+import quizzesApi from "apis/quizzes";
+import { Filter } from "neetoicons";
+import { Button, PageLoader, Input, Select } from "neetoui";
+
+import QuizCard from "./QuizCard";
+
+import useDebounce from "../../hooks/useDebounce";
+
+const Hero = () => {
+  const [quizzes, setQuizzes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState(null);
+  const [categories, setCategories] = useState([{ label: "All", value: null }]);
+  const [showFilter, setShowFilter] = useState(false);
+
+  const debouncedQuery = useDebounce(query, 500);
+
+  const loadCategories = async () => {
+    try {
+      const data = await categoriesApi.fetch();
+      const options = data.map(cat => ({ label: cat.name, value: cat.name }));
+      setCategories([{ label: "All", value: null }, ...options]);
+    } catch (err) {
+      logger.error("Error fetching categories:", err);
+    }
+  };
+
+  const loadQuizzes = async (
+    searchQuery = debouncedQuery,
+    categoryValue = category?.value
+  ) => {
+    setLoading(true);
+    try {
+      const { data } = await quizzesApi.fetch({
+        query: searchQuery,
+        status: "published",
+        category: categoryValue,
+        page: 1,
+        pageSize: 20,
+      });
+      setQuizzes(data.quizzes);
+    } catch (err) {
+      logger.error("Error fetching quizzes:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  useEffect(() => {
+    loadQuizzes();
+  }, [debouncedQuery, category]);
+
+  return (
+    <div className="mt-8 flex min-h-screen flex-col bg-gray-50">
+      <header className="flex items-center justify-between  px-8 py-4 text-white">
+        <h1 className="text-2xl font-semibold">
+          {quizzes[0]?.organization_name}
+        </h1>
+        <Button label="Login as admin" to="/login" />
+      </header>
+      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-6 py-10">
+        <div className="mb-8 flex items-center justify-center">
+          <div className="flex w-full max-w-2xl items-center space-x-3">
+            <Input
+              className="flex-1"
+              placeholder="Search for a quiz"
+              type="search"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+            />
+            <div className="relative">
+              <Button
+                icon={Filter}
+                style="tertiary"
+                onClick={() => setShowFilter(!showFilter)}
+              />
+              {showFilter && (
+                <div className="absolute right-0 top-10 z-50 w-56 bg-white p-2 shadow-lg">
+                  <Select
+                    isClearable
+                    label="Category"
+                    menuPortalTarget={document.body}
+                    options={categories}
+                    placeholder="Select category"
+                    styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+                    value={category}
+                    onChange={option => {
+                      setCategory(option);
+                      setShowFilter(false);
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        {loading ? (
+          <PageLoader />
+        ) : (
+          <section className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {quizzes.slice(0, 6).map(quiz => (
+              <QuizCard key={quiz.id} quiz={quiz} />
+            ))}
+          </section>
+        )}
+      </main>
+    </div>
+  );
+};
+
+export default Hero;

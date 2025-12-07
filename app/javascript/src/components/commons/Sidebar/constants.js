@@ -22,7 +22,8 @@ export const SIDENAV_LINKS = [
   },
   {
     label: "Explore",
-    to: "/explore",
+    to: "/publicdashboard",
     icon: GlobeIcon,
+    target: "_blank",
   },
 ];

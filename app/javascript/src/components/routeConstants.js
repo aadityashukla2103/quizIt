@@ -8,6 +8,8 @@ import QuizQuestions from "components/Dashboard/Questions/QuizQuestions";
 import Quizzes from "components/Dashboard/Quizzes";
 import Settings from "components/Dashboard/Settings";
 
+export const PUBLIC_DASHBOARD_PATH = "/publicdashboard";
+
 export const DASHBOARD_PATH = "/";
 export const QUIZZES_PATH = "/quizzes";
 export const QUIZ_QUESTIONS_PATH = "/quizzes/:id/questions";
