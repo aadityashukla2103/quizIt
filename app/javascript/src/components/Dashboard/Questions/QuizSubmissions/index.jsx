@@ -84,6 +84,7 @@ const QuizSubmissions = () => {
       />
       <SubmissionsSubHeader
         filters={filters}
+        quizId={quizId}
         setFilterPaneOpen={setFilterPaneOpen}
         setFilters={setFilters}
         submissionsCount={submissions.length}

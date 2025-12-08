@@ -19,3 +19,4 @@ linters:
         Enabled: false
       Layout/TrailingEmptyLines:
         Enabled: false
+        Max: 140

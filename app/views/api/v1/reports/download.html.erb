@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz Submissions Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        /* Column widths */
+        th.student,
+        td.student {
+            width: 25%;
+        }
+
+        th.email,
+        td.email {
+            width: 25%;
+        }
+
+        th.date,
+        td.date {
+            width: 15%;
+        }
+
+        th.total,
+        td.total,
+        th.correct,
+        td.correct,
+        th.wrong,
+        td.wrong,
+        th.unanswered,
+        td.unanswered {
+            width: 5%;
+            text-align: center;
+        }
+
+        th.status,
+        td.status {
+            width: 10%;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Quiz Submissions Report</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th class="student">Student</th>
+                <th class="email">Email</th>
+                <th class="total">Total Questions</th>
+                <th class="correct">Correct</th>
+                <th class="wrong">Wrong</th>
+                <th class="unanswered">Unanswered</th>
+                <th class="status">Status</th>
+                <th class="date">Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% submissions.each do |submission| %>
+            <tr>
+                <td class="student"><%= submission.guest_name %></td>
+                <td class="email"><%= submission.guest_email %></td>
+                <td class="total"><%= submission.total_questions || 0 %></td>
+                <td class="correct"><%= submission.correct_answers || 0 %></td>
+                <td class="wrong"><%= submission.wrong_answers || 0 %></td>
+                <td class="unanswered">
+                    <%= (submission.total_questions || 0) -
+                     (submission.correct_answers || 0) -
+                     (submission.wrong_answers || 0) %>
+                </td>
+                <td class="status"><%= submission.status %></td>
+                <td class="date"><%= submission.created_at.strftime("%d %b %Y") %></td>
+            </tr>
+            <% end %>
+        </tbody>
+    </table>
+
+    <p>Total Submissions: <%= submissions.count %></p>
+</body>
+
+</html>
