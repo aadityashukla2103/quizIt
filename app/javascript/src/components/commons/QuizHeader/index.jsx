@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import quizzesApi from "apis/quizzes";
 import InlineEdit from "components/commons/InlineEdit";
@@ -8,8 +8,6 @@ import { useHistory } from "react-router-dom";
 
 const QuizHeader = ({
   quizId,
-  quizName,
-  onTitleChange,
   lastSavedAt,
   status,
   reloadQuizData,
@@ -17,6 +15,16 @@ const QuizHeader = ({
 }) => {
   const history = useHistory();
   const path = history.location.pathname;
+  const [quizName, setQuizName] = useState("");
+
+  const fetchQuizName = async quizId => {
+    const response = await quizzesApi.show(quizId);
+    setQuizName(response.data.quiz.name);
+  };
+
+  useEffect(() => {
+    fetchQuizName(quizId);
+  }, []);
 
   const onLeftArrowClick = () => {
     if (isQuestionBuilder) {
@@ -26,18 +34,25 @@ const QuizHeader = ({
     }
   };
 
+  const handleQuizNameChange = async newName => {
+    try {
+      await quizzesApi.update(quizId, { quiz: { name: newName } });
+      reloadQuizData();
+    } catch (error) {
+      logger.log(error);
+    }
+  };
+
   const onPublish = async () => {
     await quizzesApi.update(quizId, {
       quiz: { status: "published" },
     });
-
     reloadQuizData();
   };
 
   const onCopyLink = () => {
-    const publicLink = `${window.location.origin}/public/${quizId}`;
+    const publicLink = `${window.location.origin}/publicdashboard/register//${quizId}`;
     navigator.clipboard.writeText(publicLink);
-    logger.log(publicLink);
   };
 
   return (
@@ -45,9 +60,9 @@ const QuizHeader = ({
       <div className="grid grid-cols-3 items-center">
         <div className="flex items-center gap-3">
           <LeftArrow className="cursor-pointer" onClick={onLeftArrowClick} />
-          <InlineEdit value={quizName} onSave={onTitleChange} />
+          <InlineEdit value={quizName} onSave={handleQuizNameChange} />
         </div>
-        <div className="flex justify-center gap-4">
+        <div className="col-span-1 flex justify-center gap-4">
           <Tab.Item
             active={path.includes("questions")}
             onClick={() => history.push(`/quizzes/${quizId}/questions`)}
