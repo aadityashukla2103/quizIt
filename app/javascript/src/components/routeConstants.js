@@ -2,6 +2,7 @@ import Login from "components/Authentication/Login";
 import PasswordReset from "components/Authentication/ResetPassword";
 import Signup from "components/Authentication/Signup";
 import Dashboard from "components/Dashboard";
+import DownloadReport from "components/Dashboard/Questions/DownloadReport";
 import EditQuestion from "components/Dashboard/Questions/EditQuestion";
 import QuestionBuilder from "components/Dashboard/Questions/QuestionCreate";
 import QuizQuestions from "components/Dashboard/Questions/QuizQuestions";
@@ -9,7 +10,6 @@ import QUizSubmissions from "components/Dashboard/Questions/QuizSubmissions";
 import Quizzes from "components/Dashboard/Quizzes";
 import Settings from "components/Dashboard/Settings";
 import PublicDashboard from "components/PublicDashboard";
-import PublicQuizQuestions from "components/PublicDashboard/QuestionSlider";
 
 import PublicQuizResult from "./PublicDashboard/PublicQuizResult";
 import UserRegistrationForm from "./PublicDashboard/UserRegistration";
@@ -20,6 +20,7 @@ export const PUBLIC_QUIZ_PATH = "/quiz/:quizId/:submissionId";
 export const PUBLIC_QUIZ_RESULT_PATH =
   "/public/quizzes/:quizId/submissions/:submissionId/result";
 
+export const SUBMISSION_REPORT_DOWNLOAD = "/quiz/:quizId/report";
 export const DASHBOARD_PATH = "/";
 export const QUIZZES_PATH = "/quizzes";
 export const QUIZ_QUESTIONS_PATH = "/quizzes/:id/questions";
@@ -75,6 +76,10 @@ export const DASHBOARD_ROUTES = [
     path: QUIZ_SUBMISSIONS_PATH,
     component: QUizSubmissions,
   },
+  {
+    path: SUBMISSION_REPORT_DOWNLOAD,
+    component: DownloadReport,
+  },
 ];
 
 export const PUBLIC_ROUTES = [
@@ -82,10 +87,10 @@ export const PUBLIC_ROUTES = [
     path: PUBLIC_DASHBOARD_PATH,
     component: PublicDashboard,
   },
-  {
-    path: PUBLIC_QUIZ_PATH,
-    component: PublicQuizQuestions,
-  },
+  // {
+  //   path: PUBLIC_QUIZ_PATH,
+  //   component: PublicQuizQuestions,
+  // },
   {
     path: PUBLIC_REGISTER_PATH,
     component: UserRegistrationForm,

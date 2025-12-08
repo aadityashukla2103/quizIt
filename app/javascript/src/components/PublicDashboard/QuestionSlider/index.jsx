@@ -78,7 +78,7 @@ const PublicQuizQuestions = () => {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center text-xl">
-        Loading...
+        Loading....
       </div>
     );
   }

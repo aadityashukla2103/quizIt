@@ -19,20 +19,25 @@ namespace :api, defaults: { format: :json } do
 
    resources :quizzes, only: [:index, :show, :create, :update, :destroy] do
     member do
-         post :clone
-       end
-    collection do
-        put :bulk_update
-        delete :bulk_delete
-
+      post :clone
+      resource :report, only: [:create], module: :quizzes do
+        get :download, on: :member
       end
+    end
+
+    collection do
+      put :bulk_update
+      delete :bulk_delete
+    end
+
     resources :questions, only: [:index, :show, :create, :update, :destroy] do
       member do
-         post :clone
-       end
+        post :clone
+      end
       resources :options, only: [:index, :show, :create, :update, :destroy]
     end
   end
+
    resources :organizations, only: [:index, :show, :create, :update, :destroy]
    resources :categories, only: [:index, :show, :create, :update, :destroy]
    resources :submissions, only: [:index, :show, :create, :update, :destroy] do

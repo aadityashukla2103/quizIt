@@ -9,6 +9,7 @@ import {
   ActionDropdown,
 } from "neetoui";
 import { SubHeader } from "neetoui/layouts";
+import { Link } from "react-router-dom";
 
 import { Column } from "../../../../assets/icons";
 
@@ -22,6 +23,7 @@ const SubmissionsHeader = ({
   setFilters,
   visibleColumns,
   toggleColumnVisibility,
+  quizId,
 }) => {
   const handleClearFilters = () => {
     setFilters({ name: "", email: "", status: "" });
@@ -46,7 +48,9 @@ const SubmissionsHeader = ({
       }
       rightActionBlock={
         <div className="flex items-center gap-2">
-          <Button icon={Download} style="tertiary" />
+          <Link to={`/quiz/${quizId}/report`}>
+            <Button icon={Download} style="tertiary" />
+          </Link>
           <Dropdown buttonStyle="tertiary" icon={Column}>
             <Menu>
               <MenuItemButton>
