@@ -39,6 +39,9 @@ namespace :api, defaults: { format: :json } do
      member do
          post :finalize
        end
+     collection do
+     get :quiz_submissions
+   end
    end
    resources :submission_answers, only: [:index, :show, :create, :update, :destroy]
  end

@@ -6,7 +6,7 @@ class Api::V1::QuizzesController < Api::V1::BaseController
 
   def index
     if @current_user
-      quizzes = Quiz.includes(:category, :submissions)
+      quizzes = Quiz.includes(:category, :organization, :questions, :submissions)
         .where(organization_id: @current_user.organization_id)
     else
       quizzes = Quiz.includes(:category, :submissions)
