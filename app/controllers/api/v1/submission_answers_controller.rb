@@ -15,6 +15,13 @@ class Api::V1::SubmissionAnswersController < Api::V1::BaseController
   def create
     submission_answer = SubmissionAnswer.new(submission_answer_params)
 
+    if submission_answer.selected_option_id.present?
+      option = Option.find(submission_answer.selected_option_id)
+      submission_answer.is_correct = option.is_correct
+    else
+      submission_answer.is_correct = nil
+    end
+
     if submission_answer.save
       render_json(submission_answer, :created)
     else

@@ -1,10 +1,15 @@
 import axios from "axios";
 
+const show = submissionId => axios.get(`/api/v1/submissions/${submissionId}`);
+
 const register = payload =>
   axios.post("/api/v1/submissions", {
     submission: payload,
   });
 
-const submissionsApi = { register };
+const finalizeSubmission = submissionId =>
+  axios.post(`/api/v1/submissions/${submissionId}/finalize`);
+
+const submissionsApi = { register, finalizeSubmission, show };
 
 export default submissionsApi;
