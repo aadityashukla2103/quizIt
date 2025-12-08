@@ -2,10 +2,15 @@ import React, { useEffect, useState } from "react";
 
 import quizzesApi from "apis/quizzes";
 import submissionAnswersApi from "apis/submissionAnswers";
-import { useNavigate, useParams } from "react-router-dom";
+import submissionsApi from "apis/submissions";
+import { useHistory, useParams } from "react-router-dom";
+
+import ActionButtons from "./ActionButtons";
+import Header from "./Header";
+import QuestionCard from "./QuestionCard";
 
 const PublicQuizQuestions = () => {
-  const navigate = useNavigate();
+  const history = useHistory();
   const { quizId, submissionId } = useParams();
 
   const [questions, setQuestions] = useState([]);
@@ -15,42 +20,58 @@ const PublicQuizQuestions = () => {
 
   const currentQuestion = questions[currentIndex];
 
-  const fetchQuestions = async () => {
-    try {
-      const response = await quizzesApi.questions(quizId);
-      setQuestions(response.data.questions);
-      setLoading(false);
-    } catch (e) {
-      logger.log("Error fetching questions", e);
-    }
-  };
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const response = await quizzesApi.show(quizId);
+        const questionsWithAnswers = response.data.questions.map(q => ({
+          ...q,
+          selected_option_id: null,
+        }));
+        setQuestions(questionsWithAnswers);
+        setLoading(false);
+      } catch (e) {
+        logger.error("Error fetching questions", e);
+      }
+    };
+    fetchQuestions();
+  }, [quizId]);
 
   useEffect(() => {
-    fetchQuestions();
-  }, []);
+    if (!questions.length) return;
+    const current = questions[currentIndex];
+    const previouslySelected = current.options.find(
+      o => o.id === current.selected_option_id
+    );
+    setSelectedOption(previouslySelected ?? null);
+  }, [currentIndex, questions]);
 
-  const submitAnswer = async () => {
-    if (!selectedOption) return;
+  const handleOptionSelect = option => {
+    setSelectedOption(option);
+    const updatedQuestions = [...questions];
+    updatedQuestions[currentIndex].selected_option_id = option.id;
+    setQuestions(updatedQuestions);
+  };
 
+  const handleSubmitQuiz = async () => {
     try {
-      await submissionAnswersApi.create({
-        submission_answer: {
-          submission_id: submissionId,
-          question_id: currentQuestion.id,
-          option_id: selectedOption.id,
-        },
-      });
-
-      if (currentIndex + 1 < questions.length) {
-        setCurrentIndex(currentIndex + 1);
-        setSelectedOption(null);
-      } else {
-        navigate(
-          `/public/quizzes/${quizId}/submissions/${submissionId}/result`
-        );
+      for (const q of questions) {
+        await submissionAnswersApi.create({
+          submission_answer: {
+            submission_id: submissionId,
+            question_id: q.id,
+            selected_option_id: q.selected_option_id,
+          },
+        });
       }
+
+      await submissionsApi.finalizeSubmission(submissionId);
+
+      history.replace(
+        `/public/quizzes/${quizId}/submissions/${submissionId}/result`
+      );
     } catch (e) {
-      logger.log("Error saving answer", e);
+      logger.error("Error submitting quiz", e);
     }
   };
 
@@ -63,49 +84,25 @@ const PublicQuizQuestions = () => {
   }
 
   return (
-    <div className="mx-auto flex h-screen max-w-3xl flex-col justify-between p-8">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-800">Quiz Questions</h1>
-        <p className="mt-2 text-gray-500">
-          Question {currentIndex + 1} of {questions.length}
-        </p>
-      </div>
-      <div className="mt-10">
-        <h2 className="mb-6 text-xl font-semibold text-gray-900">
-          {currentQuestion.question}
-        </h2>
-        <div className="space-y-4">
-          {currentQuestion.options.map(opt => (
-            <div
-              key={opt.id}
-              className={`
-                cursor-pointer rounded-xl border p-4 transition
-                ${
-                  selectedOption?.id === opt.id
-                    ? "border-blue-600 bg-blue-50"
-                    : "border-gray-300 hover:bg-gray-100"
-                }
-              `}
-              onClick={() => setSelectedOption(opt)}
-            >
-              {opt.option}
-            </div>
-          ))}
-        </div>
-      </div>
-      <button
-        disabled={!selectedOption}
-        className={`mt-10 w-full rounded-xl py-3 text-lg
-          ${
-            selectedOption
-              ? "bg-blue-600 text-white hover:bg-blue-700"
-              : "cursor-not-allowed bg-gray-300 text-gray-600"
+    <div className="mx-auto flex h-screen max-w-3xl flex-col justify-evenly p-8">
+      <Header currentIndex={currentIndex} totalQuestions={questions.length} />
+      <QuestionCard
+        question={currentQuestion}
+        selectedOption={selectedOption}
+        onSelect={handleOptionSelect}
+      />
+      <ActionButtons
+        currentIndex={currentIndex}
+        total={questions.length}
+        onPrev={() => setCurrentIndex(prev => prev - 1)}
+        onNext={() => {
+          if (currentIndex + 1 < questions.length) {
+            setCurrentIndex(currentIndex + 1);
+          } else {
+            handleSubmitQuiz();
           }
-        `}
-        onClick={submitAnswer}
-      >
-        {currentIndex + 1 === questions.length ? "Finish Quiz" : "Next"}
-      </button>
+        }}
+      />
     </div>
   );
 };

@@ -9,7 +9,21 @@ class Api::V1::SubmissionsController < Api::V1::BaseController
   end
 
   def show
-    render_json(@submission)
+    submission = Submission.includes(submission_answers: { selected_option: {}, question: :options }).find(params[:id])
+
+    render json: submission.as_json(
+      include: {
+        submission_answers: {
+          include: {
+            selected_option: { only: [:id, :content, :is_correct] },
+            question: {
+              only: [:id, :content],
+              include: { options: { only: [:id, :content, :is_correct] } }
+            }
+          }
+        }
+      }
+    )
   end
 
   def create
@@ -36,6 +50,21 @@ class Api::V1::SubmissionsController < Api::V1::BaseController
     @submission.destroy
     head :no_content
   end
+
+  def finalize
+    submission = Submission.find(params[:id])
+    answers = submission.submission_answers
+
+    submission.update(
+      total_questions: answers.count,
+      correct_answers: answers.where(is_correct: true).count,
+      wrong_answers: answers.where(is_correct: false).count,
+      status: "completed",
+      submitted_at: Time.current
+    )
+
+    render json: submission
+ end
 
   private
 

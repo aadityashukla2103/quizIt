@@ -42,9 +42,7 @@ const UserRegistrationForm = () => {
       const response = await axios.post("/api/v1/guest_registrations", payload);
       const submissionId = response.data.submission_id;
 
-      logger.log("Submission created:", submissionId);
-
-      history.push(`/quiz/${quizId}?submissionId=${submissionId}`);
+      history.push(`/quiz/${quizId}/${submissionId}`);
     } catch (error) {
       logger.error(error.response.data.error);
     }

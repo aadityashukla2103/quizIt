@@ -35,7 +35,11 @@ namespace :api, defaults: { format: :json } do
   end
    resources :organizations, only: [:index, :show, :create, :update, :destroy]
    resources :categories, only: [:index, :show, :create, :update, :destroy]
-   resources :submissions, only: [:index, :show, :create, :update, :destroy]
+   resources :submissions, only: [:index, :show, :create, :update, :destroy] do
+     member do
+         post :finalize
+       end
+   end
    resources :submission_answers, only: [:index, :show, :create, :update, :destroy]
  end
 end
