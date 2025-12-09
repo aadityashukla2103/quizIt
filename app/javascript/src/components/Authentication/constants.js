@@ -15,7 +15,6 @@ export const SIGNUP_FORM_INITIAL_VALUES = {
   lastName: "",
   password: "",
   passwordConfirmation: "",
-  organizationId: "",
 };
 
 export const LOGIN_FORM_VALIDATION_SCHEMA = yup.object().shape({
@@ -36,5 +35,4 @@ export const SIGNUP_FORM_VALIDATION_SCHEMA = yup.object().shape({
     .string()
     .oneOf([yup.ref("password")], "Passwords must match")
     .required("Required"),
-  organizationId: yup.string().required("Required"),
 });

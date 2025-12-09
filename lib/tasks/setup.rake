@@ -38,7 +38,7 @@ def delete_all_records_from_all_tables
 end
 
 def create_sample_data!
-  organization = Organization.find_or_create_by!(name: "Acme Inc")
+  organization = Organization.find_or_create_by!(name: "Big Binary")
   seed_categories!
   create_user! email: "oliver@example.com", organization: organization
 end
