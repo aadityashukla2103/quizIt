@@ -40,3 +40,7 @@ export const CHANGE_PASSWORD_FORM_INPUT_ATTRIBUTES = {
   "aria-required": "true",
   placeholder: "******",
 };
+
+export const ORGANIZATION_FORM_VALIDATION_SCHEMA = yup.object().shape({
+  name: yup.string().required("Organization name is required"),
+});

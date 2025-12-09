@@ -14,9 +14,18 @@ const create = async organizationData => {
   return response.data;
 };
 
+const update = async (id, payload) => {
+  const response = await axios.put(`/api/v1/organizations/${id}`, {
+    organization: payload,
+  });
+
+  return response.data;
+};
+
 export const organizationApi = {
   fetch,
   create,
+  update,
 };
 
 export default organizationApi;

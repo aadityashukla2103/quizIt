@@ -6,8 +6,10 @@ namespace :api, defaults: { format: :json } do
      post "login", to: "sessions#create", as: "login"
      delete "logout", to: "sessions#destroy", as: "logout"
    end
+   get "users/me", to: "users#me"
 
    resources :users, only: [:show, :create, :update, :destroy], constraints: { id: /.*/ }
+
    resources :notes, only: [:index, :create, :update] do
      collection do
        post "bulk_destroy"

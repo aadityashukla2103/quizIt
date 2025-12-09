@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import quizzesApi from "apis/quizzes";
 import InlineEdit from "components/commons/InlineEdit";
-import { LeftArrow, ExternalLink, Link } from "neetoicons";
+import { LeftArrow, ExternalLink, Link, Check } from "neetoicons";
 import { Tab, Button, Tooltip } from "neetoui";
 import { useHistory } from "react-router-dom";
 
@@ -16,6 +16,7 @@ const QuizHeader = ({
   const history = useHistory();
   const path = history.location.pathname;
   const [quizName, setQuizName] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const fetchQuizName = async quizId => {
     const response = await quizzesApi.show(quizId);
@@ -24,7 +25,7 @@ const QuizHeader = ({
 
   useEffect(() => {
     fetchQuizName(quizId);
-  }, []);
+  }, [quizId]);
 
   const onLeftArrowClick = () => {
     if (isQuestionBuilder) {
@@ -44,15 +45,15 @@ const QuizHeader = ({
   };
 
   const onPublish = async () => {
-    await quizzesApi.update(quizId, {
-      quiz: { status: "published" },
-    });
+    await quizzesApi.update(quizId, { quiz: { status: "published" } });
     reloadQuizData();
   };
 
   const onCopyLink = () => {
-    const publicLink = `${window.location.origin}/publicdashboard/register//${quizId}`;
+    const publicLink = `${window.location.origin}/publicdashboard/register/${quizId}`;
     navigator.clipboard.writeText(publicLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -84,7 +85,9 @@ const QuizHeader = ({
             <Button icon={ExternalLink} label="Publish" onClick={onPublish} />
             {status === "published" && (
               <Tooltip content="Copy quiz link">
-                <Link className="cursor-pointer" onClick={onCopyLink} />
+                <div className="cursor-pointer" onClick={onCopyLink}>
+                  {copied ? <Check /> : <Link />}
+                </div>
               </Tooltip>
             )}
           </div>

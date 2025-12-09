@@ -80,3 +80,9 @@ en:
     bulk_deleted_successfully: "Selected quizzes deleted successfully."
     no_fields_to_update: "No fields to update."
     no_quizzes_selected: "No quizzes selected."
+  organization:
+    created_successfully: "Organization created successfully"
+    creation_failed: "Failed to create organization"
+    updated_successfully: "Organization updated successfully"
+    update_failed: "Failed to update organization"
+    deleted_successfully: "Organization deleted successfully"
