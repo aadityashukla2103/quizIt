@@ -1,39 +1,36 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+// @ts-nocheck
+import React, { useCallback, useRef, useState } from "react";
 
-import NewSidebar from "./NewSidebar";
-import OldSidebar from "./OldSidebar";
+// eslint-disable-next-line import/extensions
+import NewSidebar from "./NewSidebar.jsx";
+// eslint-disable-next-line import/extensions
+import OldSidebar from "./OldSidebar.jsx";
 
-const SIDEBAR_TRIGGERS = ["Notes", "Settings", "Explore"];
-
+// Switch to the new sidebar when the old sidebar itself is clicked (but not its links).
 const SidebarWrapper = () => {
   const [activeSidebar, setActiveSidebar] = useState("old");
-  const wrapperRef = useRef();
+  const containerRef = useRef(null);
 
-  useEffect(() => {
-    const handleClickOutside = event => {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-        setActiveSidebar("old");
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+  const handleOldSidebarClick = useCallback(event => {
+    const isLinkClick = event.target.closest("a, button");
+    if (isLinkClick) return; // keep normal nav clicks unchanged
+    setActiveSidebar("new");
   }, []);
 
-  const handleNavClick = useCallback(label => {
-    if (SIDEBAR_TRIGGERS.includes(label)) {
-      setActiveSidebar("new");
-    } else {
-      setActiveSidebar("old");
-    }
+  const handleCloseNewSidebar = useCallback(() => {
+    setActiveSidebar("old");
   }, []);
 
   return (
-    <div className="flex">
-      {activeSidebar === "old" && <OldSidebar onNavClick={handleNavClick} />}
+    <div className="relative flex min-h-screen" ref={containerRef}>
+      {activeSidebar === "old" && (
+        <div className="h-full" onClick={handleOldSidebarClick}>
+          <OldSidebar />
+        </div>
+      )}
       {activeSidebar === "new" && (
-        <div ref={wrapperRef}>
-          <NewSidebar onNavClick={handleNavClick} />
+        <div className="relative z-10 h-full">
+          <NewSidebar onClose={handleCloseNewSidebar} />
         </div>
       )}
     </div>

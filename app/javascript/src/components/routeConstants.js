@@ -12,11 +12,12 @@ import Settings from "components/Dashboard/Settings";
 import PublicDashboard from "components/PublicDashboard";
 
 import PublicQuizResult from "./PublicDashboard/PublicQuizResult";
+import PublicQuizQuestions from "./PublicDashboard/QuestionSlider";
 import UserRegistrationForm from "./PublicDashboard/UserRegistration";
 
 export const PUBLIC_DASHBOARD_PATH = "/publicdashboard";
 export const PUBLIC_REGISTER_PATH = "/publicdashboard/register/:quizId";
-export const PUBLIC_QUIZ_PATH = "/quiz/:quizId/:submissionId";
+export const PUBLIC_QUIZ_PATH = "/public/quiz/:quizId/:submissionId";
 export const PUBLIC_QUIZ_RESULT_PATH =
   "/public/quizzes/:quizId/submissions/:submissionId/result";
 
@@ -87,10 +88,10 @@ export const PUBLIC_ROUTES = [
     path: PUBLIC_DASHBOARD_PATH,
     component: PublicDashboard,
   },
-  // {
-  //   path: PUBLIC_QUIZ_PATH,
-  //   component: PublicQuizQuestions,
-  // },
+  {
+    path: PUBLIC_QUIZ_PATH,
+    component: PublicQuizQuestions,
+  },
   {
     path: PUBLIC_REGISTER_PATH,
     component: UserRegistrationForm,

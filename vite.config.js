@@ -1,4 +1,5 @@
 import { mergeDeepRight } from "ramda";
+import react from "@vitejs/plugin-react";
 import { alias } from "./config/build/config";
 import { define, entryPoints, extensions } from "./config/build/constants";
 import svgr from "vite-plugin-svgr";
@@ -21,6 +22,7 @@ const baseConfig = {
   },
   define,
   plugins: [
+    react(),
     svgr({
       svgrOptions: { exportType: "default" },
       include: "**/*.svg",
