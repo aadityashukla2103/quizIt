@@ -1,4 +1,5 @@
 import Email from "./Email";
+import Organization from "./Organization";
 import Password from "./Password";
 import Profile from "./Profile";
 
@@ -24,5 +25,12 @@ export const SETTINGS_NAVLINKS = [
     description: "Manage password",
     path: "/settings?tab=password",
     component: Password,
+  },
+  {
+    key: "organization",
+    label: "Organization",
+    description: "Change organization name",
+    path: "/settings?tab=organization",
+    component: Organization,
   },
 ];

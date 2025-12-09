@@ -4,5 +4,5 @@ class Organization < ApplicationRecord
   has_many :users, dependent: :destroy
   has_many :quizzes, dependent: :destroy
 
-  validates :name, presence: true
+  validates :name, presence: true, uniqueness: { case_sensitive: false }
 end

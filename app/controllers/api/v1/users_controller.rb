@@ -7,7 +7,7 @@ class Api::V1::UsersController < Api::V1::BaseController
   before_action :load_user!, only: %i[show destroy]
 
   def show
-    render_json(@user)
+    render_json(@user.as_json(include: :organization))
   end
 
   def create
@@ -20,13 +20,17 @@ class Api::V1::UsersController < Api::V1::BaseController
     render_message(
       t("signup_successful"),
       :ok,
-      { user: user, auth_token: user.authentication_token }
+      { user: user.as_json(include: :organization), auth_token: user.authentication_token }
     )
   end
 
   def destroy
     @user.destroy!
     render_message(t("successfully_deleted", count: 1, entity: "User"))
+  end
+
+  def me
+    render json: current_user.as_json(include: :organization)
   end
 
   private

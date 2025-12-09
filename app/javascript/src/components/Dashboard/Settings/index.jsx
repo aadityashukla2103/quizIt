@@ -18,6 +18,7 @@ const Settings = ({ history, location }) => {
     location.state.resetTab = null;
     setActiveNavlink(() => getActiveNavLink(tab));
   }
+  const ComponentToRender = activeNavlink.component;
 
   return (
     <>
@@ -32,7 +33,7 @@ const Settings = ({ history, location }) => {
           />
         ))}
       </MenuBar>
-      <activeNavlink.component />
+      <ComponentToRender />
     </>
   );
 };

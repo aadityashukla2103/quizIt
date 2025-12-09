@@ -121,7 +121,7 @@ const QuizQuestions = () => {
             <NoData title="There are no questions to show." />
           </div>
         ) : (
-          <Scrollable>
+          <Scrollable className="m-auto w-[80%]">
             <Header
               isHeaderFixed
               className="w-full px-0 md:px-0"

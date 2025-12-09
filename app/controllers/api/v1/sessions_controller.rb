@@ -10,7 +10,12 @@ class Api::V1::SessionsController < Api::V1::BaseController
       render_error(t("invalid_credentials"), :unauthorized)
     else
       sign_in(user)
-      render_json({ auth_token: user.authentication_token, user:, is_admin: user.admin? }, :created)
+      render_json(
+        {
+          auth_token: user.authentication_token,
+          user: user.as_json(include: :organization),
+          is_admin: user.admin?
+        }, :created)
     end
   end
 
