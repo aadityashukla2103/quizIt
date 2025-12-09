@@ -2,18 +2,25 @@
 
 class Api::V1::GuestRegistrationsController < Api::V1::BaseController
   skip_before_action :authenticate_user_using_x_auth_token
+
   def create
     guest_name = "#{params[:firstName]} #{params[:lastName]}"
     guest_email = params[:email].downcase
     quiz_id = params[:quiz_id]
 
     if User.exists?(email: guest_email)
-      render json: { error: "This email is already registered as a user." }, status: :unprocessable_entity
+      render_message(
+        t("guest_registration.email_already_registered"),
+        :unprocessable_entity
+      )
       return
     end
 
     if Submission.exists?(quiz_id: quiz_id, guest_email: guest_email)
-      render json: { error: "You have already registered for this quiz." }, status: :unprocessable_entity
+      render_message(
+        t("guest_registration.already_registered_for_quiz"),
+        :unprocessable_entity
+      )
       return
     end
 
@@ -25,9 +32,17 @@ class Api::V1::GuestRegistrationsController < Api::V1::BaseController
     )
 
     if submission.save
-      render json: { submission_id: submission.id }, status: :created
+      render_message(
+        t("guest_registration.registered_successfully"),
+        :created,
+        { submission_id: submission.id }
+      )
     else
-      render json: { errors: submission.errors.full_messages }, status: :unprocessable_entity
+      render_message(
+        t("guest_registration.registration_failed"),
+        :unprocessable_entity,
+        { errors: submission.errors.full_messages }
+      )
     end
   end
 end

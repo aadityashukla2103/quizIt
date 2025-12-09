@@ -23,23 +23,39 @@ class Api::V1::SubmissionAnswersController < Api::V1::BaseController
     end
 
     if submission_answer.save
-      render_json(submission_answer, :created)
+      render_message(
+        t("submission_answer.created_successfully"),
+        :created,
+        { submission_answer: submission_answer }
+      )
     else
-      render json: { errors: submission_answer.errors.full_messages }, status: :unprocessable_entity
+      render_message(
+        t("submission_answer.creation_failed"),
+        :unprocessable_entity,
+        { errors: submission_answer.errors.full_messages }
+      )
     end
   end
 
   def update
     if @submission_answer.update(submission_answer_params)
-      render_json(@submission_answer)
+      render_message(
+        t("submission_answer.updated_successfully"),
+        :ok,
+        { submission_answer: @submission_answer }
+      )
     else
-      render json: { errors: @submission_answer.errors.full_messages }, status: :unprocessable_entity
+      render_message(
+        t("submission_answer.update_failed"),
+        :unprocessable_entity,
+        { errors: @submission_answer.errors.full_messages }
+      )
     end
   end
 
   def destroy
     @submission_answer.destroy
-    head :no_content
+    render_message(t("submission_answer.deleted_successfully"), :ok)
   end
 
   private

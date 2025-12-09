@@ -11,44 +11,60 @@ class Api::V1::SubmissionsController < Api::V1::BaseController
   def show
     submission = Submission.includes(submission_answers: { selected_option: {}, question: :options }).find(params[:id])
 
-    render json: submission.as_json(
-      include: {
-        submission_answers: {
-          include: {
-            selected_option: { only: [:id, :content, :is_correct] },
-            question: {
-              only: [:id, :content],
-              include: { options: { only: [:id, :content, :is_correct] } }
+    render_json(
+      submission.as_json(
+        include: {
+          submission_answers: {
+            include: {
+              selected_option: { only: [:id, :content, :is_correct] },
+              question: {
+                only: [:id, :content],
+                include: { options: { only: [:id, :content, :is_correct] } }
+              }
             }
           }
         }
-      }
-    )
+          ))
   end
 
   def create
     submission = Submission.new(submission_params)
-
     submission.submitted_at ||= Time.current
 
     if submission.save
-      render json: { submission: submission }, status: :created
+      render_message(
+        t("submission.created_successfully"),
+        :created,
+        { submission: submission }
+      )
     else
-      render json: { errors: submission.errors.full_messages }, status: :unprocessable_entity
+      render_message(
+        t("submission.creation_failed"),
+        :unprocessable_entity,
+        { errors: submission.errors.full_messages }
+      )
     end
   end
 
   def update
     if @submission.update(submission_params)
-      render_json(@submission)
+      render_message(
+        t("submission.updated_successfully"),
+        :ok,
+        { submission: @submission }
+      )
     else
-      render json: { errors: @submission.errors.full_messages }, status: :unprocessable_entity
+      render_message(
+        t("submission.update_failed"),
+        :unprocessable_entity,
+        { errors: @submission.errors.full_messages }
+      )
     end
   end
 
   def destroy
     @submission.destroy
-    head :no_content
+    render_message(t("submission.deleted_successfully"), :ok)
   end
 
   def finalize
@@ -63,8 +79,12 @@ class Api::V1::SubmissionsController < Api::V1::BaseController
       submitted_at: Time.current
     )
 
-    render json: submission
- end
+    render_message(
+      t("submission.finalized_successfully"),
+      :ok,
+      { submission: submission }
+    )
+  end
 
   def quiz_submissions
     submissions = Submission.where(quiz_id: params[:quiz_id])
@@ -81,21 +101,22 @@ class Api::V1::SubmissionsController < Api::V1::BaseController
       submissions = submissions.where(status: params[:status])
     end
 
-    render json: submissions.as_json(
-      only: [
-        :id,
-        :quiz_id,
-        :user_id,
-        :status,
-        :submitted_at,
-        :correct_answers,
-        :wrong_answers,
-        :total_questions,
-        :guest_name,
-        :guest_email
-      ]
-    )
-end
+    render_json(
+      submissions.as_json(
+        only: [
+          :id,
+          :quiz_id,
+          :user_id,
+          :status,
+          :submitted_at,
+          :correct_answers,
+          :wrong_answers,
+          :total_questions,
+          :guest_name,
+          :guest_email
+        ]
+          ))
+  end
 
   private
 
@@ -115,5 +136,5 @@ end
         :guest_name,
         :guest_email
       )
-end
+    end
 end

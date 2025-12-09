@@ -90,7 +90,7 @@ class Api::V1::QuizzesController < Api::V1::BaseController
       questions: @quiz.questions.as_json(include: :options),
       last_saved_at: last_saved_at
     }
-end
+  end
 
   def create
     quiz = Quiz.new(quiz_params)
@@ -98,9 +98,17 @@ end
     quiz.status = "draft"
 
     if quiz.save
-      render_json(quiz, :created)
+      render_message(
+        t("quiz.created_successfully"),
+        :created,
+        { quiz: quiz }
+      )
     else
-      render json: { errors: quiz.errors.full_messages }, status: :unprocessable_entity
+      render_message(
+        t("quiz.creation_failed"),
+        :unprocessable_entity,
+        { errors: quiz.errors.full_messages }
+      )
     end
   end
 
@@ -108,59 +116,71 @@ end
     safe_params = quiz_params
 
     if @quiz.update(safe_params)
-      render_json(@quiz)
+      render_message(
+        t("quiz.updated_successfully"),
+        :ok,
+        { quiz: @quiz }
+      )
     else
-      render json: { errors: @quiz.errors.full_messages }, status: :unprocessable_entity
+      render_message(
+        t("quiz.update_failed"),
+        :unprocessable_entity,
+        { errors: @quiz.errors.full_messages }
+      )
     end
   end
 
   def destroy
     @quiz.destroy
-    head :no_content
+    render_message(t("quiz.deleted_successfully"), :ok)
   end
 
   def clone
     original_quiz = Quiz.find(params[:id])
     cloned_quiz = original_quiz.clone_with_questions!
 
-    render json: {
-      id: cloned_quiz.id,
-      name: cloned_quiz.name,
-      status: cloned_quiz.status,
-      category_name: cloned_quiz.category&.name,
-      created_at: cloned_quiz.created_at,
-      submission_count: 0
-    }, status: :created
+    render_message(
+      t("quiz.cloned_successfully"),
+      :created,
+      { quiz: cloned_quiz }
+    )
   rescue ActiveRecord::RecordInvalid => e
-    render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
- end
+    render_message(
+      t("quiz.clone_failed"),
+      :unprocessable_entity,
+      { errors: e.record.errors.full_messages }
+    )
+  end
 
   def bulk_update
     data = bulk_params
-
     quiz_ids = data[:ids]
     updates = data[:updates].to_h
 
     if updates.blank?
-      return render json: { error: "No fields to update" }, status: :bad_request
+      return render_message(
+        t("quiz.no_fields_to_update"),
+        :bad_request
+      )
     end
 
     Quiz.where(id: quiz_ids).update_all(updates)
-
-    render json: { message: "Quizzes updated" }
+    render_message(t("quiz.bulk_updated_successfully"), :ok)
   end
 
   def bulk_delete
     quiz_ids = bulk_params[:ids]
 
     if quiz_ids.blank?
-      return render json: { error: "No quizzes selected" }, status: :bad_request
+      return render_message(
+        t("quiz.no_quizzes_selected"),
+        :bad_request
+      )
     end
 
     Quiz.where(id: quiz_ids).destroy_all
-
-    render json: { message: "Quizzes deleted successfully" }
-end
+    render_message(t("quiz.bulk_deleted_successfully"), :ok)
+  end
 
   private
 

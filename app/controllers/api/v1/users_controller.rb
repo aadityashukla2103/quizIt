@@ -11,12 +11,16 @@ class Api::V1::UsersController < Api::V1::BaseController
   end
 
   def create
-    user = User.create!(user_params)
+    organization = Organization.first || Organization.create!(name: "Default Organization")
+    user = User.new(user_params)
+    user.organization = organization
     user.role = "admin"
+    user.save!
+
     render_message(
       t("signup_successful"),
       :ok,
-      { user:, auth_token: user.authentication_token }
+      { user: user, auth_token: user.authentication_token }
     )
   end
 

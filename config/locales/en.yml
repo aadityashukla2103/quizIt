@@ -41,3 +41,42 @@ en:
   signup_successful: "Signup successful. Please login to continue"
   session:
     expiry: "Your session has expired. Please login again."
+
+  submission:
+    fetched_successfully: "Submission fetched successfully"
+    created_successfully: "Submission created successfully"
+    updated_successfully: "Submission updated successfully"
+    deleted_successfully: "Submission deleted successfully"
+    finalized_successfully: "Submission finalized successfully"
+    quiz_submissions_fetched: "Quiz submissions fetched successfully"
+    creation_failed: "Failed to create submission"
+    update_failed: "Failed to update submission"
+  submission_answer:
+    created_successfully: "Submission answer created successfully"
+    updated_successfully: "Submission answer updated successfully"
+    deleted_successfully: "Submission answer deleted successfully"
+    creation_failed: "Failed to create submission answer"
+    update_failed: "Failed to update submission answer"
+  question:
+    created_successfully: "Question created successfully"
+    updated_successfully: "Question updated successfully"
+    deleted_successfully: "Question deleted successfully"
+    creation_failed: "Failed to create question"
+    update_failed: "Failed to update question"
+  guest_registration:
+    email_already_registered: "This email is already registered as a user."
+    already_registered_for_quiz: "You have already registered for this quiz."
+    registered_successfully: "Guest registration successful."
+    registration_failed: "Failed to register guest. Please try again."
+  quiz:
+    created_successfully: "Quiz created successfully."
+    creation_failed: "Failed to create quiz."
+    updated_successfully: "Quiz updated successfully."
+    update_failed: "Failed to update quiz."
+    deleted_successfully: "Quiz deleted successfully."
+    cloned_successfully: "Quiz cloned successfully."
+    clone_failed: "Failed to clone quiz."
+    bulk_updated_successfully: "Selected quizzes updated successfully."
+    bulk_deleted_successfully: "Selected quizzes deleted successfully."
+    no_fields_to_update: "No fields to update."
+    no_quizzes_selected: "No quizzes selected."
