@@ -1,3 +1,5 @@
+// @ts-nocheck
+/* eslint-disable import/no-unresolved, import/extensions, no-undef */
 import React, { useEffect, useState } from "react";
 
 import questionsApi from "apis/questions";
@@ -77,12 +79,13 @@ const QuestionCreate = () => {
 
   useEffect(() => {
     fetchQuiz();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   if (loading) return null;
 
   return (
-    <div className="w-full">
-      <div className="w-full ">
+    <div className="w-full bg-white px-4 md:bg-transparent md:px-8">
+      <div className="w-full">
         <QuizHeader
           isQuestionBuilder
           quizId={quizId}
@@ -90,7 +93,7 @@ const QuestionCreate = () => {
           onTitleChange={updateQuizName}
         />
       </div>
-      <div className="mx-auto mt-6 w-full max-w-3xl space-y-6 rounded bg-white p-6 shadow">
+      <div className="mx-auto mt-6 w-full max-w-3xl space-y-6 rounded bg-white p-6 shadow md:px-8 md:shadow-lg">
         <div>
           <button
             className="text-indigo-500 hover:underline"

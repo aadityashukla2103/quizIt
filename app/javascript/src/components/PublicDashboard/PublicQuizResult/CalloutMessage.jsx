@@ -22,7 +22,7 @@ const CalloutMessage = ({ currentAnswer }) => {
   }
 
   return (
-    <div className="mt-0">
+    <div className="mb-6">
       <Callout style={calloutStyle}>{calloutMessage}</Callout>
     </div>
   );

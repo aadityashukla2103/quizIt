@@ -84,7 +84,7 @@ const PublicQuizQuestions = () => {
   }
 
   return (
-    <div className="mx-auto flex h-screen max-w-3xl flex-col justify-evenly p-8">
+    <div className="mx-auto flex h-screen max-w-3xl flex-col justify-center p-8">
       <Header currentIndex={currentIndex} totalQuestions={questions.length} />
       <QuestionCard
         question={currentQuestion}

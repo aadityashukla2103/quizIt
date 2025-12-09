@@ -38,7 +38,9 @@ def delete_all_records_from_all_tables
 end
 
 def create_sample_data!
-  create_user! email: "oliver@example.com"
+  organization = Organization.find_or_create_by!(name: "Acme Inc")
+  seed_categories!
+  create_user! email: "oliver@example.com", organization: organization
 end
 
 def create_user!(options = {})
@@ -50,5 +52,13 @@ def create_user!(options = {})
     role: "admin"
   }
   attributes = user_attributes.merge options
-  User.create! attributes
+  user = User.find_or_initialize_by(email: attributes[:email])
+  user.assign_attributes(attributes)
+  user.save!
+end
+
+def seed_categories!
+  %w[General Technology Science Business Lifestyle].each do |name|
+    Category.find_or_create_by!(name: name)
+  end
 end

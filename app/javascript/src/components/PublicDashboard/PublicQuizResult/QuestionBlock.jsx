@@ -7,7 +7,7 @@ const QuestionBlock = ({ currentAnswer }) => (
     <h2 className="mb-6 text-xl font-semibold">
       {currentAnswer.question.content}
     </h2>
-    <div className="space-y-4">
+    <div className="space-y-6">
       {currentAnswer.question.options.map(option => (
         <OptionCard
           key={option.id}
