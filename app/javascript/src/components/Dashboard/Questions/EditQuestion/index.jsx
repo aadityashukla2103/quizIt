@@ -17,7 +17,7 @@ const EditQuestion = () => {
   const fetchQuiz = async () => {
     try {
       const response = await quizzesApi.show(quizId);
-      setQuizName(response.name);
+      setQuizName(response.quiz.name);
     } catch (error) {
       logger.log(error);
     }
@@ -46,7 +46,6 @@ const EditQuestion = () => {
         content: values.question,
         options: values.options,
       });
-
       history.push(`/quizzes/${quizId}/questions`);
     } catch (err) {
       logger.log(err);
@@ -72,6 +71,7 @@ const EditQuestion = () => {
   return (
     <div className="w-full">
       <QuizHeader
+        isQuestionBuilder
         quizId={quizId}
         quizName={quizName}
         onTitleChange={updateQuizName}

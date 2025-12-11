@@ -18,31 +18,24 @@ const QuizQuestions = () => {
   const [quiz, setQuiz] = useState({});
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
   const [selectedPostIds, setSelectedPostIds] = useState([]);
   const [selectedPostName, setSelectedPostName] = useState("");
   const [lastUpdatedQuiz, setLastUpdatedQuiz] = useState("");
 
+  // Fetch quiz data including questions
   const fetchQuiz = async () => {
     try {
       const response = await quizzesApi.show(quizId);
-      setQuiz(response.data.quiz);
-      setLastUpdatedQuiz(response.data.last_saved_at);
+      setQuiz(response.quiz || {});
+      setQuestions(response.questions || []);
+      setLastUpdatedQuiz(response.last_saved_at || "");
     } catch (error) {
       logger.log(error);
     }
   };
 
-  const fetchQuestions = async () => {
-    try {
-      const response = await questionsApi.fetch(quizId);
-      setQuestions(response);
-    } catch (error) {
-      logger.log(error);
-    }
-  };
-
+  // Update quiz name
   const updateQuizName = async newName => {
     try {
       await quizzesApi.update(quizId, { quiz: { name: newName } });
@@ -52,20 +45,24 @@ const QuizQuestions = () => {
     }
   };
 
+  // Delete a question
   const handleDeleteQuestion = async () => {
     try {
       await questionsApi.destroy(quizId, selectedPostIds);
-      await fetchQuestions();
+      fetchQuiz();
       setSelectedPostIds([]);
     } catch (error) {
       logger.log(error);
     }
   };
 
+  // Navigate to edit page
   const handleEditQuestion = (quizId, questionId) => {
     history.push(`/quizzes/${quizId}/question/${questionId}/edit`);
+    fetchQuiz();
   };
 
+  // Clone a question
   const handleCloneQuestion = async questionId => {
     try {
       const cloned = await questionsApi.clone(quizId, questionId);
@@ -75,14 +72,22 @@ const QuizQuestions = () => {
     }
   };
 
+  // Load quiz data on mount and on quizId change
   useEffect(() => {
     const loadData = async () => {
+      setLoading(true);
       await fetchQuiz();
-      await fetchQuestions();
       setLoading(false);
     };
+
     loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    // Optional: refresh data on navigation
+    const unlisten = history.listen(() => {
+      loadData();
+    });
+
+    return () => unlisten();
   }, [quizId]);
 
   if (loading) return <PageLoader />;
@@ -116,11 +121,7 @@ const QuizQuestions = () => {
             </Link>
           }
         />
-        {questions.length === 0 ? (
-          <div className="flex min-h-[60vh] items-center justify-center px-0">
-            <NoData title="There are no questions to show." />
-          </div>
-        ) : (
+        {Array.isArray(questions) && questions.length > 0 ? (
           <Scrollable className="m-auto w-[80%]">
             <Header
               isHeaderFixed
@@ -146,6 +147,10 @@ const QuizQuestions = () => {
               ))}
             </div>
           </Scrollable>
+        ) : (
+          <div className="flex min-h-[60vh] items-center justify-center px-0">
+            <NoData title="There are no questions to show." />
+          </div>
         )}
       </div>
     </div>

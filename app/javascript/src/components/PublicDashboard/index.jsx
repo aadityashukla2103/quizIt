@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 
 import categoriesApi from "apis/categories";
 import quizzesApi from "apis/quizzes";
+import EmptyQuizzesListImage from "assets/images/EmptyQuizzesList";
+import EmptyState from "components/commons/EmptyState";
 import { Filter } from "neetoicons";
 import { Button, PageLoader, Input, Select } from "neetoui";
 
@@ -104,6 +106,12 @@ const Hero = () => {
         </div>
         {loading ? (
           <PageLoader />
+        ) : quizzes.length === 0 ? (
+          <EmptyState
+            image={<EmptyQuizzesListImage />}
+            primaryActionLabel="Add new quiz"
+            title="No quiz found!"
+          />
         ) : (
           <section className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {quizzes.slice(0, 6).map(quiz => (

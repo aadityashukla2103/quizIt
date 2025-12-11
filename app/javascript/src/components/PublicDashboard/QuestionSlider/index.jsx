@@ -24,7 +24,7 @@ const PublicQuizQuestions = () => {
     const fetchQuestions = async () => {
       try {
         const response = await quizzesApi.show(quizId);
-        const questionsWithAnswers = response.data.questions.map(q => ({
+        const questionsWithAnswers = response.questions.map(q => ({
           ...q,
           selected_option_id: null,
         }));

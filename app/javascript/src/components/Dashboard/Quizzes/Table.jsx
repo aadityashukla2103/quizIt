@@ -50,9 +50,13 @@ const Table = ({
 
   const handleClone = async id => {
     try {
-      const { data } = await quizzesApi.cloneQuiz(id);
+      const quiz = await quizzesApi.cloneQuiz(id);
+
       setQuizzes(prev => [
-        { ...data, submission_count: 0, created_at: new Date().toISOString() },
+        {
+          ...quiz,
+          submission_count: 0,
+        },
         ...prev,
       ]);
     } catch (err) {

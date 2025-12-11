@@ -13,25 +13,26 @@ class Api::V1::OptionsController < Api::V1::BaseController
   end
 
   def create
-    option = @question.options.build(option_params)
-    if option.save
-      render_json(option, :created)
+    result = Options::CreateService.new(@question, option_params).call
+    if result[:success]
+      render_json(result[:option], result[:status])
     else
-      render json: { errors: option.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: result[:errors] }, status: result[:status]
     end
   end
 
   def update
-    if @option.update(option_params)
-      render_json(@option)
+    result = Options::UpdateService.new(@option, option_params).call
+    if result[:success]
+      render_json(result[:option], result[:status])
     else
-      render json: { errors: @option.errors.full_messages }, status: :unprocessable_entity
+      render json: { errors: result[:errors] }, status: result[:status]
     end
   end
 
   def destroy
-    @option.destroy
-    head :no_content
+    result = Options::DestroyService.new(@option).call
+    head result[:status]
   end
 
   private

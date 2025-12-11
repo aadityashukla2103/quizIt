@@ -1,16 +1,56 @@
 import axios from "axios";
 
-const fetch = params => axios.get("api/v1/quizzes", { params });
-const show = id => axios.get(`/api/v1/quizzes/${id}`);
-const create = payload => axios.post("api/v1/quizzes", { quiz: payload });
-const update = (id, payload) => axios.put(`api/v1/quizzes/${id}`, payload);
-const destroy = id => axios.delete(`/api/v1/quizzes/${id}`);
-const cloneQuiz = id => axios.post(`/api/v1/quizzes/${id}/clone`);
-const bulkUpdate = payload =>
-  axios.put("/api/v1/quizzes/bulk_update", { quiz: payload });
+const fetch = async params => {
+  const response = await axios.get("/api/v1/quizzes", { params });
 
-const bulkDelete = payload =>
-  axios.delete("api/v1/quizzes/bulk_delete", { data: { quiz: payload } });
+  return response;
+};
+
+const show = async id => {
+  const response = await axios.get(`/api/v1/quizzes/${id}`);
+
+  return response.data;
+};
+
+const create = async payload => {
+  const response = await axios.post("/api/v1/quizzes", { quiz: payload });
+
+  return response.data;
+};
+
+const update = async (id, payload) => {
+  const response = await axios.put(`/api/v1/quizzes/${id}`, payload);
+
+  return response.data;
+};
+
+const destroy = async id => {
+  const response = await axios.delete(`/api/v1/quizzes/${id}`);
+
+  return response.data;
+};
+
+const cloneQuiz = async id => {
+  const response = await axios.post(`/api/v1/quizzes/${id}/clone`);
+
+  return response.data.quiz;
+};
+
+const bulkUpdate = async payload => {
+  const response = await axios.put("/api/v1/quizzes/bulk_update", {
+    quiz: payload,
+  });
+
+  return response.data;
+};
+
+const bulkDelete = async payload => {
+  const response = await axios.delete("/api/v1/quizzes/bulk_delete", {
+    data: { quiz: payload },
+  });
+
+  return response.data;
+};
 
 const quizzesApi = {
   fetch,

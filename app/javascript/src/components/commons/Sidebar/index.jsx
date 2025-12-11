@@ -1,19 +1,15 @@
-// @ts-nocheck
 import React, { useCallback, useRef, useState } from "react";
 
-// eslint-disable-next-line import/extensions
-import NewSidebar from "./NewSidebar.jsx";
-// eslint-disable-next-line import/extensions
-import OldSidebar from "./OldSidebar.jsx";
+import NewSidebar from "./NewSidebar";
+import OldSidebar from "./OldSidebar";
 
-// Switch to the new sidebar when the old sidebar itself is clicked (but not its links).
 const SidebarWrapper = () => {
   const [activeSidebar, setActiveSidebar] = useState("old");
   const containerRef = useRef(null);
 
   const handleOldSidebarClick = useCallback(event => {
     const isLinkClick = event.target.closest("a, button");
-    if (isLinkClick) return; // keep normal nav clicks unchanged
+    if (isLinkClick) return;
     setActiveSidebar("new");
   }, []);
 

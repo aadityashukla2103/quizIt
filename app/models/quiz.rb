@@ -13,7 +13,16 @@ class Quiz < ApplicationRecord
   def clone_with_questions!
     cloned_quiz = self.deep_clone include: { questions: :options }
 
-    cloned_quiz.name = "#{self.name} (Copy)"
+    base_name = "#{self.name} (Copy)"
+    counter = 1
+    new_name = base_name
+
+    while Quiz.exists?(organization_id: self.organization_id, name: new_name)
+      counter += 1
+      new_name = "#{base_name} #{counter}"
+    end
+
+    cloned_quiz.name = new_name
     cloned_quiz.status = "draft"
     cloned_quiz.category_id = self.category_id
     cloned_quiz.organization_id = self.organization_id

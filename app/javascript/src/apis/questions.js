@@ -47,7 +47,7 @@ const clone = async (quizId, questionId) => {
   return response.data;
 };
 
-export default {
+const questionsApi = {
   fetch,
   show,
   create,
@@ -55,3 +55,5 @@ export default {
   destroy,
   clone,
 };
+
+export default questionsApi;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import quizzesApi from "apis/quizzes";
 import InlineEdit from "components/commons/InlineEdit";
@@ -7,6 +7,7 @@ import { Tab, Button, Tooltip } from "neetoui";
 import { useHistory } from "react-router-dom";
 
 const QuizHeader = ({
+  quizName,
   quizId,
   lastSavedAt,
   status,
@@ -15,17 +16,7 @@ const QuizHeader = ({
 }) => {
   const history = useHistory();
   const path = history.location.pathname;
-  const [quizName, setQuizName] = useState("");
   const [copied, setCopied] = useState(false);
-
-  const fetchQuizName = async quizId => {
-    const response = await quizzesApi.show(quizId);
-    setQuizName(response.data.quiz.name);
-  };
-
-  useEffect(() => {
-    fetchQuizName(quizId);
-  }, [quizId]);
 
   const onLeftArrowClick = () => {
     if (isQuestionBuilder) {
