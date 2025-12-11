@@ -4,58 +4,28 @@ class Api::V1::SubmissionAnswersController < Api::V1::BaseController
   before_action :set_submission_answer, only: [:show, :update, :destroy]
 
   def index
-    submission_answers = SubmissionAnswer.all
+    submission_answers = SubmissionAnswers::IndexService.new.call
     render_json(submission_answers)
   end
 
   def show
-    render_json(@submission_answer)
+    submission_answer = SubmissionAnswers::ShowService.new(@submission_answer).call
+    render_json(submission_answer)
   end
 
   def create
-    submission_answer = SubmissionAnswer.new(submission_answer_params)
-
-    if submission_answer.selected_option_id.present?
-      option = Option.find(submission_answer.selected_option_id)
-      submission_answer.is_correct = option.is_correct
-    else
-      submission_answer.is_correct = nil
-    end
-
-    if submission_answer.save
-      render_message(
-        t("submission_answer.created_successfully"),
-        :created,
-        { submission_answer: submission_answer }
-      )
-    else
-      render_message(
-        t("submission_answer.creation_failed"),
-        :unprocessable_entity,
-        { errors: submission_answer.errors.full_messages }
-      )
-    end
+    result = SubmissionAnswers::CreateService.new(submission_answer_params).call
+    render_message(result[:message], result[:status], result[:data])
   end
 
   def update
-    if @submission_answer.update(submission_answer_params)
-      render_message(
-        t("submission_answer.updated_successfully"),
-        :ok,
-        { submission_answer: @submission_answer }
-      )
-    else
-      render_message(
-        t("submission_answer.update_failed"),
-        :unprocessable_entity,
-        { errors: @submission_answer.errors.full_messages }
-      )
-    end
+    result = SubmissionAnswers::UpdateService.new(@submission_answer, submission_answer_params).call
+    render_message(result[:message], result[:status], result[:data])
   end
 
   def destroy
-    @submission_answer.destroy
-    render_message(t("submission_answer.deleted_successfully"), :ok)
+    result = SubmissionAnswers::DestroyService.new(@submission_answer).call
+    render_message(result[:message], result[:status], result[:data])
   end
 
   private

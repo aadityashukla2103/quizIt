@@ -2,80 +2,36 @@
 
 class Api::V1::QuestionsController < Api::V1::BaseController
   before_action :set_quiz
-  before_action :set_question, only: [:show, :update, :destroy]
+  before_action :set_question, only: [:show, :update, :destroy, :clone]
 
   def index
-    questions = @quiz.questions.includes(:options)
-    render json: questions.as_json(include: :options)
+    result = Questions::IndexService.new(@quiz).call
+    render_message(message: result[:message], data: result[:data], status: result[:status])
   end
 
   def show
-    render json: @question.as_json(include: :options)
-  end
+    result = Questions::ShowService.new(@question).call
+    render_message(result[:message], :ok, result[:data])
+   end
 
   def create
-    question = @quiz.questions.build(content: question_params[:content])
-
-    if question.save
-      if question_params[:options]
-        question_params[:options].each do |opt|
-          question.options.create(content: opt[:content], is_correct: opt[:isCorrect])
-        end
-      end
-      render_message(
-        t("question.created_successfully"),
-        :created,
-        { question: question.as_json(include: :options) }
-      )
-    else
-      render_message(
-        t("question.creation_failed"),
-        :unprocessable_entity,
-        { errors: question.errors.full_messages }
-      )
-    end
+    result = Questions::CreateService.new(@quiz, question_params).call
+    render_message(result[:message], result[:status])
   end
 
   def update
-    ActiveRecord::Base.transaction do
-      @question.update!(content: question_params[:content])
-
-      if question_params[:options]
-        @question.options.destroy_all
-
-        question_params[:options].each do |opt|
-          @question.options.create!(
-            content: opt[:content],
-            is_correct: opt[:isCorrect]
-          )
-        end
-      end
-    end
-
-    render_message(
-      t("question.updated_successfully"),
-      :ok,
-      { question: @question.as_json(include: :options) }
-    )
-  rescue ActiveRecord::RecordInvalid => e
-    render_message(
-      t("question.update_failed"),
-      :unprocessable_entity,
-      { errors: e.record.errors.full_messages }
-    )
+    result = Questions::UpdateService.new(@question, question_params).call
+    render_message(result[:message], result[:status], result[:data])
   end
 
   def destroy
-    @question.destroy
-    render_message(t("question.deleted_successfully"), :ok)
+    result = Questions::DestroyService.new(@question).call
+    render_message(result[:message], result[:status], result[:data])
   end
 
   def clone
-    original_question = @quiz.questions.find(params[:id])
-    cloned_question = original_question.clone_question!
-    render json: cloned_question.as_json(include: :options), status: :created
-  rescue ActiveRecord::RecordInvalid => e
-    render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
+    result = Questions::CloneService.new(@question).call
+    render_message(result[:message], result[:status], result[:data])
   end
 
   private

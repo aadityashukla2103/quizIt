@@ -16,6 +16,6 @@ module ApiResponders
     end
 
     def render_json(json = {}, status = :ok)
-      render status:, json:
+      render status: status, json: json
     end
 end

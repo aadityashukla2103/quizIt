@@ -155,6 +155,7 @@ const Quizzes = () => {
       {quizzes.length ? (
         <>
           <TableHeader
+            fetchQuizzes={fetchQuizzes}
             quizzesLength={quizzes.length}
             selectedQuizIds={selectedQuizIds}
             setQuizzes={setQuizzes}
