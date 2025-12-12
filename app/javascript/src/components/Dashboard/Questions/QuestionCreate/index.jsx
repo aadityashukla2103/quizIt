@@ -1,5 +1,3 @@
-// @ts-nocheck
-/* eslint-disable import/no-unresolved, import/extensions, no-undef */
 import React, { useEffect, useState } from "react";
 
 import questionsApi from "apis/questions";

@@ -54,19 +54,27 @@ const QuizHeader = ({
           <LeftArrow className="cursor-pointer" onClick={onLeftArrowClick} />
           <InlineEdit value={quizName} onSave={handleQuizNameChange} />
         </div>
-        <div className="col-span-1 flex justify-center gap-4">
-          <Tab.Item
-            active={path.includes("questions")}
-            onClick={() => history.push(`/quizzes/${quizId}/questions`)}
-          >
-            Questions
-          </Tab.Item>
-          <Tab.Item
-            active={path.includes("submissions")}
-            onClick={() => history.push(`/quizzes/${quizId}/submissions`)}
-          >
-            Submissions
-          </Tab.Item>
+        <div className="col-span-1 m-auto flex justify-center gap-4">
+          <Tab noUnderline>
+            <Tab.Item
+              active={path.includes("questions")}
+              onClick={() => history.push(`/quizzes/${quizId}/questions`)}
+            >
+              Questions
+            </Tab.Item>
+            <Tab.Item
+              active={path.includes("submissions")}
+              onClick={() => history.push(`/quizzes/${quizId}/submissions`)}
+            >
+              Submissions
+            </Tab.Item>
+            <Tab.Item
+              active={path.includes("configure")}
+              onClick={() => history.push(`/quizzes/${quizId}/configure`)}
+            >
+              Configure
+            </Tab.Item>
+          </Tab>
         </div>
         {!isQuestionBuilder && (
           <div className="flex items-center justify-end gap-4 text-xs text-gray-600">

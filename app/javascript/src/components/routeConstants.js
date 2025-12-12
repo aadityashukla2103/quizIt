@@ -2,11 +2,12 @@ import Login from "components/Authentication/Login";
 import PasswordReset from "components/Authentication/ResetPassword";
 import Signup from "components/Authentication/Signup";
 import Dashboard from "components/Dashboard";
+import QuizConfigure from "components/Dashboard/Questions/Configure";
 import DownloadReport from "components/Dashboard/Questions/DownloadReport";
 import EditQuestion from "components/Dashboard/Questions/EditQuestion";
 import QuestionBuilder from "components/Dashboard/Questions/QuestionCreate";
 import QuizQuestions from "components/Dashboard/Questions/QuizQuestions";
-import QUizSubmissions from "components/Dashboard/Questions/QuizSubmissions";
+import QuizSubmissions from "components/Dashboard/Questions/QuizSubmissions";
 import Quizzes from "components/Dashboard/Quizzes";
 import Settings from "components/Dashboard/Settings";
 import PublicDashboard from "components/PublicDashboard";
@@ -27,7 +28,9 @@ export const QUIZZES_PATH = "/quizzes";
 export const QUIZ_QUESTIONS_PATH = "/quizzes/:id/questions";
 export const QUESTION_CREATE_PATH = "/quizzes/:id/questions/new";
 export const QUESTION_EDIT_PATH = "/quizzes/:quizId/question/:questionId/edit";
+export const QUIZ_CONFIGURE_PATH = "/quizzes/:quizId/configure";
 export const QUIZ_SUBMISSIONS_PATH = "/quizzes/:quizId/submissions";
+
 export const CHANGE_PASSWORD_PATH = "/settings?tab=password";
 export const PROFILE_PATH = "/settings?tab=profile";
 export const SETTINGS_PATH = "/settings";
@@ -75,11 +78,15 @@ export const DASHBOARD_ROUTES = [
   },
   {
     path: QUIZ_SUBMISSIONS_PATH,
-    component: QUizSubmissions,
+    component: QuizSubmissions,
   },
   {
     path: SUBMISSION_REPORT_DOWNLOAD,
     component: DownloadReport,
+  },
+  {
+    path: QUIZ_CONFIGURE_PATH,
+    component: QuizConfigure,
   },
 ];
 
