@@ -1,5 +1,3 @@
-// @ts-nocheck
-/* eslint-disable import/no-unresolved, import/extensions, no-undef */
 import React, { useEffect, useState } from "react";
 
 import questionsApi from "apis/questions";
@@ -23,7 +21,6 @@ const QuizQuestions = () => {
   const [selectedPostName, setSelectedPostName] = useState("");
   const [lastUpdatedQuiz, setLastUpdatedQuiz] = useState("");
 
-  // Fetch quiz data including questions
   const fetchQuiz = async () => {
     try {
       const response = await quizzesApi.show(quizId);
@@ -35,7 +32,6 @@ const QuizQuestions = () => {
     }
   };
 
-  // Update quiz name
   const updateQuizName = async newName => {
     try {
       await quizzesApi.update(quizId, { quiz: { name: newName } });
@@ -45,7 +41,6 @@ const QuizQuestions = () => {
     }
   };
 
-  // Delete a question
   const handleDeleteQuestion = async () => {
     try {
       await questionsApi.destroy(quizId, selectedPostIds);
@@ -56,13 +51,11 @@ const QuizQuestions = () => {
     }
   };
 
-  // Navigate to edit page
   const handleEditQuestion = (quizId, questionId) => {
     history.push(`/quizzes/${quizId}/question/${questionId}/edit`);
     fetchQuiz();
   };
 
-  // Clone a question
   const handleCloneQuestion = async questionId => {
     try {
       const cloned = await questionsApi.clone(quizId, questionId);
@@ -72,7 +65,6 @@ const QuizQuestions = () => {
     }
   };
 
-  // Load quiz data on mount and on quizId change
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
@@ -82,7 +74,6 @@ const QuizQuestions = () => {
 
     loadData();
 
-    // Optional: refresh data on navigation
     const unlisten = history.listen(() => {
       loadData();
     });
