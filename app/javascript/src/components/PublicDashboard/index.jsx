@@ -40,6 +40,7 @@ const Hero = () => {
       const { data } = await quizzesApi.fetch({
         query: searchQuery,
         status: "published",
+        homepage: true,
         category: categoryValue,
         page: 1,
         pageSize: 20,

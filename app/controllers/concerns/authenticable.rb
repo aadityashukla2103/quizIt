@@ -18,15 +18,23 @@ module Authenticable
       if user && auth_token && Devise.secure_compare(user.authentication_token, auth_token)
         sign_in user, store: false
       elsif public_action?
-        # Allow public access
         nil
       else
         render_error(t("invalid_credentials"), :unauthorized)
       end
     end
 
-    # Define which actions are public
     def public_action?
-      controller_name == "quizzes" && ["index", "show", "create_submission"].include?(action_name)
-    end
+      (controller_name == "quizzes" &&
+        ["index", "show", "create_submission"].include?(action_name)) ||
+
+      (controller_name == "guest_registrations" &&
+        action_name == "create") ||
+
+      (controller_name == "submissions" &&
+        ["show", "update", "finalize"].include?(action_name)) ||
+
+      (controller_name == "submission_answers" &&
+        action_name == "create")
+end
 end
