@@ -3,31 +3,34 @@ import React from "react";
 const OptionCard = ({ option, selectedOptionId }) => {
   const isCorrect = option.is_correct;
   const isSelected = option.id === selectedOptionId;
-  const unanswered = selectedOptionId === null;
+  const isUnanswered = selectedOptionId === null;
 
   let boxClass = "border-gray-300 bg-white";
-  let label;
+  let label = null;
 
-  if (unanswered && isCorrect) {
+  if (isUnanswered && isCorrect) {
     boxClass = "border-green-500 bg-green-50";
     label = "✓ Correct Answer";
   }
 
-  if (!unanswered) {
-    if (isCorrect) {
-      boxClass = "border-green-500 bg-green-50";
-      label = "✓ Correct Answer";
-    } else if (isSelected) {
-      boxClass = "border-red-500 bg-red-50";
+  if (!isUnanswered) {
+    if (isSelected && isCorrect) {
+      boxClass = "border-green-600";
+      label = "✓ Your Answer (Correct)";
+    } else if (isSelected && !isCorrect) {
+      boxClass = "border-red-500";
       label = "✗ Your Answer";
+    } else if (!isSelected && isCorrect) {
+      boxClass = "border-green-500";
+      label = "✓ Correct Answer";
     }
   }
 
   return (
     <div className={`rounded-xl border p-4 ${boxClass}`}>
-      <div className="flex justify-between">
-        {option.content}
-        {label && <span className="ml-2 text-sm">{label}</span>}
+      <div className="flex items-center justify-between">
+        <span>{option.content}</span>
+        {label && <span className="text-sm font-medium">{label}</span>}
       </div>
     </div>
   );

@@ -4,19 +4,22 @@ import { Callout } from "neetoui";
 
 const CalloutMessage = ({ currentAnswer }) => {
   const isUnanswered = currentAnswer.selected_option_id === null;
+  const isUnvisited = currentAnswer.attempted === false;
   const isCorrect = currentAnswer.is_correct === true;
-  const isWrong = currentAnswer.is_correct === false && !isUnanswered;
 
   let calloutMessage = "";
   let calloutStyle = "info";
 
-  if (isUnanswered) {
-    calloutMessage = "You did not answer this question.";
+  if (isUnvisited) {
+    calloutMessage = "🚫 You did not attempt this question.";
+    calloutStyle = "info";
+  } else if (isUnanswered) {
+    calloutMessage = "⚠️ You did not answer this question.";
     calloutStyle = "info";
   } else if (isCorrect) {
     calloutMessage = "🎉 Your answer is correct!";
     calloutStyle = "success";
-  } else if (isWrong) {
+  } else {
     calloutMessage = "❌ Your answer is incorrect.";
     calloutStyle = "danger";
   }

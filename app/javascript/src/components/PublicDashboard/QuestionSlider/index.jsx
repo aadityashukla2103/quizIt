@@ -17,6 +17,7 @@ const PublicQuizQuestions = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [selectedOption, setSelectedOption] = useState(null);
+  const [timeLeft, setTimeLeft] = useState(null);
 
   const currentQuestion = questions[currentIndex];
 
@@ -34,23 +35,79 @@ const PublicQuizQuestions = () => {
         logger.error("Error fetching questions", e);
       }
     };
+
     fetchQuestions();
   }, [quizId]);
 
   useEffect(() => {
     if (!questions.length) return;
+
     const current = questions[currentIndex];
     const previouslySelected = current.options.find(
       o => o.id === current.selected_option_id
     );
+
     setSelectedOption(previouslySelected ?? null);
   }, [currentIndex, questions]);
+
+  useEffect(() => {
+    const fetchRemainingTime = async () => {
+      try {
+        const response = await submissionsApi.show(submissionId);
+        setTimeLeft(response.data.remaining_time);
+      } catch (e) {
+        logger.error("Error fetching remaining time", e);
+      }
+    };
+
+    fetchRemainingTime();
+  }, [submissionId]);
+
+  useEffect(() => {
+    if (timeLeft === null) return undefined;
+
+    if (timeLeft <= 0) {
+      handleAutoSubmit();
+
+      return undefined;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft(prev => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft]);
 
   const handleOptionSelect = option => {
     setSelectedOption(option);
     const updatedQuestions = [...questions];
     updatedQuestions[currentIndex].selected_option_id = option.id;
     setQuestions(updatedQuestions);
+  };
+
+  const handleAutoSubmit = async () => {
+    try {
+      for (const q of questions) {
+        if (!q.selected_option_id) continue;
+
+        await submissionAnswersApi.create({
+          submission_answer: {
+            submission_id: submissionId,
+            question_id: q.id,
+            selected_option_id: q.selected_option_id,
+          },
+        });
+      }
+
+      await submissionsApi.finalizeSubmission(submissionId);
+
+      history.replace(
+        `/public/quizzes/${quizId}/submissions/${submissionId}/result`
+      );
+    } catch (e) {
+      logger.error("Auto submit failed", e);
+    }
   };
 
   const handleSubmitQuiz = async () => {
@@ -84,8 +141,12 @@ const PublicQuizQuestions = () => {
   }
 
   return (
-    <div className="mx-auto flex h-screen max-w-3xl flex-col justify-center p-8">
-      <Header currentIndex={currentIndex} totalQuestions={questions.length} />
+    <div className="mx-auto flex h-screen max-w-3xl flex-col justify-center">
+      <Header
+        currentIndex={currentIndex}
+        timeLeft={timeLeft}
+        totalQuestions={questions.length}
+      />
       <QuestionCard
         question={currentQuestion}
         selectedOption={selectedOption}

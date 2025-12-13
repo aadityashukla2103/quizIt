@@ -15,7 +15,8 @@ class GuestRegistrations::CreateService
       guest_name: @guest_name,
       guest_email: @guest_email,
       quiz_id: @quiz_id,
-      status: 0
+      status: 0,
+      started_at: Time.current
     )
 
     if submission.save

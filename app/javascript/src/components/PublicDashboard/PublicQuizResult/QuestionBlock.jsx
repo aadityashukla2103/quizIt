@@ -12,7 +12,7 @@ const QuestionBlock = ({ currentAnswer }) => (
         <OptionCard
           key={option.id}
           option={option}
-          selectedOptionId={currentAnswer.selected_option_id}
+          selectedOptionId={currentAnswer.selected_option?.id}
         />
       ))}
     </div>

@@ -77,7 +77,6 @@ const QuestionCreate = () => {
 
   useEffect(() => {
     fetchQuiz();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   if (loading) return null;
 
