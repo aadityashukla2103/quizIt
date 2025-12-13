@@ -6,4 +6,10 @@ class Submission < ApplicationRecord
   belongs_to :user, optional: true
 
   has_many :submission_answers, dependent: :destroy
+
+  def time_over?
+    return false unless quiz.time_limit && started_at
+
+    Time.current >= started_at + quiz.time_limit.minutes
+  end
 end

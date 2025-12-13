@@ -24,7 +24,6 @@ const PublicQuizResult = () => {
       try {
         const response = await submissionsApi.show(submissionId);
         setSubmission(response.data);
-        logger.log("res", response.data);
       } catch (e) {
         logger.error("Error fetching result", e);
       } finally {
