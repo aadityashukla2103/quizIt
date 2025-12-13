@@ -36,13 +36,22 @@
     private
 
       def base_scope
-        if @current_user
-          Quiz.includes(:category, :organization, :questions, :submissions)
-            .where(organization_id: @current_user.organization_id)
-        else
-          Quiz.includes(:category, :submissions).where(status: "published")
+        quizzes =
+          if @current_user
+            Quiz.includes(:category, :organization, :questions, :submissions)
+              .where(organization_id: @current_user.organization_id)
+          else
+            Quiz.includes(:category, :submissions)
+          end
+
+        if @params[:homepage].present?
+          quizzes = quizzes.where(
+            status: "published",
+            show_on_homepage: true
+          )
         end
-      end
+        quizzes
+     end
 
       def search(quizzes)
         return quizzes unless @params[:query].present?
