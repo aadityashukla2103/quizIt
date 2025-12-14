@@ -51,7 +51,9 @@ class Api::V1::QuizzesController < Api::V1::BaseController
     end
 
     def quiz_params
-      params.require(:quiz).permit(:name, :category_id, :status, :show_on_homepage, :time_limit)
+      params.require(:quiz).permit(
+        :name, :category_id, :status, :show_on_homepage, :time_limit, :randomize_questions,
+        :randomize_options)
     end
 
     def bulk_params

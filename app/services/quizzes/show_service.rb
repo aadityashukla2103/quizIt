@@ -6,12 +6,26 @@ class Quizzes::ShowService
   end
 
   def call
+    questions = @quiz.questions.to_a
+
+    questions.shuffle! if @quiz.randomize_questions
+
+    questions_with_options = questions.map do |question|
+      options = question.options.to_a
+
+      options.shuffle! if @quiz.randomize_options
+
+      question.as_json.merge(
+        options: options.as_json
+      )
+    end
+
     {
       message: "Quiz fetched successfully",
       status: :ok,
       data: {
         quiz: @quiz.as_json,
-        questions: @quiz.questions.as_json(include: :options),
+        questions: questions_with_options,
         last_saved_at: last_saved_at
       }
     }
@@ -28,7 +42,8 @@ class Quizzes::ShowService
 
       return nil unless latest_time > @quiz.created_at
 
-      latest_time.in_time_zone("Asia/Kolkata")
+      latest_time
+        .in_time_zone("Asia/Kolkata")
         .strftime("%I:%M%p, %d %B %Y")
     end
 end
