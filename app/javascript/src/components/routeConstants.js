@@ -3,6 +3,7 @@ import PasswordReset from "components/Authentication/ResetPassword";
 import Signup from "components/Authentication/Signup";
 import Dashboard from "components/Dashboard";
 import QuizConfigure from "components/Dashboard/Questions/Configure";
+import QuizConfigureQuestions from "components/Dashboard/Questions/Configure/QuizQuestionsConfigure";
 import QuizConfigureTiming from "components/Dashboard/Questions/Configure/QuizTiming";
 import QuizConfigureVisibilty from "components/Dashboard/Questions/Configure/QuizVisibiltyConfigure";
 import DownloadReport from "components/Dashboard/Questions/DownloadReport";
@@ -33,6 +34,9 @@ export const QUESTION_EDIT_PATH = "/quizzes/:quizId/question/:questionId/edit";
 export const QUIZ_CONFIGURE_PATH = "/quizzes/:quizId/configure";
 export const QUIZ_CONFIGURE_VISIBILITY_PATH =
   "/quizzes/:quizId/configure/visibility";
+
+export const QUIZ_CONFIGURE_QUESTIONS_PATH =
+  "/quizzes/:quizId/configure/questions";
 
 export const QUIZ_CONFIGURE_TIMING_PATH = "/quizzes/:quizId/configure/timing";
 
@@ -102,6 +106,10 @@ export const DASHBOARD_ROUTES = [
   {
     path: QUIZ_CONFIGURE_TIMING_PATH,
     component: QuizConfigureTiming,
+  },
+  {
+    path: QUIZ_CONFIGURE_QUESTIONS_PATH,
+    component: QuizConfigureQuestions,
   },
 ];
 
