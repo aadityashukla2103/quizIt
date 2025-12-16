@@ -4,6 +4,7 @@ import Signup from "components/Authentication/Signup";
 import Dashboard from "components/Dashboard";
 import QuizConfigure from "components/Dashboard/Questions/Configure";
 import QuizConfigureQuestions from "components/Dashboard/Questions/Configure/QuizQuestionsConfigure";
+import QuizEmailNotifications from "components/Dashboard/Questions/Configure/QuizSubmissionEmail";
 import QuizConfigureTiming from "components/Dashboard/Questions/Configure/QuizTiming";
 import QuizConfigureVisibilty from "components/Dashboard/Questions/Configure/QuizVisibiltyConfigure";
 import DownloadReport from "components/Dashboard/Questions/DownloadReport";
@@ -39,6 +40,8 @@ export const QUIZ_CONFIGURE_QUESTIONS_PATH =
   "/quizzes/:quizId/configure/questions";
 
 export const QUIZ_CONFIGURE_TIMING_PATH = "/quizzes/:quizId/configure/timing";
+export const QUIZ_CONFIGURE_NOTIFICATIONS_PATH =
+  "/quizzes/:quizId/configure/notifications";
 
 export const QUIZ_SUBMISSIONS_PATH = "/quizzes/:quizId/submissions";
 
@@ -110,6 +113,10 @@ export const DASHBOARD_ROUTES = [
   {
     path: QUIZ_CONFIGURE_QUESTIONS_PATH,
     component: QuizConfigureQuestions,
+  },
+  {
+    path: QUIZ_CONFIGURE_NOTIFICATIONS_PATH,
+    component: QuizEmailNotifications,
   },
 ];
 

@@ -8,6 +8,7 @@ class User < ApplicationRecord
   has_many :notes, dependent: :delete_all
   belongs_to :organization
   has_many :submissions, dependent: :destroy
+  has_many :quizzes, foreign_key: :creator_id
 
   validates :email, uniqueness: true
   validates :password_confirmation, presence: true, on: :create

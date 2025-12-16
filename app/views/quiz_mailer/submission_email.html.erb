@@ -1,0 +1,9 @@
+<h2>Quiz Submitted</h2>
+
+<p><strong>Quiz:</strong> <%= @quiz.name %></p>
+<p><strong>Candidate name:</strong> <%= @submission.guest_name %></p>
+<p><strong>Candidate email:</strong> <%= @submission.guest_email %></p>
+<p><strong>Score:</strong>
+    <%= @submission.correct_answers %> /
+    <%= @submission.total_questions %>
+</p>
