@@ -24,6 +24,8 @@ module Submissions
         submitted_at: Time.current
       )
 
+      send_email_notification
+
       {
         message: I18n.t("submission.finalized_successfully"),
         status: :ok,
@@ -39,6 +41,14 @@ module Submissions
           status: :ok,
           data: { submission: @submission }
         }
+      end
+
+      def send_email_notification
+        return unless @quiz.email_notifications
+
+        QuizMailer
+          .submission_email(@quiz, @submission)
+          .deliver_later
       end
   end
 end
