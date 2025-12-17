@@ -1,40 +1,40 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 
-import { MenuBar } from "neetoui/layouts";
-import queryString from "query-string";
+import { Tab } from "neetoui";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 
-import { SETTINGS_NAVLINKS } from "./navLinks";
-import { getActiveNavLink } from "./utils";
+import Organization from "./Organization";
 
-const Settings = ({ history, location }) => {
-  const { tab } = queryString.parse(location.search);
-  const [activeNavlink, setActiveNavlink] = useState(
-    () => getActiveNavLink(tab) || SETTINGS_NAVLINKS[0]
-  );
-
-  useEffect(() => history.push(activeNavlink?.path), [activeNavlink]);
-
-  if (location.state?.resetTab) {
-    location.state.resetTab = null;
-    setActiveNavlink(() => getActiveNavLink(tab));
-  }
-  const ComponentToRender = activeNavlink.component;
+const Settings = () => {
+  const history = useHistory();
+  const path = history.location.pathname;
 
   return (
-    <>
-      <MenuBar showMenu title="Settings">
-        {SETTINGS_NAVLINKS.map(navlink => (
-          <MenuBar.Item
-            active={tab === navlink.key}
-            description={navlink.description}
-            key={navlink.key}
-            label={navlink.label}
-            onClick={() => setActiveNavlink(navlink)}
-          />
-        ))}
-      </MenuBar>
-      <ComponentToRender />
-    </>
+    <div className="w-full">
+      <div className="mt-4 flex w-full justify-center gap-4">
+        <Tab className="flex justify-center gap-4 ">
+          <Tab.Item
+            active={path.includes("questions")}
+            onClick={() => history.push(`/settings/general`)}
+          >
+            Questions
+          </Tab.Item>
+          <Tab.Item
+            active={path.includes("submissions")}
+            onClick={() => history.push(`/settings/redirections`)}
+          >
+            Submissions
+          </Tab.Item>
+          <Tab.Item
+            active={path.includes("configure")}
+            onClick={() => history.push(`/settings/categories`)}
+          >
+            Configure
+          </Tab.Item>
+        </Tab>
+      </div>
+      <Organization />
+    </div>
   );
 };
 

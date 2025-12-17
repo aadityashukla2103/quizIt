@@ -1,6 +1,7 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import organizationApi from "apis/organization";
+import usersApi from "apis/users";
 import { useUserState, useUserDispatch } from "contexts/user";
 import { Form, Formik } from "formik";
 import { Button } from "neetoui";
@@ -12,12 +13,22 @@ import { ORGANIZATION_FORM_VALIDATION_SCHEMA } from "./constants";
 const Organization = () => {
   const { user } = useUserState();
   const dispatch = useUserDispatch();
+  const [organization, setOrganization] = useState({});
+
+  const fetchUser = async () => {
+    const response = await usersApi.fetchCurrentUser();
+    setOrganization(response.organization);
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
   const initialFormValues = useMemo(
     () => ({
-      name: user.organization?.name || "",
+      name: organization.name || "",
     }),
-    [user]
+    [organization]
   );
 
   const handleSubmit = async (data, { setSubmitting, resetForm }) => {
@@ -45,12 +56,10 @@ const Organization = () => {
 
   return (
     <Container>
-      <Header
-        className="neeto-ui-border-gray-200 border-b"
-        title="Update Organization"
-      />
+      <Header title="Update Organization" />
       <div className="mx-auto flex h-full w-full flex-col items-center justify-center sm:max-w-md">
         <Formik
+          enableReinitialize
           initialValues={initialFormValues}
           validationSchema={ORGANIZATION_FORM_VALIDATION_SCHEMA}
           onSubmit={handleSubmit}
