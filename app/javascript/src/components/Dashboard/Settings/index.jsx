@@ -14,22 +14,22 @@ const Settings = () => {
       <div className="mt-4 flex w-full justify-center gap-4">
         <Tab className="flex justify-center gap-4 ">
           <Tab.Item
-            active={path.includes("questions")}
+            active={path.includes("setting")}
             onClick={() => history.push(`/settings/general`)}
           >
-            Questions
+            General
           </Tab.Item>
           <Tab.Item
-            active={path.includes("submissions")}
+            active={path.includes("redirections")}
             onClick={() => history.push(`/settings/redirections`)}
           >
-            Submissions
+            Redirections
           </Tab.Item>
           <Tab.Item
-            active={path.includes("configure")}
+            active={path.includes("categories")}
             onClick={() => history.push(`/settings/categories`)}
           >
-            Configure
+            Categories
           </Tab.Item>
         </Tab>
       </div>
