@@ -2,6 +2,6 @@
 
 class Categories::IndexService
   def call
-    Category.all
+    Category.includes(:quizzes)
   end
 end

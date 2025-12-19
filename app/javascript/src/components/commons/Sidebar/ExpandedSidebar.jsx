@@ -110,7 +110,7 @@ const NewSidebar = ({ onClose = () => {} }) => {
         <div className="space-y-2 border-b border-gray-200 pb-4 text-base">
           <button
             className="flex w-full items-center rounded px-2 py-2 text-gray-700 hover:bg-gray-100"
-            onClick={() => history.push("/settings")}
+            onClick={() => history.push("/settings/general")}
           >
             <span className="mr-2">⚙️</span>
             <span>Settings</span>

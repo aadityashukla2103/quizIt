@@ -14,6 +14,7 @@ import QuizQuestions from "components/Dashboard/Questions/QuizQuestions";
 import QuizSubmissions from "components/Dashboard/Questions/QuizSubmissions";
 import Quizzes from "components/Dashboard/Quizzes";
 import Settings from "components/Dashboard/Settings";
+import categoriesSettings from "components/Dashboard/Settings/CategoriesSettings";
 import PublicDashboard from "components/PublicDashboard";
 
 import PublicQuizResult from "./PublicDashboard/PublicQuizResult";
@@ -47,7 +48,8 @@ export const QUIZ_SUBMISSIONS_PATH = "/quizzes/:quizId/submissions";
 
 export const CHANGE_PASSWORD_PATH = "/settings?tab=password";
 export const PROFILE_PATH = "/settings?tab=profile";
-export const SETTINGS_PATH = "/settings";
+export const SETTINGS_PATH = "/settings/general";
+export const CATEGORIES_SETTINGS_PATH = "/settings/categories";
 export const LOGIN_PATH = "/login";
 export const SIGNUP_PATH = "/signup";
 export const RESET_PASSWORD_PATH = "/my/password/new";
@@ -77,6 +79,10 @@ export const DASHBOARD_ROUTES = [
   {
     path: SETTINGS_PATH,
     component: Settings,
+  },
+  {
+    path: CATEGORIES_SETTINGS_PATH,
+    component: categoriesSettings,
   },
   {
     path: QUIZ_QUESTIONS_PATH,
