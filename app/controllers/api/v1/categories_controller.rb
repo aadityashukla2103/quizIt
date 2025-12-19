@@ -5,7 +5,7 @@ class Api::V1::CategoriesController < ApplicationController
 
   def index
     result = Categories::IndexService.new.call
-    render json: result
+    render json: result, include: :quizzes
   end
 
   def show
@@ -15,17 +15,17 @@ class Api::V1::CategoriesController < ApplicationController
 
   def create
     result = Categories::CreateService.new(category_params).call
-    render_service_result(result)
+    render json: result
   end
 
   def update
     result = Categories::UpdateService.new(@category, category_params).call
-    render_service_result(result)
+    render json: result
   end
 
   def destroy
     result = Categories::DestroyService.new(@category).call
-    render_service_result(result)
+    render json: result
   end
 
   private

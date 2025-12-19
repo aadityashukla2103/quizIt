@@ -17,7 +17,7 @@ export const SIDENAV_LINKS = [
   },
   {
     label: "Settings",
-    to: "/settings",
+    to: "/settings/general",
     icon: Settings,
   },
   {
