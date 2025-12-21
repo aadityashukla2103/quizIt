@@ -2,6 +2,7 @@
 
 class Category < ApplicationRecord
   has_many :quizzes, dependent: :destroy
+  acts_as_list
 
   validates :name, presence: true
 end

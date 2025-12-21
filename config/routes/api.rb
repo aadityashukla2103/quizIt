@@ -41,7 +41,9 @@ namespace :api, defaults: { format: :json } do
   end
 
    resources :organizations, only: [:index, :show, :create, :update, :destroy]
-   resources :categories, only: [:index, :show, :create, :update, :destroy]
+   resources :categories, only: [:index, :show, :create, :update, :destroy] do
+     patch :reorder, on: :collection
+   end
    resources :submissions, only: [:index, :show, :create, :update, :destroy] do
      member do
          post :finalize
