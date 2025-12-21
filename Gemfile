@@ -108,5 +108,6 @@ gem "deep_cloneable"
 # for pagination
 gem "pagy"
 
+gem "acts_as_list"
 gem "wicked_pdf"
 gem "wkhtmltopdf-binary"

@@ -30,6 +30,8 @@ const destroy = async id => {
   return response.data;
 };
 
-const categoriesApi = { fetch, create, show, update, destroy };
+const reorder = payload => axios.patch("/api/v1/categories/reorder", payload);
+
+const categoriesApi = { fetch, create, show, update, destroy, reorder };
 
 export default categoriesApi;

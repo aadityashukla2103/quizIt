@@ -28,6 +28,14 @@ class Api::V1::CategoriesController < ApplicationController
     render json: result
   end
 
+  def reorder
+    params[:category_ids].each_with_index do |id, index|
+      Category.find(id).set_list_position(index + 1)
+    end
+
+    head :ok
+  end
+
   private
 
     def set_category

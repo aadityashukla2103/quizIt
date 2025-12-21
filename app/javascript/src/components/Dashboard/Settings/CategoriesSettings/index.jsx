@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from "react";
 
+import { DndContext, closestCenter } from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
 import categoriesApi from "apis/categories";
 import { Plus } from "neetoicons";
 import { Typography, Button } from "neetoui";
 import { Header, Scrollable } from "neetoui/layouts";
 
-import CategoryCard from "./CategoryCard";
 import AddCategoryModal from "./Form";
+import SortableCategoryCard from "./SortableCategoryCard";
 
 import SettingsHeader from "../SettingsHeader";
 
@@ -20,16 +26,6 @@ const CategoriesSettings = () => {
     const response = await categoriesApi.fetch();
     setCategories(response);
   };
-
-  const handleDelete = async id => {
-    await categoriesApi.destroy(id);
-    fetchCategories();
-  };
-
-  const categoryOptions = categories.map(cat => ({
-    label: cat.name,
-    value: cat.id,
-  }));
 
   useEffect(() => {
     fetchCategories();
@@ -60,6 +56,27 @@ const CategoriesSettings = () => {
     fetchCategories();
   };
 
+  const handleDragEnd = async event => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = categories.findIndex(c => c.id === active.id);
+    const newIndex = categories.findIndex(c => c.id === over.id);
+
+    const newCategories = arrayMove(categories, oldIndex, newIndex);
+    setCategories(newCategories);
+
+    await categoriesApi.reorder({
+      category_ids: newCategories.map(c => c.id),
+    });
+  };
+
+  const categoryOptions = categories.map(cat => ({
+    label: cat.name,
+    value: cat.id,
+  }));
+
   return (
     <div className="flex h-screen w-full flex-col">
       <SettingsHeader />
@@ -71,6 +88,7 @@ const CategoriesSettings = () => {
           </Typography>
         </div>
         <Header
+          title={`${categories.length} categories`}
           actionBlock={
             <Button
               icon={Plus}
@@ -80,25 +98,27 @@ const CategoriesSettings = () => {
               onClick={handleAddClick}
             />
           }
-          title={`${categories.length} ${
-            categories.length === 1 ? "category" : "categories"
-          }`}
         />
         <Scrollable className="mt-4 flex-1 overflow-auto p-4">
-          {categories.length > 0 ? (
-            categories.map(cat => (
-              <CategoryCard
-                cat={cat}
-                categoryOptions={categoryOptions}
-                fetchCategories={fetchCategories}
-                key={cat.id}
-                onDelete={handleDelete}
-                onEdit={() => handleEditClick(cat)}
-              />
-            ))
-          ) : (
-            <div className="py-4 text-center">No categories found.</div>
-          )}
+          <DndContext
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={categories.map(c => c.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {categories.map(cat => (
+                <SortableCategoryCard
+                  cat={cat}
+                  categoryOptions={categoryOptions}
+                  fetchCategories={fetchCategories}
+                  key={cat.id}
+                  onEdit={() => handleEditClick(cat)}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
         </Scrollable>
       </div>
       {showModal && (

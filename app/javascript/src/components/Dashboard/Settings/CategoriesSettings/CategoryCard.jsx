@@ -12,10 +12,19 @@ import {
   Select,
 } from "neetoui";
 
+import Drag from "../../../../assets/icons/Drag";
+
 const { Menu, MenuItem } = ActionDropdown;
 const { Button: MenuItemButton } = MenuItem;
 
-const CategoryCard = ({ cat, onEdit, categoryOptions, fetchCategories }) => {
+const CategoryCard = ({
+  cat,
+  onEdit,
+  categoryOptions,
+  fetchCategories,
+  dragAttributes,
+  dragListeners,
+}) => {
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
@@ -37,30 +46,28 @@ const CategoryCard = ({ cat, onEdit, categoryOptions, fetchCategories }) => {
     await categoriesApi.destroy(cat.id);
   };
 
-  const handleChange = options => {
-    setSelectedCategory(options.value);
-  };
-
   return (
-    <div className="mb-2 flex items-center justify-between rounded border p-4">
+    <div className="mb-2 flex items-center gap-3 rounded border p-4">
+      <Drag
+        className="cursor-grab text-gray-400"
+        {...dragAttributes}
+        {...dragListeners}
+      />
       <Alert
         isOpen={isAlertOpen}
         title="Delete Category"
         message={
           <div>
-            You are permanently deleting <b>{cat.name}</b>. This cannot be
-            undone.
+            You are permanently deleting <b>{cat.name}</b>.
             {cat.quizzes.length > 0 && (
               <>
                 <Callout className="mt-2" icon={Warning} style="warning">
-                  {`Category has ${cat.quizzes.length} ${
-                    cat.quizzes.length === 1 ? "quiz" : "quizzes"
-                  }. Before this category can be deleted, these quizzes need to be moved to another category.`}
+                  Move quizzes before deleting.
                 </Callout>
                 <Select
-                  label="Select a category to move these quizzes into*"
+                  label="Move quizzes to"
                   options={filteredOptions}
-                  onChange={handleChange}
+                  onChange={opt => setSelectedCategory(opt.value)}
                 />
               </>
             )}
@@ -73,18 +80,24 @@ const CategoryCard = ({ cat, onEdit, categoryOptions, fetchCategories }) => {
           fetchCategories();
         }}
       />
-      <div>
-        <Typography style="h3">{cat.name}</Typography>
-        <Typography>{cat.quizzes?.length || 0} quizzes</Typography>
+      <div className="flex w-full items-center justify-between">
+        <div>
+          <Typography style="h3">{cat.name}</Typography>
+          <Typography>{cat.quizzes?.length || 0} quizzes</Typography>
+        </div>
+        <Dropdown
+          buttonStyle="text"
+          icon={MenuHorizontal}
+          placement="bottom-end"
+        >
+          <Menu>
+            <MenuItemButton onClick={onEdit}>Edit</MenuItemButton>
+            <MenuItemButton style="danger" onClick={() => setIsAlertOpen(true)}>
+              Delete
+            </MenuItemButton>
+          </Menu>
+        </Dropdown>
       </div>
-      <Dropdown buttonStyle="text" icon={MenuHorizontal} placement="bottom-end">
-        <Menu>
-          <MenuItemButton onClick={onEdit}>Edit</MenuItemButton>
-          <MenuItemButton style="danger" onClick={() => setIsAlertOpen(true)}>
-            Delete
-          </MenuItemButton>
-        </Menu>
-      </Dropdown>
     </div>
   );
 };
