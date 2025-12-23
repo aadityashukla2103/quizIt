@@ -8,19 +8,19 @@ module Organizations
     end
 
     def call
-      new_name = @params[:name]
-      existing_org = Organization.find_by(name: new_name)
+      @organization.update!(@params)
 
-      if existing_org && existing_org.id != @organization.id
-        @organization.users.update_all(organization_id: existing_org.id)
-        @organization = existing_org
-      else
-        @organization.update!(@params)
-      end
-
-      { success: true, organization: @organization, status: :ok }
+      {
+        message: "Organization updated successfully",
+        data: { organization: @organization.as_json },
+        status: :ok
+      }
     rescue ActiveRecord::RecordInvalid => e
-      { success: false, errors: e.record.errors.full_messages, status: :unprocessable_entity }
+      {
+        message: "Validation failed",
+        data: { errors: e.record.errors.full_messages },
+        status: :unprocessable_entity
+      }
     end
   end
 end

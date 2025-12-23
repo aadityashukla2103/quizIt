@@ -2,91 +2,106 @@ import React, { useEffect, useMemo, useState } from "react";
 
 import organizationApi from "apis/organization";
 import usersApi from "apis/users";
-import { useUserState, useUserDispatch } from "contexts/user";
 import { Form, Formik } from "formik";
-import { Button } from "neetoui";
+import { Button, Typography } from "neetoui";
 import { Input } from "neetoui/formik";
-import { Container, Header } from "neetoui/layouts";
 
 import { ORGANIZATION_FORM_VALIDATION_SCHEMA } from "./constants";
+import SettingsHeader from "./SettingsHeader";
 
 const Organization = () => {
-  const { user } = useUserState();
-  const dispatch = useUserDispatch();
-  const [organization, setOrganization] = useState({});
+  const [organization, setOrganization] = useState({ name: "" });
+  const [loading, setLoading] = useState(true);
 
-  const fetchUser = async () => {
-    const response = await usersApi.fetchCurrentUser();
-    setOrganization(response.organization);
+  const fetchOrganization = async () => {
+    try {
+      const response = await usersApi.fetchCurrentUser();
+      setOrganization(response.organization || { name: "" });
+    } catch (err) {
+      logger.error("Failed to fetch user", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchUser();
+    fetchOrganization();
   }, []);
 
   const initialFormValues = useMemo(
     () => ({
-      name: organization.name || "",
+      name: organization?.name || "",
     }),
     [organization]
   );
 
   const handleSubmit = async (data, { setSubmitting, resetForm }) => {
+    if (!organization?.id) return;
+
     try {
-      const updatedOrg = await organizationApi.update(user.organization.id, {
+      const updatedOrg = await organizationApi.update(organization.id, {
         name: data.name,
       });
-
-      dispatch({
-        type: "SET_USER",
-        payload: { ...user, organization: updatedOrg },
-      });
-
-      resetForm({ values: data });
+      setOrganization(updatedOrg.organization);
+      resetForm({ values: { name: updatedOrg.organization.name } });
     } catch (err) {
-      logger.error(err);
-      alert("Failed to update organization");
+      logger.error("Failed to update organization", err);
     } finally {
       setSubmitting(false);
     }
   };
-  if (!user) {
+
+  if (loading) {
     return <div>Loading...</div>;
   }
 
   return (
-    <Container>
-      <Header title="Update Organization" />
-      <div className="mx-auto flex h-full w-full flex-col items-center justify-center sm:max-w-md">
-        <Formik
-          enableReinitialize
-          initialValues={initialFormValues}
-          validationSchema={ORGANIZATION_FORM_VALIDATION_SCHEMA}
-          onSubmit={handleSubmit}
-        >
-          {({ dirty, isSubmitting }) => (
-            <Form className="neeto-ui-rounded-lg neeto-ui-bg-white neeto-ui-shadow-s w-full space-y-6 border p-8">
-              <Input
-                required
-                label="Organization Name"
-                name="name"
-                placeholder="Enter organization name"
-                type="text"
-              />
-              <Button
-                fullWidth
-                className="h-8"
-                disabled={!dirty || isSubmitting}
-                label="Update"
-                loading={isSubmitting}
-                size="small"
-                type="submit"
-              />
-            </Form>
-          )}
-        </Formik>
+    <div className="flex h-screen w-full flex-col">
+      <SettingsHeader />
+      <div className="m-8 overflow-hidden">
+        <div className="mb-6">
+          <Typography style="h1">General Settings</Typography>
+          <Typography className="text-gray-500" style="h4">
+            Customize the quiz site name
+          </Typography>
+        </div>
+        <div className="mt-6 max-w-xl">
+          <Formik
+            enableReinitialize
+            initialValues={initialFormValues}
+            validationSchema={ORGANIZATION_FORM_VALIDATION_SCHEMA}
+            onSubmit={handleSubmit}
+          >
+            {({ dirty, isSubmitting, resetForm }) => (
+              <Form className="space-y-6">
+                <Input
+                  required
+                  label="Quiz Title"
+                  name="name"
+                  placeholder="Enter organization name"
+                  size="large"
+                  type="text"
+                />
+                <div className="flex items-center gap-4">
+                  <Button
+                    disabled={!dirty || isSubmitting}
+                    label="Save Changes"
+                    loading={isSubmitting}
+                    type="submit"
+                  />
+                  <Button
+                    disabled={!dirty}
+                    label="Cancel"
+                    style="text"
+                    onClick={() => resetForm({ values: initialFormValues })}
+                  />
+                </div>
+              </Form>
+            )}
+          </Formik>
+        </div>
       </div>
-    </Container>
+    </div>
   );
 };
 
