@@ -36,5 +36,14 @@ module Authenticable
 
       (controller_name == "submission_answers" &&
         action_name == "create")
-end
+     end
+
+    def ensure_current_user_is_admin!
+      user_email = request.headers["X-Auth-Email"].presence
+      @current_user = user_email && User.find_by(email: user_email)
+
+      unless @current_user&.admin?
+        render_error("Unauthorized Access!", :forbidden)
+      end
+    end
 end
