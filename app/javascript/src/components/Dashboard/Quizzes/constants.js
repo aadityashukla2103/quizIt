@@ -2,12 +2,12 @@ import * as yup from "yup";
 
 export const QUIZZES_FORM_INITIAL_FORM_VALUES = {
   name: "",
-  category: "",
+  category_id: "",
 };
 
 export const QUIZZES_FORM_VALIDATION_SCHEMA = yup.object().shape({
   name: yup.string().required("Name is required"),
-  category: yup.string().required("Category is required"),
+  category_id: yup.string().required("Category is required"),
 });
 
 export const DEFAULT_PAGE = 1;

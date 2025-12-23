@@ -13,7 +13,7 @@ import { useHistory } from "react-router-dom";
 
 import { APP_NAME, SIDENAV_LINKS } from "./constants";
 
-const OldSidebar = () => {
+const OldSidebar = ({ currentUser }) => {
   const history = useHistory();
   const authDispatch = useAuthDispatch();
   const { user } = useUserState();
@@ -43,13 +43,17 @@ const OldSidebar = () => {
     },
   ];
 
+  if (!user) return null;
+  const organizationSlug = currentUser?.organization?.slug;
+  const navLinks = SIDENAV_LINKS(organizationSlug);
+
   return (
     <NeetoUISidebar
       appName={APP_NAME}
-      navLinks={SIDENAV_LINKS}
+      navLinks={navLinks}
       profileInfo={{
         name: `${user.first_name} ${user.last_name}`,
-        imageUrl: user.profile_image_path,
+        imageUrl: user.profile_image_path || "",
         email: user.email,
         bottomLinks,
       }}

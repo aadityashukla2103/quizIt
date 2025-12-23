@@ -9,7 +9,12 @@ export const PASSWORD_PATH = "/my/password/edit";
 export const PROFILE_PATH = "/my/profile";
 export const LOGOUT_PATH = "/logout";
 
-export const SIDENAV_LINKS = [
+export const PUBLIC_DASHBOARD_PATH = "/publicdashboard/:slug";
+
+export const publicDashboardLink = slug =>
+  PUBLIC_DASHBOARD_PATH.replace(":slug", slug);
+
+export const SIDENAV_LINKS = organizationSlug => [
   {
     label: "Quizzes",
     to: "/quizzes",
@@ -22,7 +27,9 @@ export const SIDENAV_LINKS = [
   },
   {
     label: "Explore",
-    to: "/publicdashboard",
+    to: organizationSlug
+      ? publicDashboardLink(organizationSlug)
+      : "/publicdashboard",
     icon: GlobeIcon,
     target: "_blank",
   },

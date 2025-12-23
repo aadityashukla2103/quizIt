@@ -10,7 +10,20 @@ class Quizzes::CreateService
     quiz = Quiz.new(@params)
     quiz.organization_id = @user.organization_id
     quiz.status = "draft"
-    quiz.save
-    quiz
+    quiz.creator = @user
+
+    if quiz.save
+      {
+        message: "Quiz created successfully",
+        status: :ok,
+        data: { quiz: quiz }
+      }
+    else
+      {
+        message: quiz.errors.full_messages.join(", "),
+        status: :unprocessable_entity,
+        data: {}
+      }
+    end
   end
 end
