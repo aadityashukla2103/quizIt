@@ -16,6 +16,7 @@ namespace :api, defaults: { format: :json } do
      end
    end
    post "guest_registrations", to: "guest_registrations#create"
+   resources :redirections, only: [:index, :create, :update, :destroy]
 
    resources :cypress_runs, only: [:create]
 

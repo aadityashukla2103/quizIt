@@ -3,6 +3,7 @@
 class ApplicationController < ActionController::Base
   include SetHoneyBadgerContext
   include Expirable
+  before_action :handle_redirections
 
   private
 
@@ -12,5 +13,14 @@ class ApplicationController < ActionController::Base
       unless current_user.admin?
         redirect_to root_path, status: :forbidden, alert: "Unauthorized Access!"
       end
+    end
+
+    def handle_redirections
+      return if request.path.start_with?("/api")
+
+      redirection = Redirection.find_by(from_path: request.path)
+      return unless redirection
+
+      redirect_to redirection.to_path, status: :moved_permanently
     end
 end
