@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_12_19_163432) do
+ActiveRecord::Schema[7.1].define(version: 2025_12_22_221349) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -110,6 +110,14 @@ ActiveRecord::Schema[7.1].define(version: 2025_12_19_163432) do
     t.boolean "email_notifications", default: false, null: false
     t.uuid "creator_id", null: false
     t.index ["creator_id"], name: "index_quizzes_on_creator_id"
+  end
+
+  create_table "redirections", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "from_path"
+    t.string "to_path"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["from_path"], name: "index_redirections_on_from_path", unique: true
   end
 
   create_table "submission_answers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
