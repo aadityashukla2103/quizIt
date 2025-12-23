@@ -30,9 +30,9 @@ const Form = ({ refetchQuizzes, onClose, quiz }) => {
     try {
       const payload = {
         ...values,
-        category_id: values.category,
         status: "draft",
       };
+
       await quizzesApi.create(payload);
       await refetchQuizzes();
       history.push("/quizzes");
@@ -63,10 +63,10 @@ const Form = ({ refetchQuizzes, onClose, quiz }) => {
               required
               className="w-full flex-grow-0"
               label="Category"
-              name="category"
+              name="category_id"
               options={options}
               placeholder="Select Category"
-              onChange={option => setFieldValue("category", option.value)}
+              onChange={option => setFieldValue("category_id", option.value)}
             />
           </Pane.Body>
           <Pane.Footer>

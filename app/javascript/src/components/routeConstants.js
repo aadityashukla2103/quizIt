@@ -22,7 +22,7 @@ import PublicQuizResult from "./PublicDashboard/PublicQuizResult";
 import PublicQuizQuestions from "./PublicDashboard/QuestionSlider";
 import UserRegistrationForm from "./PublicDashboard/UserRegistration";
 
-export const PUBLIC_DASHBOARD_PATH = "/publicdashboard";
+export const PUBLIC_DASHBOARD_PATH = "/publicdashboard/:slug";
 export const PUBLIC_REGISTER_PATH = "/publicdashboard/register/:quizId";
 export const PUBLIC_QUIZ_PATH = "/public/quiz/:quizId/:submissionId";
 export const PUBLIC_QUIZ_RESULT_PATH =

@@ -6,16 +6,27 @@ import EmptyQuizzesListImage from "assets/images/EmptyQuizzesList";
 import EmptyState from "components/commons/EmptyState";
 import { Filter } from "neetoicons";
 import { Button, PageLoader, Input, Select } from "neetoui";
+import { useParams, useLocation, useHistory } from "react-router-dom";
 
 import QuizCard from "./QuizCard";
 
 import useDebounce from "../../hooks/useDebounce";
 
 const Hero = () => {
+  const { slug } = useParams();
+  const location = useLocation();
+  const history = useHistory();
+
+  const urlParams = new URLSearchParams(location.search);
+  const queryFromUrl = urlParams.get("q") || "";
+  const categoryFromUrl = urlParams.get("category");
+
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState(null);
+  const [query, setQuery] = useState(queryFromUrl);
+  const [category, setCategory] = useState(
+    categoryFromUrl ? { label: categoryFromUrl, value: categoryFromUrl } : null
+  );
   const [categories, setCategories] = useState([{ label: "All", value: null }]);
   const [showFilter, setShowFilter] = useState(false);
 
@@ -24,34 +35,49 @@ const Hero = () => {
   const loadCategories = async () => {
     try {
       const data = await categoriesApi.fetch();
-      const options = data.map(cat => ({ label: cat.name, value: cat.name }));
+      const options = data.map(cat => ({
+        label: cat.name,
+        value: cat.name,
+      }));
       setCategories([{ label: "All", value: null }, ...options]);
     } catch (err) {
-      logger.error("Error fetching categories:", err);
+      logger.error(err);
     }
   };
 
-  const loadQuizzes = async (
-    searchQuery = debouncedQuery,
-    categoryValue = category?.value
-  ) => {
+  const loadQuizzes = async () => {
+    if (!slug) return;
+
     setLoading(true);
     try {
       const { data } = await quizzesApi.fetch({
-        query: searchQuery,
+        query: debouncedQuery,
         status: "published",
-        homepage: true,
-        category: categoryValue,
+        organization_slug: slug,
+        category: category?.value,
         page: 1,
         pageSize: 20,
       });
       setQuizzes(data.quizzes);
     } catch (err) {
-      logger.error("Error fetching quizzes:", err);
+      logger.error(err);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+
+    if (debouncedQuery) params.set("q", debouncedQuery);
+
+    if (category?.value) params.set("category", category.value);
+
+    history.replace({
+      pathname: `/publicdashboard/${slug}`,
+      search: params.toString(),
+    });
+  }, [debouncedQuery, category, slug, history]);
 
   useEffect(() => {
     loadCategories();
@@ -59,13 +85,13 @@ const Hero = () => {
 
   useEffect(() => {
     loadQuizzes();
-  }, [debouncedQuery, category]);
+  }, [debouncedQuery, category, slug]);
 
   return (
     <div className="mt-8 flex min-h-screen flex-col bg-gray-50">
-      <header className="flex items-center justify-between  px-8 py-4 text-white">
+      <header className="flex items-center justify-between px-8 py-4 text-white">
         <h1 className="text-2xl font-semibold">
-          {quizzes[0]?.organization_name}
+          {quizzes[0]?.organization_name || slug}
         </h1>
         <Button label="Login as admin" to="/login" />
       </header>
@@ -90,10 +116,7 @@ const Hero = () => {
                   <Select
                     isClearable
                     label="Category"
-                    menuPortalTarget={document.body}
                     options={categories}
-                    placeholder="Select category"
-                    styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                     value={category}
                     onChange={option => {
                       setCategory(option);
@@ -110,12 +133,11 @@ const Hero = () => {
         ) : quizzes.length === 0 ? (
           <EmptyState
             image={<EmptyQuizzesListImage />}
-            primaryActionLabel="Add new quiz"
             title="No quiz found!"
           />
         ) : (
-          <section className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {quizzes.slice(0, 6).map(quiz => (
+          <section className="grid max-h-[70vh] grid-cols-1 gap-6 overflow-y-auto md:grid-cols-2 lg:grid-cols-3">
+            {quizzes.map(quiz => (
               <QuizCard key={quiz.id} quiz={quiz} />
             ))}
           </section>

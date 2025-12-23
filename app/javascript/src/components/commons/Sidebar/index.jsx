@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 
+import userApi from "apis/users";
 import { createPortal } from "react-dom";
 
 import OldSidebar from "./CollapseSidebar";
@@ -7,7 +8,21 @@ import NewSidebar from "./ExpandedSidebar";
 
 const SidebarWrapper = () => {
   const [isNewSidebarOpen, setIsNewSidebarOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
   const newSidebarRef = useRef(null);
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const data = await userApi.fetchCurrentUser();
+        setCurrentUser(data);
+      } catch (err) {
+        logger.error("Error fetching current user:", err);
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = event => {
@@ -51,7 +66,10 @@ const SidebarWrapper = () => {
           isNewSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <NewSidebar onClose={() => setIsNewSidebarOpen(false)} />
+        <NewSidebar
+          user={currentUser}
+          onClose={() => setIsNewSidebarOpen(false)}
+        />
       </div>
     </>
   );
@@ -62,10 +80,10 @@ const SidebarWrapper = () => {
         className="relative h-full flex-shrink-0"
         onClick={handleOldSidebarClick}
       >
-        <OldSidebar />
+        <OldSidebar currentUser={currentUser} />
         <button
           aria-label={isNewSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
-          className="absolute right-0 top-4 rounded-l  p-2 text-white transition-transform duration-300 hover:bg-blue-700"
+          className="absolute right-0 top-4 rounded-l p-2 text-white transition-transform duration-300 hover:bg-blue-700"
           onClick={() => setIsNewSidebarOpen(prev => !prev)}
         />
       </div>
