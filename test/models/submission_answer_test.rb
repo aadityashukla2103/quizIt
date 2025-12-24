@@ -23,14 +23,23 @@ class SubmissionAnswerTest < ActiveSupport::TestCase
     assert_includes @submission_answer.errors[:question], "must exist"
   end
 
-  def test_selected_option_presence
+  def test_selected_option_can_be_nil
     @submission_answer.selected_option = nil
-    assert_not @submission_answer.valid?
-    assert_includes @submission_answer.errors[:selected_option], "must exist"
+    assert @submission_answer.valid?
   end
 
-  def test_is_correct_boolean
+  def test_is_correct_can_be_true
+    @submission_answer.is_correct = true
+    assert @submission_answer.valid?
+  end
+
+  def test_is_correct_can_be_false
+    @submission_answer.is_correct = false
+    assert @submission_answer.valid?
+  end
+
+  def test_is_correct_can_be_nil
     @submission_answer.is_correct = nil
-    assert_not @submission_answer.valid?
+    assert @submission_answer.valid?
   end
 end

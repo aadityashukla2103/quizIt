@@ -14,8 +14,17 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     json = response_body
-    assert_equal %w{ email first_name last_name current_sign_in_at }.sort, json.keys.sort
-  end
+
+    expected_keys = %w[
+      email
+      first_name
+      last_name
+      current_sign_in_at
+      organization
+    ]
+
+    assert_equal expected_keys.sort, json.keys.sort
+ end
 
   def test_show_when_email_is_not_present
     an_invalid_email = { "X-Auth-Email" => "this_email_is_not_present_in_db@example.com" }

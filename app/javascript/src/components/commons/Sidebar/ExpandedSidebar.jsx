@@ -9,8 +9,9 @@ import { Collapse } from "neetoicons";
 import { Avatar } from "neetoui";
 import { useHistory } from "react-router-dom";
 
-const NewSidebar = ({ onClose = () => {} }) => {
+const NewSidebar = ({ onClose = () => {}, currentUser }) => {
   const { user } = useUserState();
+  const slug = currentUser?.organization?.slug;
   const authDispatch = useAuthDispatch();
   const {
     fetchQuizzes,
@@ -42,6 +43,8 @@ const NewSidebar = ({ onClose = () => {} }) => {
       logger.error(err);
     }
   }, [authDispatch]);
+
+  const getPublicPageUrl = slug => `/publicdashboard/${slug}`;
 
   return (
     <aside className="relative flex h-full w-64 flex-col justify-between border-r border-gray-200 bg-white px-4 py-6">
@@ -115,7 +118,13 @@ const NewSidebar = ({ onClose = () => {} }) => {
             <span className="mr-2">⚙️</span>
             <span>Settings</span>
           </button>
-          <button className="flex w-full items-center justify-between rounded px-2 py-2 text-gray-700 hover:bg-gray-100">
+          <button
+            className="flex w-full items-center justify-between rounded px-2 py-2 text-gray-700 hover:bg-gray-100"
+            onClick={() => {
+              if (!slug) return;
+              window.open(getPublicPageUrl(slug), "_blank");
+            }}
+          >
             <span className="flex items-center">
               <span className="mr-2">🌐</span>
               <span>Public page</span>

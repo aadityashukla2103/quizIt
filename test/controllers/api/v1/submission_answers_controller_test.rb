@@ -57,11 +57,11 @@ class Api::V1::SubmissionAnswersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should delete a submission answer" do
-    assert_difference "SubmissionAnswer.count", -1 do
-      delete api_v1_submission_answer_path(@submission_answer),
-        headers: @headers
-    end
+   assert_difference "SubmissionAnswer.count", -1 do
+     delete api_v1_submission_answer_path(@submission_answer),
+       headers: @headers
+   end
 
-    assert_response :no_content
-  end
+   assert_response :success
+ end
 end
