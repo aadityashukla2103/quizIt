@@ -19,9 +19,9 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
   end
 
   def update
-    result = Organizations::UpdateService.new(@organization, organization_params).call
+    result = Organizations::UpdateService.new(current_user, organization_params).call
     render_message(result[:message], result[:status], result[:data])
-  end
+ end
 
   def destroy
     result = Organizations::DestroyService.new(@organization).call

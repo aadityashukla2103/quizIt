@@ -2,26 +2,39 @@
 
 module Organizations
   class UpdateService
-    def initialize(organization, params)
-      @organization = organization
+    def initialize(user, params)
+      @user = user
       @params = params
     end
 
     def call
-      if @organization.update(@params)
+      existing_org = Organization.find_by(name: @params[:name])
+
+      if existing_org
+        @user.organization = existing_org
+        @user.save!
         {
           success: true,
-          message: "Organization updated successfully",
-          data: { organization: @organization.as_json },
+          message: "User linked to existing organization",
+          data: { organization: existing_org.as_json, quizzes: existing_org.quizzes.as_json },
           status: :ok
         }
       else
-        {
-          success: false,
-          message: "Organization update failed",
-          data: { errors: @organization.errors.full_messages },
-          status: :unprocessable_entity
-        }
+        if @user.organization.update(@params)
+          {
+            success: true,
+            message: "Organization updated successfully",
+            data: { organization: @user.organization.as_json, quizzes: @user.organization.quizzes.as_json },
+            status: :ok
+          }
+        else
+          {
+            success: false,
+            message: "Organization update failed",
+            data: { errors: @user.organization.errors.full_messages },
+            status: :unprocessable_entity
+          }
+        end
       end
     end
   end
