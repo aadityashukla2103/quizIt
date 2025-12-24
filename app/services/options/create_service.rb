@@ -1,6 +1,7 @@
-  # frozen_string_literal: true
+# frozen_string_literal: true
 
-  class Options::CreateService
+module Options
+  class CreateService
     def initialize(question, params)
       @question = question
       @params = params
@@ -16,3 +17,4 @@
       end
     end
   end
+end

@@ -13,7 +13,7 @@ class Api::V1::OptionsController < Api::V1::BaseController
   end
 
   def create
-    result = Options::CreateService.new(@question, option_params).call
+    result = ::Options::CreateService.new(@question, option_params).call
     if result[:success]
       render_json(result[:option], result[:status])
     else
@@ -22,7 +22,7 @@ class Api::V1::OptionsController < Api::V1::BaseController
   end
 
   def update
-    result = Options::UpdateService.new(@option, option_params).call
+    result = ::Options::UpdateService.new(@option, option_params).call
     if result[:success]
       render_json(result[:option], result[:status])
     else
@@ -31,7 +31,7 @@ class Api::V1::OptionsController < Api::V1::BaseController
   end
 
   def destroy
-    result = Options::DestroyService.new(@option).call
+    result = ::Options::DestroyService.new(@option).call
     head result[:status]
   end
 

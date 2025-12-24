@@ -67,7 +67,7 @@ const SidebarWrapper = () => {
         }`}
       >
         <NewSidebar
-          user={currentUser}
+          currentUser={currentUser}
           onClose={() => setIsNewSidebarOpen(false)}
         />
       </div>

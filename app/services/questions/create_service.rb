@@ -24,7 +24,7 @@ module Questions
 
       {
         message: "Question created successfully",
-        data: question.as_json(include: :options),
+        data: { question: question.as_json(include: :options) },
         status: :created
       }
     rescue ActiveRecord::RecordInvalid => e

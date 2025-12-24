@@ -9,11 +9,16 @@ module Questions
     def call
       @question.destroy
       {
-        success: true,
-        status: :ok,
         message: "Question deleted successfully",
-        data: {}
+        data: {},
+        status: :no_content
       }
-end
+    rescue => e
+      {
+        message: "Failed to delete question",
+        data: { errors: [e.message] },
+        status: :unprocessable_entity
+      }
+    end
   end
 end

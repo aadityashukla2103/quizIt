@@ -8,10 +8,21 @@ module Organizations
 
     def call
       org = Organization.new(@params)
+
       if org.save
-        { success: true, organization: org, status: :created }
+        {
+          success: true,
+          message: "Organization created successfully",
+          data: { organization: org.as_json },
+          status: :created
+        }
       else
-        { success: false, errors: org.errors.full_messages, status: :unprocessable_entity }
+        {
+          success: false,
+          message: "Organization creation failed",
+          data: { errors: org.errors.full_messages },
+          status: :unprocessable_entity
+        }
       end
     end
   end

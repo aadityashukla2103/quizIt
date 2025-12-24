@@ -6,5 +6,6 @@ FactoryBot.define do
     status { :draft }
     association :organization
     association :category
+    association :creator, factory: :user
   end
 end

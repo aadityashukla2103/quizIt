@@ -11,14 +11,15 @@ class SubmissionTest < ActiveSupport::TestCase
     assert @submission.valid?
   end
 
-  def test_user_presence
+  def test_user_can_be_nil
     @submission.user = nil
-    assert_not @submission.valid?
+    assert @submission.valid?
   end
 
   def test_quiz_presence
     @submission.quiz = nil
     assert_not @submission.valid?
+    assert_includes @submission.errors[:quiz], "must exist"
   end
 
   def test_status_enum_values

@@ -15,14 +15,16 @@ class Api::V1::OrganizationsControllerTest < ActionDispatch::IntegrationTest
     get api_v1_organizations_url, headers: @headers
 
     assert_response :success
-    assert_kind_of Array, response_body
+    assert_kind_of Hash, response_body
+    assert_kind_of Array, response_body["organizations"]
+    assert_kind_of Hash, response_body["organizations"].first
   end
 
   def test_show_organization
     get api_v1_organization_url(@organization), headers: @headers
 
     assert_response :success
-    assert_equal @organization.id, response_body["id"]
+    assert_equal @organization.id, response_body["organization"]["id"]
   end
 
   def test_create_valid_organization
@@ -35,7 +37,7 @@ class Api::V1::OrganizationsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :created
-    assert_equal "New Org", response_body["name"]
+    assert_equal "New Org", response_body["organization"]["name"]
   end
 
   def test_create_invalid_organization
@@ -59,7 +61,7 @@ class Api::V1::OrganizationsControllerTest < ActionDispatch::IntegrationTest
     patch api_v1_organization_url(@organization), params: payload, headers: @headers
 
     assert_response :success
-    assert_equal "Updated Org", response_body["name"]
+    assert_equal "Updated Org", response_body["organization"]["name"]
   end
 
   def test_update_invalid_organization

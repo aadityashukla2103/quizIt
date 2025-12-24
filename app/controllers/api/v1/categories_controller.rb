@@ -5,27 +5,37 @@ class Api::V1::CategoriesController < ApplicationController
 
   def index
     result = Categories::IndexService.new.call
-    render json: result, include: :quizzes
+    render json: result, include: :quizzes, status: :ok
   end
 
   def show
     result = Categories::ShowService.new(@category.id).call
-    render json: result
+    render json: result, status: :ok
   end
 
   def create
     result = Categories::CreateService.new(category_params).call
-    render json: result
+
+    if result[:success]
+      render json: result[:category], status: :created
+    else
+      render json: { errors: result[:errors] }, status: :unprocessable_entity
+    end
   end
 
   def update
     result = Categories::UpdateService.new(@category, category_params).call
-    render json: result
+
+    if result[:success]
+      render json: @category, status: :ok
+    else
+      render json: { errors: result[:errors] }, status: :unprocessable_entity
+    end
   end
 
   def destroy
-    result = Categories::DestroyService.new(@category).call
-    render json: result
+    Categories::DestroyService.new(@category).call
+    head :no_content
   end
 
   def reorder
