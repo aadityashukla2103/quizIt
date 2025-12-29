@@ -47,7 +47,6 @@ export const QUIZ_CONFIGURE_NOTIFICATIONS_PATH =
 
 export const QUIZ_SUBMISSIONS_PATH = "/quizzes/:quizId/submissions";
 
-export const CHANGE_PASSWORD_PATH = "/settings?tab=password";
 export const PROFILE_PATH = "/settings?tab=profile";
 export const SETTINGS_PATH = "/settings/general";
 export const CATEGORIES_SETTINGS_PATH = "/settings/categories";

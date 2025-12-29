@@ -1,20 +1,14 @@
 import React from "react";
 
 import authenticationApi from "apis/authentication";
-import {
-  PROFILE_PATH,
-  CHANGE_PASSWORD_PATH,
-  LOGIN_PATH,
-} from "components/routeConstants";
+import { LOGIN_PATH } from "components/routeConstants";
 import { useAuthDispatch } from "contexts/auth";
 import { useUserState } from "contexts/user";
 import { Sidebar as NeetoUISidebar } from "neetoui/layouts";
-import { useHistory } from "react-router-dom";
 
 import { APP_NAME, SIDENAV_LINKS } from "./constants";
 
 const OldSidebar = ({ currentUser }) => {
-  const history = useHistory();
   const authDispatch = useAuthDispatch();
   const { user } = useUserState();
 
@@ -29,14 +23,6 @@ const OldSidebar = ({ currentUser }) => {
   };
 
   const bottomLinks = [
-    {
-      label: "My profile",
-      onClick: () => history.push(PROFILE_PATH),
-    },
-    {
-      label: "Change password",
-      onClick: () => history.push(CHANGE_PASSWORD_PATH),
-    },
     {
       label: "Logout",
       onClick: handleLogout,
