@@ -7,7 +7,6 @@ import { Button, PageLoader, Typography } from "neetoui";
 import { Container, Header, SubHeader } from "neetoui/layouts";
 import { useHistory, useLocation } from "react-router-dom";
 
-import DeleteAlert from "./DeleteAlert";
 import FilterPane from "./FilterPane/Create";
 import NewQuizPane from "./Pane/Create";
 import Table from "./Table";
@@ -18,8 +17,37 @@ import useDebounce from "../../../hooks/useDebounce";
 const Quizzes = () => {
   const history = useHistory();
   const location = useLocation();
+
   const queryParams = new URLSearchParams(location.search);
   const initialQuery = queryParams.get("query") || "";
+
+  const {
+    quizzes,
+    fetchQuizzes,
+    loading,
+    pageTitle,
+    setQuizzes,
+    totalQuizCount,
+    status,
+  } = useQuizzes();
+
+  const [showNewQuizPane, setShowNewQuizPane] = useState(false);
+  const [showFilterPane, setShowFilterPane] = useState(false);
+
+  const [searchTerm, setSearchTerm] = useState(initialQuery);
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  const [selectedQuizIds, setSelectedQuizIds] = useState([]);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  const [filtersApplied, setFiltersApplied] = useState(false);
+  const [selectedFilters, setSelectedFilters] = useState({
+    query: "",
+    categoryName: "",
+    status: "",
+  });
+
   const [visibleColumns, setVisibleColumns] = useState({
     name: true,
     category: true,
@@ -35,39 +63,20 @@ const Quizzes = () => {
     }));
   };
 
-  const {
-    quizzes,
-    fetchQuizzes,
-    loading,
-    pageTitle,
-    setQuizzes,
-    totalQuizCount,
-    status,
-  } = useQuizzes();
-
-  const [showNewQuizPane, setShowNewQuizPane] = useState(false);
-  const [showFilterPane, setShowFilterPane] = useState(false);
-  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
-  const [searchTerm, setSearchTerm] = useState(initialQuery);
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
-
-  const [selectedQuizIds, setSelectedQuizIds] = useState([]);
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-
-  const [filtersApplied, setFiltersApplied] = useState(false);
-  const [selectedFilters, setSelectedFilters] = useState({
-    query: "",
-    categoryName: "",
-    status: "",
-  });
-
-  const updateURL = (currentPage = page, currentPageSize = pageSize) => {
+  const updateURL = (
+    currentPage = page,
+    currentPageSize = pageSize,
+    filters = selectedFilters
+  ) => {
     const params = new URLSearchParams();
+
     if (debouncedSearchTerm) params.set("query", debouncedSearchTerm);
-    params.set("status", status);
+
+    if (filters.status) params.set("status", filters.status);
+
     params.set("page", currentPage);
     params.set("pageSize", currentPageSize);
+
     history.replace({ search: params.toString() });
   };
 
@@ -100,26 +109,30 @@ const Quizzes = () => {
     const newPage = 1;
     setPage(newPage);
 
-    fetchQuizzes({ ...filters, page: newPage, pageSize });
-
-    const applied =
-      filters.query !== "" ||
-      filters.category !== "" ||
-      filters.status !== "all";
-    setFiltersApplied(applied);
-
-    setSelectedFilters({
+    const newSelectedFilters = {
       query: filters.query || "",
       categoryName: filters.category_name || "",
       status: filters.status || "",
-    });
+    };
 
-    updateURL(newPage, pageSize);
+    setSelectedFilters(newSelectedFilters);
+    setFiltersApplied(true);
+
+    fetchQuizzes({ ...filters, page: newPage, pageSize });
   };
 
   const handleClearFilters = () => {
     const newPage = 1;
     setPage(newPage);
+
+    const clearedFilters = {
+      query: "",
+      categoryName: "",
+      status: "",
+    };
+
+    setSelectedFilters(clearedFilters);
+    setFiltersApplied(false);
 
     fetchQuizzes({
       query: "",
@@ -128,10 +141,8 @@ const Quizzes = () => {
       page: newPage,
       pageSize,
     });
-    setFiltersApplied(false);
-    setSelectedFilters({ query: "", categoryName: "", status: "" });
 
-    updateURL(newPage, pageSize);
+    updateURL(newPage, pageSize, clearedFilters);
   };
 
   return (
@@ -152,7 +163,7 @@ const Quizzes = () => {
         }}
       />
       {loading && <PageLoader />}
-      {quizzes.length ? (
+      {quizzes.length || filtersApplied ? (
         <>
           <TableHeader
             fetchQuizzes={fetchQuizzes}
@@ -168,13 +179,11 @@ const Quizzes = () => {
             <SubHeader
               leftActionBlock={
                 <div className="flex items-center gap-3">
-                  <Typography className="flex gap-2" component="h4" style="h4">
+                  <Typography component="h4" style="h4">
                     Category:
-                    {selectedFilters.categoryName && (
-                      <Typography className="text-gray-400">
-                        {selectedFilters.categoryName}
-                      </Typography>
-                    )}
+                  </Typography>
+                  <Typography className="text-gray-400">
+                    {selectedFilters.categoryName}
                   </Typography>
                   <Button
                     label="Clear filters"
@@ -217,12 +226,6 @@ const Quizzes = () => {
         setShowPane={setShowFilterPane}
         showPane={showFilterPane}
       />
-      {showDeleteAlert && (
-        <DeleteAlert
-          refetch={fetchQuizzes}
-          onClose={() => setShowDeleteAlert(false)}
-        />
-      )}
     </Container>
   );
 };

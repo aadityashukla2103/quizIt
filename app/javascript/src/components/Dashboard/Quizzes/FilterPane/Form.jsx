@@ -4,11 +4,13 @@ import categoriesApi from "apis/categories";
 import { Formik, Form as FormikForm } from "formik";
 import { Pane } from "neetoui";
 import { ActionBlock, Input, Select } from "neetoui/formik";
+import { useHistory } from "react-router-dom";
 
 import { validationSchema } from "./constants";
 
 const Form = ({ refetchQuizzes, onClose, filters }) => {
   const [categories, setCategories] = useState([]);
+  const history = useHistory();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -28,6 +30,24 @@ const Form = ({ refetchQuizzes, onClose, filters }) => {
     { label: "Published", value: "published" },
   ];
 
+  const updateURL = filters => {
+    const params = new URLSearchParams();
+
+    if (filters.query) params.set("query", filters.query);
+
+    if (filters.category_name) params.set("category", filters.category_name);
+
+    if (filters.status) params.set("status", filters.status);
+
+    params.set("page", 1);
+    params.set("pageSize", 10);
+
+    history.replace({
+      pathname: history.location.pathname,
+      search: params.toString(),
+    });
+  };
+
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       const filters = {
@@ -37,6 +57,7 @@ const Form = ({ refetchQuizzes, onClose, filters }) => {
         status: values.status || "all",
       };
 
+      updateURL(filters);
       await refetchQuizzes(filters);
       onClose();
     } catch (error) {

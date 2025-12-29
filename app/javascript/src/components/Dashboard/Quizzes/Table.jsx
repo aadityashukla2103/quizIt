@@ -64,7 +64,7 @@ const Table = ({
     }
   };
 
-  const NOTES_TABLE_COLUMN_DATA = [
+  const QUIZZES_TABLE_COLUMN_DATA = [
     {
       title: "Name",
       dataIndex: "name",
@@ -190,7 +190,7 @@ const Table = ({
       />
       <NeetoUITable
         rowSelection
-        columnData={NOTES_TABLE_COLUMN_DATA}
+        columnData={QUIZZES_TABLE_COLUMN_DATA}
         currentPageNumber={currentPageNumber}
         defaultPageSize={defaultPageSize}
         handlePageChange={handlePageChange}
