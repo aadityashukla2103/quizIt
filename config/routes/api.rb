@@ -10,11 +10,6 @@ namespace :api, defaults: { format: :json } do
 
    resources :users, only: [:show, :create, :update, :destroy], constraints: { id: /.*/ }
 
-   resources :notes, only: [:index, :create, :update] do
-     collection do
-       post "bulk_destroy"
-     end
-   end
    post "guest_registrations", to: "guest_registrations#create"
    resources :redirections, only: [:index, :create, :update, :destroy]
 
