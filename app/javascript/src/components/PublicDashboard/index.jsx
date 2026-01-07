@@ -19,13 +19,16 @@ const Hero = () => {
 
   const urlParams = new URLSearchParams(location.search);
   const queryFromUrl = urlParams.get("q") || "";
-  const categoryFromUrl = urlParams.get("category");
+  const categoryIdFromUrl = urlParams.get("category_id");
+  const categoryNameFromUrl = urlParams.get("category_name");
 
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState(queryFromUrl);
   const [category, setCategory] = useState(
-    categoryFromUrl ? { label: categoryFromUrl, value: categoryFromUrl } : null
+    categoryIdFromUrl && categoryNameFromUrl
+      ? { label: categoryNameFromUrl, value: categoryIdFromUrl }
+      : null
   );
   const [categories, setCategories] = useState([{ label: "All", value: null }]);
   const [showFilter, setShowFilter] = useState(false);
@@ -37,7 +40,7 @@ const Hero = () => {
       const data = await categoriesApi.fetch();
       const options = data.map(cat => ({
         label: cat.name,
-        value: cat.name,
+        value: cat.id,
       }));
       setCategories([{ label: "All", value: null }, ...options]);
     } catch (err) {
@@ -71,7 +74,12 @@ const Hero = () => {
 
     if (debouncedQuery) params.set("q", debouncedQuery);
 
-    if (category?.value) params.set("category", category.value);
+    if (category?.value) {
+      params.set("category_name", category.label);
+    } else {
+      params.delete("category_id");
+      params.delete("category_name");
+    }
 
     history.replace({
       pathname: `/publicdashboard/${slug}`,

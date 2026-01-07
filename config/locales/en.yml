@@ -80,6 +80,8 @@ en:
     bulk_deleted_successfully: "Selected quizzes deleted successfully."
     no_fields_to_update: "No fields to update."
     no_quizzes_selected: "No quizzes selected."
+    bulk_publish_failed: "Some quizzes cannot be published."
+    cannot_publish_without_questions: "All quizzes must have at least one question to publish."
   organization:
     created_successfully: "Organization created successfully"
     creation_failed: "Failed to create organization"

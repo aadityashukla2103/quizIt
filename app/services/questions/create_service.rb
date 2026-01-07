@@ -30,7 +30,7 @@ module Questions
     rescue ActiveRecord::RecordInvalid => e
       {
         message: "Validation failed",
-        data: { errors: e.record.errors.full_messages },
+        data: { error: e.record.errors.full_messages },
         status: :unprocessable_entity
       }
     end
