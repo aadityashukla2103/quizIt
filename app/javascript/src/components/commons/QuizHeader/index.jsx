@@ -12,11 +12,13 @@ const QuizHeader = ({
   lastSavedAt,
   status,
   reloadQuizData,
+  questionCount,
   isQuestionBuilder,
 }) => {
   const history = useHistory();
   const path = history.location.pathname;
   const [copied, setCopied] = useState(false);
+  const [localStatus, setLocalStatus] = useState(status);
 
   const onLeftArrowClick = () => {
     if (isQuestionBuilder) {
@@ -37,6 +39,7 @@ const QuizHeader = ({
 
   const onPublish = async () => {
     await quizzesApi.update(quizId, { quiz: { status: "published" } });
+    setLocalStatus("published");
     reloadQuizData();
   };
 
@@ -78,11 +81,18 @@ const QuizHeader = ({
         </div>
         {!isQuestionBuilder && (
           <div className="flex items-center justify-end gap-4 text-xs text-gray-600">
-            {status === "draft" && lastSavedAt && (
+            {localStatus === "draft" && lastSavedAt && (
               <p>Draft saved at {lastSavedAt}</p>
             )}
-            <Button icon={ExternalLink} label="Publish" onClick={onPublish} />
-            {status === "published" && (
+            {localStatus === "draft" && (
+              <Button
+                disabled={questionCount === 0}
+                icon={ExternalLink}
+                label="Publish"
+                onClick={onPublish}
+              />
+            )}
+            {localStatus === "published" && (
               <Tooltip content="Copy quiz link">
                 <div className="cursor-pointer" onClick={onCopyLink}>
                   {copied ? <Check /> : <Link />}

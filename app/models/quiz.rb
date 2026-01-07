@@ -9,13 +9,13 @@ class Quiz < ApplicationRecord
   has_many :questions, dependent: :destroy
   belongs_to :organization
 
-  validates :name, presence: true, uniqueness: { scope: :organization_id }
+  validates :name, presence: true, uniqueness: { scope: :organization_id }, length: { maximum: 30 }
   validates :status, presence: true
 
   def clone_with_questions!
     cloned_quiz = self.deep_clone include: { questions: :options }
 
-    base_name = "#{self.name} (Copy)"
+    base_name = "#{self.name.truncate(20)} (Copy)"
     counter = 1
     new_name = base_name
 
