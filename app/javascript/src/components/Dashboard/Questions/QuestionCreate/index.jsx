@@ -39,8 +39,8 @@ const QuestionCreate = () => {
   const fetchQuiz = async () => {
     try {
       const response = await quizzesApi.show(quizId);
-      setQuestionsCount(response.data.questions.length);
-      setQuizName(response.data.name);
+      setQuestionsCount(response.questions.length);
+      setQuizName(response.quiz.name);
     } catch (error) {
       logger.log(error);
     } finally {

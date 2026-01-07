@@ -8,9 +8,8 @@ import { INITIAL_VALUES, QUESTION_SCHEMA, isValidQuestion } from "./constants";
 
 const QuestionBuilderNeetoUI = ({
   initialValues,
-  onSave,
-  onSubmitAndNew,
   onSubmit,
+  onSubmitAndNew,
   isEdit,
 }) => (
   <div>
@@ -18,10 +17,10 @@ const QuestionBuilderNeetoUI = ({
       formikProps={{
         initialValues: initialValues || INITIAL_VALUES,
         validationSchema: QUESTION_SCHEMA,
-        onSubmit: values => onSave && onSave(values),
+        onSubmit: values => onSubmit(values),
       }}
     >
-      {({ values, setFieldValue, resetForm }) => {
+      {({ values, setFieldValue }) => {
         const valid = isValidQuestion(values);
 
         return (
@@ -90,18 +89,14 @@ const QuestionBuilderNeetoUI = ({
                 label={isEdit ? "Update" : "Save"}
                 style="primary"
                 type="submit"
-                onClick={() => onSubmit(values)}
               />
               {!isEdit && (
                 <Button
                   disabled={!valid}
                   label="Save & add new question"
                   style="secondary"
-                  type="submit"
-                  onClick={() => {
-                    onSubmitAndNew(values);
-                    resetForm();
-                  }}
+                  type="button"
+                  onClick={() => onSubmitAndNew(values)}
                 />
               )}
             </div>
@@ -111,4 +106,5 @@ const QuestionBuilderNeetoUI = ({
     </Form>
   </div>
 );
+
 export default QuestionBuilderNeetoUI;
