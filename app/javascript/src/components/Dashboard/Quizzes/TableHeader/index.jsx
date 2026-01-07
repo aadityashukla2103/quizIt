@@ -90,7 +90,7 @@ const ColumnAndFilterDropdown = ({
   };
 
   return (
-    <div className="flex w-full items-center justify-between border-b px-4 py-2">
+    <div className="flex w-full items-center justify-between border px-4 py-2">
       <div className="flex items-center gap-3">
         <Typography style="h4">
           {selectedQuizIds.length > 0 ? (
@@ -191,4 +191,4 @@ const ColumnAndFilterDropdown = ({
   );
 };
 
-export default ColumnAndFilterDropdown;
+export default React.memo(ColumnAndFilterDropdown);

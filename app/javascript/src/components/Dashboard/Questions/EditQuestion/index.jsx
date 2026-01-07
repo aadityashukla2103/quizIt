@@ -10,25 +10,32 @@ const EditQuestion = () => {
   const { quizId, questionId } = useParams();
   const history = useHistory();
 
-  const [loading, setLoading] = useState(true);
+  const [quizLoading, setQuizLoading] = useState(true);
+  const [questionLoading, setQuestionLoading] = useState(true);
+
   const [quizName, setQuizName] = useState("");
   const [questionData, setQuestionData] = useState(null);
 
   const fetchQuiz = async () => {
     try {
       const response = await quizzesApi.show(quizId);
-      setQuizName(response.quiz.name);
+      const quiz = response.quiz?.data || response.quiz;
+      setQuizName(quiz?.name || "");
     } catch (error) {
       logger.log(error);
+    } finally {
+      setQuizLoading(false);
     }
   };
 
   const fetchQuestion = async () => {
     try {
       const response = await questionsApi.show(quizId, questionId);
+      const data = response.data;
+
       setQuestionData({
-        question: response.content,
-        options: response.options.map(opt => ({
+        question: data.content,
+        options: data.options.map(opt => ({
           content: opt.content,
           isCorrect: opt.is_correct,
         })),
@@ -36,7 +43,7 @@ const EditQuestion = () => {
     } catch (error) {
       logger.log(error);
     } finally {
-      setLoading(false);
+      setQuestionLoading(false);
     }
   };
 
@@ -66,7 +73,9 @@ const EditQuestion = () => {
     fetchQuestion();
   }, []);
 
-  if (loading || !questionData) return null;
+  if (quizLoading || questionLoading || !questionData || quizName === "") {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="w-full">

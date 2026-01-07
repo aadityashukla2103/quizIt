@@ -24,4 +24,4 @@ const Create = ({ fetchQuizzes, showPane, setShowPane }) => {
   );
 };
 
-export default Create;
+export default React.memo(Create);
