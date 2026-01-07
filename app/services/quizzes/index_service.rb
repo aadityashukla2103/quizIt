@@ -62,13 +62,10 @@ class Quizzes::IndexService
     end
 
     def filter_category(quizzes)
-      return quizzes unless @params[:category].present? && @params[:category].downcase != "all"
+      return quizzes unless @params[:category].present?
 
-      category = Category.find_by("LOWER(name) = ?", @params[:category].downcase)
-      return quizzes unless category
-
-      quizzes.where(category_id: category.id)
-    end
+      quizzes.where(category_id: @params[:category])
+ end
 
     def filter_status(quizzes)
       return quizzes unless @current_user

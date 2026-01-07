@@ -22,6 +22,7 @@ const Quizzes = () => {
 
   const urlQuery = queryParams.get("query") || "";
   const urlStatus = queryParams.get("status") || "all";
+  const urlCategory = queryParams.get("category")?.split(",") || [];
   const urlPage = Number(queryParams.get("page")) || 1;
   const urlPageSize = Number(queryParams.get("pageSize")) || 10;
 
@@ -45,12 +46,12 @@ const Quizzes = () => {
   const [pageSize, setPageSize] = useState(urlPageSize);
 
   const [filtersApplied, setFiltersApplied] = useState(
-    Boolean(urlQuery || urlStatus !== "all")
+    Boolean(urlQuery || urlStatus !== "all" || urlCategory.length)
   );
 
   const [selectedFilters, setSelectedFilters] = useState({
     query: urlQuery,
-    categoryName: "",
+    categoryName: urlCategory,
     status: urlStatus,
   });
 
@@ -77,7 +78,7 @@ const Quizzes = () => {
     fetchQuizzes(
       {
         query: urlQuery,
-        category: "",
+        category: urlCategory,
         status: urlStatus,
       },
       urlPage,
@@ -87,15 +88,16 @@ const Quizzes = () => {
     setPage(urlPage);
     setPageSize(urlPageSize);
 
-    setSelectedFilters(prev => ({
-      ...prev,
+    setSelectedFilters({
       query: urlQuery,
+      categoryName: urlCategory,
       status: urlStatus,
-      categoryName: "",
-    }));
-    setSelectedQuizIds([]);
+    });
 
-    setFiltersApplied(Boolean(urlQuery || urlStatus !== "all"));
+    setSelectedQuizIds([]);
+    setFiltersApplied(
+      Boolean(urlQuery || urlStatus !== "all" || urlCategory.length)
+    );
   }, [location.search]);
 
   useEffect(() => {
@@ -108,34 +110,32 @@ const Quizzes = () => {
     }
 
     params.set("page", 1);
-
     history.replace({ search: params.toString() });
   }, [debouncedSearchTerm]);
 
   const handlePageChange = (currentPage, newPageSize) => {
     const params = new URLSearchParams(location.search);
-
     params.set("page", currentPage);
     params.set("pageSize", newPageSize);
-
     history.push({ search: params.toString() });
   };
 
   const handleFilterSubmit = filters => {
     const params = new URLSearchParams();
-
     if (filters.query) params.set("query", filters.query);
 
     if (filters.status) params.set("status", filters.status);
 
-    if (filters.category_name) params.set("category", filters.category_name);
+    if (filters.category_name?.length) {
+      params.set("category", filters.category_name.join(","));
+    }
 
     params.set("page", 1);
     params.set("pageSize", pageSize);
 
     setSelectedFilters({
       query: filters.query || "",
-      categoryName: filters.category_name || "",
+      categoryName: filters.category_name || [],
       status: filters.status || "",
     });
 
@@ -148,7 +148,7 @@ const Quizzes = () => {
   const handleClearFilters = () => {
     setSelectedFilters({
       query: "",
-      categoryName: "",
+      categoryName: [],
       status: "",
     });
     setFiltersApplied(false);
@@ -192,13 +192,13 @@ const Quizzes = () => {
             <SubHeader
               leftActionBlock={
                 <div className="flex items-center gap-3">
-                  {selectedFilters.categoryName && (
+                  {selectedFilters.categoryName.length > 0 && (
                     <>
                       <Typography component="h4" style="h4">
                         Category:
                       </Typography>
                       <Typography className="text-gray-400">
-                        {selectedFilters.categoryName}
+                        {selectedFilters.categoryName.join(", ")}
                       </Typography>
                     </>
                   )}
@@ -212,7 +212,8 @@ const Quizzes = () => {
                       </Typography>
                     </>
                   )}
-                  {(selectedFilters.categoryName || selectedFilters.status) && (
+                  {(selectedFilters.categoryName.length > 0 ||
+                    selectedFilters.status) && (
                     <Button
                       label="Clear filters"
                       style="secondary"

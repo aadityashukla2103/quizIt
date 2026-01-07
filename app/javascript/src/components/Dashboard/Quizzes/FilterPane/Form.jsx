@@ -4,13 +4,11 @@ import categoriesApi from "apis/categories";
 import { Formik, Form as FormikForm } from "formik";
 import { Pane } from "neetoui";
 import { ActionBlock, Input, Select } from "neetoui/formik";
-import { useHistory } from "react-router-dom";
 
-import { validationSchema } from "./constants";
+import { validationSchema, FILTERS_FORM_INITIAL_VALUES } from "./constants";
 
-const Form = ({ refetchQuizzes, onClose, filters }) => {
+const Form = ({ refetchQuizzes, onClose }) => {
   const [categories, setCategories] = useState([]);
-  const history = useHistory();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -30,38 +28,16 @@ const Form = ({ refetchQuizzes, onClose, filters }) => {
     { label: "Published", value: "published" },
   ];
 
-  const updateURL = filters => {
-    const params = new URLSearchParams();
-
-    if (filters.query) params.set("query", filters.query);
-
-    if (filters.category_name) params.set("category", filters.category_name);
-
-    if (filters.status) params.set("status", filters.status);
-
-    params.set("page", 1);
-    params.set("pageSize", 10);
-
-    history.replace({
-      pathname: history.location.pathname,
-      search: params.toString(),
-    });
-  };
-
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       const filters = {
         query: values.name || "",
-        category: values.category || "",
-        category_name: values.category_name || "",
+        category: values.category.map(c => c.value),
+        category_name: values.category.map(c => c.label),
         status: values.status || "all",
       };
-
-      updateURL(filters);
       await refetchQuizzes(filters);
       onClose();
-    } catch (error) {
-      logger.log(error);
     } finally {
       setSubmitting(false);
     }
@@ -69,11 +45,11 @@ const Form = ({ refetchQuizzes, onClose, filters }) => {
 
   return (
     <Formik
-      initialValues={filters}
+      initialValues={FILTERS_FORM_INITIAL_VALUES}
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
-      {({ setFieldValue }) => (
+      {({ setFieldValue, values }) => (
         <FormikForm className="w-full">
           <Pane.Body className="space-y-6">
             <Input
@@ -83,15 +59,14 @@ const Form = ({ refetchQuizzes, onClose, filters }) => {
               placeholder="Search by name"
             />
             <Select
+              isMulti
               className="w-full flex-grow-0"
               label="Category"
               name="category"
               options={categoryOptions}
-              placeholder="Search category"
-              onChange={option => {
-                setFieldValue("category", option.value);
-                setFieldValue("category_name", option.label);
-              }}
+              placeholder="Select categories"
+              value={values.category}
+              onChange={options => setFieldValue("category", options || [])}
             />
             <Select
               className="w-full flex-grow-0"
