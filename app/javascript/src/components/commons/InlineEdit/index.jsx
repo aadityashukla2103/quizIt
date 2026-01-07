@@ -1,49 +1,78 @@
 import React, { useState, useEffect } from "react";
 
-import { Input } from "antd";
+import { Check, Close } from "neetoicons";
+import { Input } from "neetoui";
 
-const InlineEdit = ({ value, onSave }) => {
+const InlineEdit = ({ value = "", onSave }) => {
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(value);
+  const [localValue, setLocalValue] = useState(value);
 
   useEffect(() => {
     setText(value);
+    setLocalValue(value);
   }, [value]);
 
+  const isChanged = text.trim() !== localValue;
+
   const handleSave = () => {
+    if (!isChanged) return;
+
+    const updatedValue = text.trim();
+    setLocalValue(updatedValue);
+    onSave(updatedValue);
     setEditing(false);
-    if (text.trim() !== value) {
-      onSave(text.trim());
-    }
+  };
+
+  const handleCancel = () => {
+    setText(localValue);
+    setEditing(false);
   };
 
   return (
-    <div className="inline-block">
+    <div
+      className={`relative inline-block rounded transition-colors
+        ${
+          editing
+            ? "border border-gray-300"
+            : "hover:border hover:border-gray-300"
+        }
+      `}
+    >
       {editing ? (
-        <Input
-          autoFocus
-          className="h-8 px-2 text-xl font-semibold"
-          value={text}
-          style={{
-            padding: "0 8px",
-            height: "32px",
-            lineHeight: "32px",
-          }}
-          onBlur={handleSave}
-          onChange={e => setText(e.target.value)}
-          onPressEnter={handleSave}
-        />
+        <>
+          <Input
+            autoFocus
+            nakedInput
+            className="h-8 border-0 pr-16 text-xl font-semibold shadow-none focus:shadow-none focus:ring-0"
+            value={text}
+            onChange={e => setText(e.target.value)}
+            onPressEnter={handleSave}
+          />
+          <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-2">
+            <Check
+              size={16}
+              className={
+                isChanged
+                  ? "cursor-pointer text-green-600"
+                  : "cursor-not-allowed text-gray-300"
+              }
+              onClick={handleSave}
+            />
+            <Close
+              className="cursor-pointer text-red-500"
+              size={16}
+              onClick={handleCancel}
+            />
+          </div>
+        </>
       ) : (
         <span
-          className="inline-flex max-w-[300px] cursor-pointer items-center truncate rounded px-2 text-xl font-semibold"
-          title={text}
-          style={{
-            height: "32px",
-            lineHeight: "32px",
-          }}
+          className="cursor-pointer truncate rounded px-2 text-xl font-semibold"
+          title={localValue}
           onClick={() => setEditing(true)}
         >
-          {text}
+          {localValue}
         </span>
       )}
     </div>

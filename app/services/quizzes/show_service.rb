@@ -21,7 +21,7 @@ class Quizzes::ShowService
     end
 
     {
-      message: "Quiz fetched successfully",
+      message: "",
       status: :ok,
       data: {
         quiz: @quiz.as_json,

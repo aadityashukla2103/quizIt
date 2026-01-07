@@ -1,37 +1,41 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback } from "react";
 
 import authenticationApi from "apis/authentication";
 import { LOGIN_PATH } from "components/routeConstants";
 import { useAuthDispatch } from "contexts/auth";
-import { useQuizzes } from "contexts/QuizzesContext";
 import { useUserState } from "contexts/user";
 import { Collapse } from "neetoicons";
 import { Avatar } from "neetoui";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 
 const NewSidebar = ({ onClose = () => {}, currentUser }) => {
   const { user } = useUserState();
   const slug = currentUser?.organization?.slug;
   const authDispatch = useAuthDispatch();
-  const {
-    fetchQuizzes,
-    totalQuizCount,
-    totalPublishedCount,
-    totalDraftCount,
-    setStatus,
-  } = useQuizzes();
   const history = useHistory();
+  const location = useLocation();
 
-  const [activeFilter, setActiveFilter] = useState("all");
+  const queryParams = new URLSearchParams(location.search);
+  const activeFilter = queryParams.get("status") || "all";
 
   const handleFilter = useCallback(
-    async status => {
-      setActiveFilter(status);
-      setStatus(status);
-      await fetchQuizzes("", 1, 10, status);
-      history.push("/quizzes");
+    status => {
+      const params = new URLSearchParams(location.search);
+
+      if (status === "all") {
+        params.delete("status");
+      } else {
+        params.set("status", status);
+      }
+
+      params.set("page", 1);
+
+      history.push({
+        pathname: "/quizzes",
+        search: params.toString(),
+      });
     },
-    [fetchQuizzes, history, setStatus]
+    [history, location.search]
   );
 
   const handleLogout = useCallback(async () => {
@@ -72,9 +76,6 @@ const NewSidebar = ({ onClose = () => {}, currentUser }) => {
               >
                 All
               </span>
-              <span className="rounded-full bg-gray-100 px-2 text-xs font-semibold">
-                {totalQuizCount}
-              </span>
             </button>
             <button
               className="flex w-full items-center justify-between rounded px-2 py-2"
@@ -89,9 +90,6 @@ const NewSidebar = ({ onClose = () => {}, currentUser }) => {
               >
                 Published
               </span>
-              <span className="rounded-full bg-gray-100 px-2 text-xs font-semibold">
-                {totalPublishedCount}
-              </span>
             </button>
             <button
               className="flex w-full items-center justify-between rounded px-2 py-2"
@@ -103,9 +101,6 @@ const NewSidebar = ({ onClose = () => {}, currentUser }) => {
                 }
               >
                 Draft
-              </span>
-              <span className="rounded-full bg-gray-100 px-2 text-xs font-semibold">
-                {totalDraftCount}
               </span>
             </button>
           </nav>

@@ -59,7 +59,8 @@ const QuizQuestions = () => {
   const handleCloneQuestion = async questionId => {
     try {
       const cloned = await questionsApi.clone(quizId, questionId);
-      setQuestions(prev => [...prev, cloned]);
+      const clonedData = cloned.data;
+      setQuestions(prev => [...prev, clonedData]);
     } catch (error) {
       logger.log(error);
     }
@@ -148,4 +149,4 @@ const QuizQuestions = () => {
   );
 };
 
-export default QuizQuestions;
+export default React.memo(QuizQuestions);

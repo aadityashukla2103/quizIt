@@ -19,7 +19,11 @@ const Quizzes = () => {
   const location = useLocation();
 
   const queryParams = new URLSearchParams(location.search);
-  const initialQuery = queryParams.get("query") || "";
+
+  const urlQuery = queryParams.get("query") || "";
+  const urlStatus = queryParams.get("status") || "all";
+  const urlPage = Number(queryParams.get("page")) || 1;
+  const urlPageSize = Number(queryParams.get("pageSize")) || 10;
 
   const {
     quizzes,
@@ -28,25 +32,29 @@ const Quizzes = () => {
     pageTitle,
     setQuizzes,
     totalQuizCount,
-    status,
+    setStatus,
   } = useQuizzes();
 
   const [showNewQuizPane, setShowNewQuizPane] = useState(false);
   const [showFilterPane, setShowFilterPane] = useState(false);
 
-  const [searchTerm, setSearchTerm] = useState(initialQuery);
+  const [searchTerm, setSearchTerm] = useState(urlQuery);
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-  const [selectedQuizIds, setSelectedQuizIds] = useState([]);
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [page, setPage] = useState(urlPage);
+  const [pageSize, setPageSize] = useState(urlPageSize);
 
-  const [filtersApplied, setFiltersApplied] = useState(false);
+  const [filtersApplied, setFiltersApplied] = useState(
+    Boolean(urlQuery || urlStatus !== "all")
+  );
+
   const [selectedFilters, setSelectedFilters] = useState({
-    query: "",
+    query: urlQuery,
     categoryName: "",
-    status: "",
+    status: urlStatus,
   });
+
+  const [selectedQuizIds, setSelectedQuizIds] = useState([]);
 
   const [visibleColumns, setVisibleColumns] = useState({
     name: true,
@@ -63,86 +71,91 @@ const Quizzes = () => {
     }));
   };
 
-  const updateURL = (
-    currentPage = page,
-    currentPageSize = pageSize,
-    filters = selectedFilters
-  ) => {
-    const params = new URLSearchParams();
-
-    if (debouncedSearchTerm) params.set("query", debouncedSearchTerm);
-
-    if (filters.status) params.set("status", filters.status);
-
-    params.set("page", currentPage);
-    params.set("pageSize", currentPageSize);
-
-    history.replace({ search: params.toString() });
-  };
-
   useEffect(() => {
+    setStatus(urlStatus);
+
     fetchQuizzes(
-      { query: debouncedSearchTerm, category: "", status },
-      page,
-      pageSize
+      {
+        query: urlQuery,
+        category: "",
+        status: urlStatus,
+      },
+      urlPage,
+      urlPageSize
     );
 
-    updateURL();
-  }, [debouncedSearchTerm, page, pageSize, status]);
+    setPage(urlPage);
+    setPageSize(urlPageSize);
+
+    setSelectedFilters(prev => ({
+      ...prev,
+      query: urlQuery,
+      status: urlStatus,
+      categoryName: "",
+    }));
+    setSelectedQuizIds([]);
+
+    setFiltersApplied(Boolean(urlQuery || urlStatus !== "all"));
+  }, [location.search]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+
+    if (debouncedSearchTerm) {
+      params.set("query", debouncedSearchTerm);
+    } else {
+      params.delete("query");
+    }
+
+    params.set("page", 1);
+
+    history.replace({ search: params.toString() });
+  }, [debouncedSearchTerm]);
 
   const handlePageChange = (currentPage, newPageSize) => {
-    setPage(currentPage);
-    setPageSize(newPageSize);
+    const params = new URLSearchParams(location.search);
 
-    fetchQuizzes({
-      query: debouncedSearchTerm,
-      category: "",
-      status,
-      page: currentPage,
-      pageSize: newPageSize,
-    });
+    params.set("page", currentPage);
+    params.set("pageSize", newPageSize);
 
-    updateURL(currentPage, newPageSize);
+    history.push({ search: params.toString() });
   };
 
   const handleFilterSubmit = filters => {
-    const newPage = 1;
-    setPage(newPage);
+    const params = new URLSearchParams();
 
-    const newSelectedFilters = {
+    if (filters.query) params.set("query", filters.query);
+
+    if (filters.status) params.set("status", filters.status);
+
+    if (filters.category_name) params.set("category", filters.category_name);
+
+    params.set("page", 1);
+    params.set("pageSize", pageSize);
+
+    setSelectedFilters({
       query: filters.query || "",
       categoryName: filters.category_name || "",
       status: filters.status || "",
-    };
+    });
 
-    setSelectedFilters(newSelectedFilters);
     setFiltersApplied(true);
-
-    fetchQuizzes({ ...filters, page: newPage, pageSize });
+    setSelectedQuizIds([]);
+    history.push({ search: params.toString() });
+    setShowFilterPane(false);
   };
 
   const handleClearFilters = () => {
-    const newPage = 1;
-    setPage(newPage);
-
-    const clearedFilters = {
+    setSelectedFilters({
       query: "",
       categoryName: "",
       status: "",
-    };
-
-    setSelectedFilters(clearedFilters);
-    setFiltersApplied(false);
-
-    fetchQuizzes({
-      query: "",
-      category: "",
-      status: "all",
-      page: newPage,
-      pageSize,
     });
-
-    updateURL(newPage, pageSize, clearedFilters);
+    setFiltersApplied(false);
+    setSelectedQuizIds([]);
+    history.push({
+      search: `?page=1&pageSize=${pageSize}`,
+    });
   };
 
   return (
@@ -179,17 +192,33 @@ const Quizzes = () => {
             <SubHeader
               leftActionBlock={
                 <div className="flex items-center gap-3">
-                  <Typography component="h4" style="h4">
-                    Category:
-                  </Typography>
-                  <Typography className="text-gray-400">
-                    {selectedFilters.categoryName}
-                  </Typography>
-                  <Button
-                    label="Clear filters"
-                    style="secondary"
-                    onClick={handleClearFilters}
-                  />
+                  {selectedFilters.categoryName && (
+                    <>
+                      <Typography component="h4" style="h4">
+                        Category:
+                      </Typography>
+                      <Typography className="text-gray-400">
+                        {selectedFilters.categoryName}
+                      </Typography>
+                    </>
+                  )}
+                  {selectedFilters.status && (
+                    <>
+                      <Typography component="h4" style="h4">
+                        Status:
+                      </Typography>
+                      <Typography className="text-gray-400">
+                        {selectedFilters.status}
+                      </Typography>
+                    </>
+                  )}
+                  {(selectedFilters.categoryName || selectedFilters.status) && (
+                    <Button
+                      label="Clear filters"
+                      style="secondary"
+                      onClick={handleClearFilters}
+                    />
+                  )}
                 </div>
               }
             />
