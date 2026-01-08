@@ -52,6 +52,12 @@ const bulkDelete = async payload => {
   return response.data;
 };
 
+const publicShow = async id => {
+  const response = await axios.get(`/api/v1/public/quizzes/${id}`);
+
+  return response.data;
+};
+
 const quizzesApi = {
   fetch,
   show,
@@ -61,6 +67,7 @@ const quizzesApi = {
   cloneQuiz,
   bulkUpdate,
   bulkDelete,
+  publicShow,
 };
 
 export default quizzesApi;

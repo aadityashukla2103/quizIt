@@ -5,6 +5,7 @@ module Submissions
     def initialize(submission)
       @submission = submission
       @quiz = submission.quiz
+      @organization = @quiz.organization
     end
 
     def call
@@ -14,7 +15,8 @@ module Submissions
         correct_answers: @submission.correct_answers,
         wrong_answers: @submission.wrong_answers,
         submission_answers: build_answers,
-        remaining_time: remaining_time
+        remaining_time: remaining_time,
+        organization_slug: @organization.slug
       }
     end
 

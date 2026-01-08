@@ -16,7 +16,7 @@ const PublicQuizResult = () => {
   const [submission, setSubmission] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-
+  const organizationSlug = submission?.organization_slug;
   const currentAnswer = submission?.submission_answers[currentIndex];
 
   useEffect(() => {
@@ -46,7 +46,7 @@ const PublicQuizResult = () => {
   return (
     <div className="mx-auto flex h-screen max-w-3xl flex-col justify-between p-8">
       <Header
-        goBack={() => history.push("/publicdashboard")}
+        goBack={() => history.push(`/publicdashboard/${organizationSlug}`)}
         totalQuestions={submission.total_questions}
       />
       <ScoreGrid submission={submission} />
@@ -55,7 +55,7 @@ const PublicQuizResult = () => {
       <NavigationButtons
         currentIndex={currentIndex}
         total={submission.submission_answers.length}
-        onFinish={() => history.replace("/publicdashboard")}
+        onFinish={() => history.replace(`/publicdashboard/${organizationSlug}`)}
         onNext={() => setCurrentIndex(prev => prev + 1)}
         onPrev={() => setCurrentIndex(prev => prev - 1)}
       />

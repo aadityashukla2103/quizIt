@@ -24,7 +24,7 @@ const PublicQuizQuestions = () => {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await quizzesApi.show(quizId);
+        const response = await quizzesApi.publicShow(quizId);
 
         const questionsWithAnswers = response.questions.map(q => ({
           ...q,
@@ -81,9 +81,15 @@ const PublicQuizQuestions = () => {
   }, [timeLeft]);
 
   const handleOptionSelect = option => {
-    setSelectedOption(option);
     const updatedQuestions = [...questions];
-    updatedQuestions[currentIndex].selected_option_id = option.id;
+    if (updatedQuestions[currentIndex].selected_option_id === option.id) {
+      updatedQuestions[currentIndex].selected_option_id = null;
+      setSelectedOption(null);
+    } else {
+      updatedQuestions[currentIndex].selected_option_id = option.id;
+      setSelectedOption(option);
+    }
+
     setQuestions(updatedQuestions);
   };
 
