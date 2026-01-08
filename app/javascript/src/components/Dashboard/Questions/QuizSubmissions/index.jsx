@@ -3,8 +3,9 @@ import React, { useEffect, useState } from "react";
 import submissionsApi from "apis/submissions";
 import QuizHeader from "components/commons/QuizHeader";
 import { Container } from "neetoui/layouts";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory, useLocation } from "react-router-dom";
 
+import { INITIAL_FILTERS, INITIAL_VISIBLE_COLUMNS } from "./constants";
 import SubmissionsFilterPane from "./FilterPane";
 import SubmissionsHeader from "./SubmissionsHeader";
 import SubmissionsSubHeader from "./SubmissionsSubHeader";
@@ -18,21 +19,30 @@ const QuizSubmissions = () => {
   const [submissions, setSubmissions] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterPaneOpen, setFilterPaneOpen] = useState(false);
-
-  const [filters, setFilters] = useState({ name: "", email: "", status: "" });
-
-  const [visibleColumns, setVisibleColumns] = useState({
-    guest_name: true,
-    guest_email: true,
-    submitted_at: true,
-    correct_answers: true,
-    wrong_answers: true,
-    unanswered: true,
-    total_questions: true,
-    status: true,
-  });
+  const [filters, setFilters] = useState(INITIAL_FILTERS);
+  const [visibleColumns, setVisibleColumns] = useState(INITIAL_VISIBLE_COLUMNS);
 
   const debouncedSearch = useDebounce(searchTerm, 500);
+
+  const history = useHistory();
+  const location = useLocation();
+
+  const updateUrl = (newFilters, searchValue) => {
+    const params = new URLSearchParams();
+
+    if (searchValue) params.set("search", searchValue);
+
+    if (newFilters.name) params.set("name", newFilters.name);
+
+    if (newFilters.email) params.set("email", newFilters.email);
+
+    if (newFilters.status) params.set("status", newFilters.status);
+
+    history.replace({
+      pathname: location.pathname,
+      search: params.toString(),
+    });
+  };
 
   const fetchSubmissions = async () => {
     try {
@@ -50,7 +60,13 @@ const QuizSubmissions = () => {
   };
 
   const handleFilter = newFilters => {
+    updateUrl(newFilters, searchTerm);
     setFilters(newFilters);
+  };
+
+  const handleSearch = value => {
+    setSearchTerm(value);
+    updateUrl(filters, value);
   };
 
   const toggleColumnVisibility = columnKey => {
@@ -76,17 +92,11 @@ const QuizSubmissions = () => {
         questionCount={submissions.length}
         quizId={quizId}
       />
-      <SubmissionsHeader
-        searchTerm={searchTerm}
-        setFilterPaneOpen={setFilterPaneOpen}
-        setSearchTerm={setSearchTerm}
-        submissionsCount={submissions.length}
-      />
+      <SubmissionsHeader searchTerm={searchTerm} onSearch={handleSearch} />
       <SubmissionsSubHeader
         filters={filters}
         quizId={quizId}
         setFilterPaneOpen={setFilterPaneOpen}
-        setFilters={setFilters}
         submissionsCount={submissions.length}
         toggleColumnVisibility={toggleColumnVisibility}
         visibleColumns={visibleColumns}
