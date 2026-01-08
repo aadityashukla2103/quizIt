@@ -14,7 +14,7 @@ module Submissions
 
       total_questions = @quiz.questions.count
       correct_answers = answers.where(is_correct: true).count
-      wrong_answers = total_questions - correct_answers
+      wrong_answers = answers.where(is_correct: false).count
 
       @submission.update!(
         total_questions: total_questions,

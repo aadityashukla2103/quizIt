@@ -66,7 +66,7 @@ en:
   guest_registration:
     email_already_registered: "This email is already registered as a user."
     already_registered_for_quiz: "You have already registered for this quiz."
-    registered_successfully: "Guest registration successful."
+    registered_successfully: "Quiz started successfully."
     registration_failed: "Failed to register guest. Please try again."
   quiz:
     created_successfully: "Quiz created successfully."

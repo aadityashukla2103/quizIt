@@ -2,7 +2,7 @@ import React from "react";
 
 const ScoreGrid = ({ submission }) => {
   const unansweredCount = submission.submission_answers.filter(
-    ans => ans.selected_option_id === null
+    ans => ans.selected_option === null
   ).length;
 
   return (
@@ -22,7 +22,9 @@ const ScoreGrid = ({ submission }) => {
       <div className="flex flex-col items-center rounded-xl bg-red-100 p-4 shadow-sm">
         <p className="text-sm text-red-600">Incorrect</p>
         <p className="text-2xl font-bold text-red-600">
-          {submission.wrong_answers}
+          {submission.total_questions -
+            submission.correct_answers -
+            unansweredCount}
         </p>
       </div>
       <div className="flex flex-col items-center rounded-xl bg-gray-200 p-4 shadow-sm">

@@ -3,7 +3,7 @@ import React from "react";
 import { Callout } from "neetoui";
 
 const CalloutMessage = ({ currentAnswer }) => {
-  const isUnanswered = currentAnswer.selected_option_id === null;
+  const isUnanswered = currentAnswer.selected_option === null;
   const isUnvisited = currentAnswer.attempted === false;
   const isCorrect = currentAnswer.is_correct === true;
 

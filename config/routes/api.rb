@@ -36,6 +36,10 @@ namespace :api, defaults: { format: :json } do
     end
   end
 
+   namespace :public do
+     resources :quizzes, only: [:show]
+   end
+
    resources :organizations, only: [:index, :show, :create, :update, :destroy]
    resources :categories, only: [:index, :show, :create, :update, :destroy] do
      patch :reorder, on: :collection
