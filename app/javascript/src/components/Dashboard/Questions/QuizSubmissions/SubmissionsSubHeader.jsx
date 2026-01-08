@@ -11,38 +11,76 @@ import {
 import { SubHeader } from "neetoui/layouts";
 import { Link } from "react-router-dom";
 
+import { INITIAL_FILTERS } from "./constants";
+
 import { Column } from "../../../../assets/icons";
 
 const { Menu, MenuItem } = ActionDropdown;
 const { Button: MenuItemButton } = MenuItem;
 
-const SubmissionsHeader = ({
+const SubmissionsSubHeader = ({
   submissionsCount,
   setFilterPaneOpen,
   filters,
-  setFilters,
   visibleColumns,
   toggleColumnVisibility,
   quizId,
+  onFilter,
 }) => {
   const handleClearFilters = () => {
-    setFilters({ name: "", email: "", status: "" });
+    onFilter(INITIAL_FILTERS);
   };
+
+  const filtersApplied = filters.name || filters.email || filters.status;
 
   return (
     <SubHeader
       leftActionBlock={
         <div className="flex items-center gap-4">
-          <Typography component="h4" style="h4">
-            {submissionsCount}{" "}
-            {submissionsCount === 1 ? "Submission" : "Submissions"}
-          </Typography>
-          {(filters.name || filters.email || filters.status) && (
-            <Button
-              label="Clear Filter"
-              style="secondary"
-              onClick={handleClearFilters}
-            />
+          {!filtersApplied && (
+            <Typography component="h4" style="h4">
+              {submissionsCount}{" "}
+              {submissionsCount === 1 ? "Submission" : "Submissions"}
+            </Typography>
+          )}
+          {filtersApplied && (
+            <div className="flex items-center gap-3">
+              {filters.name && (
+                <>
+                  <Typography component="h4" style="h4">
+                    Name:
+                  </Typography>
+                  <Typography className="text-gray-400">
+                    {filters.name}
+                  </Typography>
+                </>
+              )}
+              {filters.email && (
+                <>
+                  <Typography component="h4" style="h4">
+                    Email:
+                  </Typography>
+                  <Typography className="text-gray-400">
+                    {filters.email}
+                  </Typography>
+                </>
+              )}
+              {filters.status && (
+                <>
+                  <Typography component="h4" style="h4">
+                    Status:
+                  </Typography>
+                  <Typography className="text-gray-400">
+                    {filters.status}
+                  </Typography>
+                </>
+              )}
+              <Button
+                label="Clear Filter"
+                style="secondary"
+                onClick={handleClearFilters}
+              />
+            </div>
           )}
         </div>
       }
@@ -115,4 +153,4 @@ const SubmissionsHeader = ({
   );
 };
 
-export default SubmissionsHeader;
+export default SubmissionsSubHeader;

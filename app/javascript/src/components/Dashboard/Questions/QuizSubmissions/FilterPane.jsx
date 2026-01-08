@@ -1,29 +1,12 @@
 import React, { useState } from "react";
 
 import { Pane, Input, Select, Typography, Button } from "neetoui";
-import * as Yup from "yup";
 
-const STATUS_OPTIONS = [
-  { label: "Completed", value: "completed" },
-  { label: "Incomplete", value: "incomplete" },
-];
+import { STATUS_OPTIONS, INITIAL_FILTERS, validationSchema } from "./constants";
 
 const SubmissionsFilterPane = ({ isOpen, onClose, onFilter }) => {
-  const [filters, setFilters] = useState({
-    name: "",
-    email: "",
-    status: "",
-  });
-
+  const [filters, setFilters] = useState(INITIAL_FILTERS);
   const [errors, setErrors] = useState({});
-
-  const validationSchema = Yup.object().shape({
-    name: Yup.string().required("Name is required"),
-    email: Yup.string()
-      .email("Enter a valid email")
-      .required("Email is required"),
-    status: Yup.string().required("Status is required"),
-  });
 
   const handleChange = (key, value) => {
     setFilters({ ...filters, [key]: value });
@@ -45,9 +28,9 @@ const SubmissionsFilterPane = ({ isOpen, onClose, onFilter }) => {
   };
 
   const handleClear = () => {
-    setFilters({ name: "", email: "", status: "" });
+    setFilters(INITIAL_FILTERS);
     setErrors({});
-    onFilter({ name: "", email: "", status: "" });
+    onFilter(INITIAL_FILTERS);
   };
 
   return (
@@ -82,11 +65,12 @@ const SubmissionsFilterPane = ({ isOpen, onClose, onFilter }) => {
         </div>
         <div className="mb-4 w-full">
           <Select
+            key={filters.status ?? "cleared"}
             label="Status"
             options={STATUS_OPTIONS}
             placeholder="Select status"
             value={STATUS_OPTIONS.find(opt => opt.value === filters.status)}
-            onChange={val => handleChange("status", val?.value || "")}
+            onChange={val => handleChange("status", val?.value ?? null)}
           />
           {errors.status && (
             <div className="text-sm text-red-500">{errors.status}</div>
