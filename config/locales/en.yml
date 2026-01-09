@@ -47,7 +47,7 @@ en:
     created_successfully: "Submission created successfully"
     updated_successfully: "Submission updated successfully"
     deleted_successfully: "Submission deleted successfully"
-    finalized_successfully: "Submission finalized successfully"
+    finalized_successfully: "Quiz finished successfully"
     quiz_submissions_fetched: "Quiz submissions fetched successfully"
     creation_failed: "Failed to create submission"
     update_failed: "Failed to update submission"

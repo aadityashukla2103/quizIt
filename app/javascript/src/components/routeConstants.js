@@ -28,25 +28,24 @@ export const PUBLIC_QUIZ_PATH = "/public/quiz/:quizId/:submissionId";
 export const PUBLIC_QUIZ_RESULT_PATH =
   "/public/quizzes/:quizId/submissions/:submissionId/result";
 
-export const SUBMISSION_REPORT_DOWNLOAD = "/quiz/:quizId/report";
+export const SUBMISSION_REPORT_DOWNLOAD = "/quiz/:slug/report";
 export const DASHBOARD_PATH = "/";
 export const QUIZZES_PATH = "/quizzes";
-export const QUIZ_QUESTIONS_PATH = "/quizzes/:id/questions";
-export const QUESTION_CREATE_PATH = "/quizzes/:id/questions/new";
-export const QUESTION_EDIT_PATH = "/quizzes/:quizId/question/:questionId/edit";
-export const QUIZ_CONFIGURE_PATH = "/quizzes/:quizId/configure";
+export const QUIZ_QUESTIONS_PATH = "/quizzes/:slug/questions";
+export const QUESTION_CREATE_PATH = "/quizzes/:slug/questions/new";
+export const QUESTION_EDIT_PATH = "/quizzes/:slug/question/:questionId/edit";
+export const QUIZ_CONFIGURE_PATH = "/quizzes/:slug/configure";
 export const QUIZ_CONFIGURE_VISIBILITY_PATH =
-  "/quizzes/:quizId/configure/visibility";
+  "/quizzes/:slug/configure/visibility";
 
 export const QUIZ_CONFIGURE_QUESTIONS_PATH =
-  "/quizzes/:quizId/configure/questions";
+  "/quizzes/:slug/configure/questions";
 
-export const QUIZ_CONFIGURE_TIMING_PATH = "/quizzes/:quizId/configure/timing";
+export const QUIZ_CONFIGURE_TIMING_PATH = "/quizzes/:slug/configure/timing";
 export const QUIZ_CONFIGURE_NOTIFICATIONS_PATH =
-  "/quizzes/:quizId/configure/notifications";
+  "/quizzes/:slug/configure/notifications";
 
-export const QUIZ_SUBMISSIONS_PATH = "/quizzes/:quizId/submissions";
-
+export const QUIZ_SUBMISSIONS_PATH = "/quizzes/:slug/submissions";
 export const PROFILE_PATH = "/settings?tab=profile";
 export const SETTINGS_PATH = "/settings/general";
 export const CATEGORIES_SETTINGS_PATH = "/settings/categories";

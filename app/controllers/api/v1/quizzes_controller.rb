@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 class Api::V1::QuizzesController < Api::V1::BaseController
-  before_action :ensure_current_user_is_admin!, only: [:create, :update, :destroy, :clone, :bulk_update, :bulk_delete]
-  before_action :set_quiz, only: [:show, :update, :destroy, :clone]
+  before_action :ensure_current_user_is_admin!,
+    only: [:create, :update, :destroy, :clone, :bulk_update, :bulk_delete]
+  before_action :set_quiz, only: [:show, :update, :destroy, :clone, :quiz_submissions]
 
   def index
     result = Quizzes::IndexService.new(@current_user, params).call
@@ -10,7 +11,7 @@ class Api::V1::QuizzesController < Api::V1::BaseController
   end
 
   def show
-    result = Quizzes::ShowService.new(@quiz.id).call
+    result = Quizzes::ShowService.new(@quiz).call
     render_message(result[:message], :ok, result[:data])
   end
 
@@ -44,20 +45,39 @@ class Api::V1::QuizzesController < Api::V1::BaseController
     render_message(result[:message], result[:status], result[:data])
   end
 
+  def quiz_submissions
+    submissions = Submissions::QuizSubmissionsService
+      .new(@quiz, filter_params)
+      .call
+
+    render_json(submissions)
+  end
+
   private
 
     def set_quiz
-      @quiz = Quiz.find(params[:id])
+      @quiz = Quiz.find_by!(slug: params[:slug])
     end
 
     def quiz_params
       params.require(:quiz).permit(
-        :name, :category_id, :status, :show_on_homepage, :time_limit, :randomize_questions,
-        :randomize_options, :email_notifications)
+        :name,
+        :category_id,
+        :status,
+        :show_on_homepage,
+        :time_limit,
+        :randomize_questions,
+        :randomize_options,
+        :email_notifications
+      )
     end
 
     def bulk_params
       params.require(:quiz).permit(ids: [], updates: {})
+    end
+
+    def filter_params
+      params.permit(:name, :email, :status, :page, :page_size)
     end
 
     def ensure_current_user_is_admin!

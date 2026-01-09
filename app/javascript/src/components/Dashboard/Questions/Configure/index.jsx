@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
+import quizzesApi from "apis/quizzes";
 import QuizHeader from "components/commons/QuizHeader";
 import { Eye, Clock, Notification, Settings } from "neetoicons";
 import { Typography } from "neetoui";
@@ -7,16 +8,26 @@ import { Container, Header } from "neetoui/layouts";
 import { useParams, useHistory } from "react-router-dom";
 
 const QuizConfigure = () => {
-  const { quizId } = useParams();
+  const { slug } = useParams();
+  const [quiz, setQuiz] = useState({});
   const history = useHistory();
 
   const handleRedirect = path => {
-    history.push(`/quizzes/${quizId}/configure/${path}`);
+    history.push(`/quizzes/${slug}/configure/${path}`);
   };
+
+  const fetchQuiz = async () => {
+    const response = await quizzesApi.show(slug);
+    setQuiz(response.quiz);
+  };
+
+  useEffect(() => {
+    fetchQuiz();
+  }, [slug]);
 
   return (
     <div className="flex w-full flex-col">
-      <QuizHeader quizId={quizId} />
+      <QuizHeader quizName={quiz.name} quizSlug={slug} />
       <Container className="flex w-full bg-red-300">
         <div className="m-auto h-full w-[70%] p-8">
           <Header className="mb-4 w-full" title="Quiz settings" />

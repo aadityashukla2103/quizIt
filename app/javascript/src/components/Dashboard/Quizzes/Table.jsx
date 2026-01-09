@@ -76,7 +76,7 @@ const Table = ({
           <div className="mx-auto max-w-[200px] truncate">
             <Link
               className="text-blue-600 hover:underline"
-              to={`/quizzes/${record.id}/questions`}
+              to={`/quizzes/${record.slug}/questions`}
             >
               {text}
             </Link>

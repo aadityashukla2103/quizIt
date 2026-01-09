@@ -68,7 +68,7 @@ const InlineEdit = ({ value = "", onSave }) => {
         </>
       ) : (
         <span
-          className="cursor-pointer truncate rounded px-2 text-xl font-semibold"
+          className="block max-w-[300px] cursor-pointer truncate rounded px-2 text-xl font-semibold"
           title={localValue}
           onClick={() => setEditing(true)}
         >

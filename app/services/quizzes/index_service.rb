@@ -36,7 +36,7 @@ class Quizzes::IndexService
   private
 
     def base_scope
-      quizzes = Quiz.includes(:category, :organization, :questions, :submissions)
+      quizzes = Quiz.includes(:category, :organization, :questions)
 
       if @params[:organization_slug].present?
         organization = Organization.find_by(slug: @params[:organization_slug])

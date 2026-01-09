@@ -3,11 +3,11 @@ import React, { useEffect, useState } from "react";
 import questionsApi from "apis/questions";
 import quizzesApi from "apis/quizzes";
 import QuizHeader from "components/commons/QuizHeader";
-import QuestionBuilderNeetoUI from "components/Dashboard/Questions/QuestionBuilder";
+import QuestionBuilderUI from "components/Dashboard/Questions/QuestionBuilder";
 import { useParams, useHistory } from "react-router-dom";
 
 const EditQuestion = () => {
-  const { quizId, questionId } = useParams();
+  const { slug, questionId } = useParams();
   const history = useHistory();
 
   const [quizLoading, setQuizLoading] = useState(true);
@@ -18,7 +18,7 @@ const EditQuestion = () => {
 
   const fetchQuiz = async () => {
     try {
-      const response = await quizzesApi.show(quizId);
+      const response = await quizzesApi.show(slug);
       const quiz = response.quiz?.data || response.quiz;
       setQuizName(quiz?.name || "");
     } catch (error) {
@@ -30,7 +30,7 @@ const EditQuestion = () => {
 
   const fetchQuestion = async () => {
     try {
-      const response = await questionsApi.show(quizId, questionId);
+      const response = await questionsApi.show(slug, questionId);
       const data = response.data;
 
       setQuestionData({
@@ -49,11 +49,11 @@ const EditQuestion = () => {
 
   const handleUpdate = async values => {
     try {
-      await questionsApi.update(quizId, questionId, {
+      await questionsApi.update(slug, questionId, {
         content: values.question,
         options: values.options,
       });
-      history.push(`/quizzes/${quizId}/questions`);
+      history.push(`/quizzes/${slug}/questions`);
     } catch (err) {
       logger.log(err);
     }
@@ -61,7 +61,7 @@ const EditQuestion = () => {
 
   const updateQuizName = async newName => {
     try {
-      await quizzesApi.update(quizId, { quiz: { name: newName } });
+      await quizzesApi.update(slug, { quiz: { name: newName } });
       setQuizName(newName);
     } catch (error) {
       logger.log(error);
@@ -71,7 +71,7 @@ const EditQuestion = () => {
   useEffect(() => {
     fetchQuiz();
     fetchQuestion();
-  }, []);
+  }, [slug, questionId]);
 
   if (quizLoading || questionLoading || !questionData || quizName === "") {
     return <div>Loading...</div>;
@@ -81,7 +81,7 @@ const EditQuestion = () => {
     <div className="w-full">
       <QuizHeader
         isQuestionBuilder
-        quizId={quizId}
+        quizId={slug}
         quizName={quizName}
         onTitleChange={updateQuizName}
       />
@@ -90,14 +90,14 @@ const EditQuestion = () => {
           <button
             className="text-indigo-500 hover:underline"
             type="button"
-            onClick={() => history.push(`/quizzes/${quizId}/questions`)}
+            onClick={() => history.push(`/quizzes/${slug}/questions`)}
           >
             All Questions
           </button>
           <span className="mx-2">{">"}</span>
           <span className="font-medium text-gray-700">Edit Question</span>
         </div>
-        <QuestionBuilderNeetoUI
+        <QuestionBuilderUI
           isEdit
           initialValues={questionData}
           onSubmit={handleUpdate}

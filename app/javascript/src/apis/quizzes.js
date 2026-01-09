@@ -6,8 +6,8 @@ const fetch = async params => {
   return response;
 };
 
-const show = async id => {
-  const response = await axios.get(`/api/v1/quizzes/${id}`);
+const show = async slug => {
+  const response = await axios.get(`/api/v1/quizzes/${slug}`);
 
   return response.data;
 };
@@ -18,20 +18,20 @@ const create = async payload => {
   return response.data;
 };
 
-const update = async (id, payload) => {
-  const response = await axios.put(`/api/v1/quizzes/${id}`, payload);
+const update = async (slug, payload) => {
+  const response = await axios.put(`/api/v1/quizzes/${slug}`, payload);
 
   return response.data;
 };
 
-const destroy = async id => {
-  const response = await axios.delete(`/api/v1/quizzes/${id}`);
+const destroy = async slug => {
+  const response = await axios.delete(`/api/v1/quizzes/${slug}`);
 
   return response.data;
 };
 
-const cloneQuiz = async id => {
-  const response = await axios.post(`/api/v1/quizzes/${id}/clone`);
+const cloneQuiz = async slug => {
+  const response = await axios.post(`/api/v1/quizzes/${slug}/clone`);
 
   return response.data.quiz;
 };
@@ -52,8 +52,14 @@ const bulkDelete = async payload => {
   return response.data;
 };
 
-const publicShow = async id => {
-  const response = await axios.get(`/api/v1/public/quizzes/${id}`);
+const publicShow = async slug => {
+  const response = await axios.get(`/api/v1/public/quizzes/${slug}`);
+
+  return response.data;
+};
+
+const publicFetch = async params => {
+  const response = await axios.get("/api/v1/public/quizzes", { params });
 
   return response.data;
 };
@@ -68,6 +74,7 @@ const quizzesApi = {
   bulkUpdate,
   bulkDelete,
   publicShow,
+  publicFetch,
 };
 
 export default quizzesApi;

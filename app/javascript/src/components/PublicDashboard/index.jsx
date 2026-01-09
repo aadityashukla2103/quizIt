@@ -53,7 +53,7 @@ const Hero = () => {
 
     setLoading(true);
     try {
-      const { data } = await quizzesApi.fetch({
+      const data = await quizzesApi.publicFetch({
         query: debouncedQuery,
         status: "published",
         organization_slug: slug,

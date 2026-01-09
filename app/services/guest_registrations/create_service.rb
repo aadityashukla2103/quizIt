@@ -49,7 +49,6 @@ class GuestRegistrations::CreateService
     def success(submission_id)
       {
         success: true,
-        message: I18n.t("guest_registration.registered_successfully"),
         status: :created,
         data: { submission_id: submission_id }
       }

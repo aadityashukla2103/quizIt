@@ -6,16 +6,15 @@ import { Container } from "neetoui/layouts";
 import { useParams, useHistory } from "react-router-dom";
 
 const DownloadReport = () => {
-  const { quizId } = useParams();
+  const { slug } = useParams();
   const [isLoading, setIsLoading] = useState(true);
   const history = useHistory();
 
   const generatePdf = async () => {
     try {
-      await reportsApi.generatePdf(quizId);
+      await reportsApi.generatePdf(slug);
       Toastr.success("Report generation started...");
-    } catch (error) {
-      logger.error(error);
+    } catch {
       Toastr.error("Failed to start report generation.");
     }
   };
@@ -33,20 +32,21 @@ const DownloadReport = () => {
 
   const downloadPdf = async () => {
     let isReady = false;
+    let attempts = 0;
+    const maxAttempts = 15;
 
-    while (!isReady) {
+    while (!isReady && attempts < maxAttempts) {
       try {
-        const response = await reportsApi.download(quizId, {
-          responseType: "blob",
-        });
+        const response = await reportsApi.download(slug);
 
         saveAs({
           blob: response.data,
-          fileName: `quiz_${quizId}_submissions_report.pdf`,
+          fileName: "quiz_submissions_report.pdf",
         });
         isReady = true;
         history.goBack();
       } catch {
+        attempts += 1;
         await new Promise(res => setTimeout(res, 2000));
       }
     }
@@ -56,20 +56,16 @@ const DownloadReport = () => {
 
   useEffect(() => {
     generatePdf();
-    setTimeout(() => {
-      downloadPdf();
-    }, 2000);
+    setTimeout(downloadPdf, 2000);
   }, []);
-
-  const message = isLoading
-    ? "Report is being generated..."
-    : "Report downloaded!";
 
   return (
     <Container>
       <div className="flex flex-col gap-y-8">
         <Typography title="Download report" />
-        <h1>{message}</h1>
+        <h1>
+          {isLoading ? "Report is being generated..." : "Report downloaded!"}
+        </h1>
       </div>
     </Container>
   );

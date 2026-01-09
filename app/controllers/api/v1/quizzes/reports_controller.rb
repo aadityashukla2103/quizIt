@@ -29,8 +29,8 @@ module Api
         private
 
           def set_quiz
-            @quiz = Quiz.find(params[:id])
-          end
+            @quiz = Quiz.find_by!(slug: params[:slug])
+ end
       end
     end
   end

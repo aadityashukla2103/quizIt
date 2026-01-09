@@ -9,14 +9,16 @@ import { useParams, useHistory } from "react-router-dom";
 import ConfigureSubHeader from "../ConfigureSubHeader";
 
 const QuizEmailNotifications = () => {
-  const { quizId } = useParams();
+  const { slug } = useParams();
   const history = useHistory();
 
   const [emailNotifications, setEmailNotifications] = useState(false);
+  const [quizName, setQuizName] = useState("");
 
   const fetchQuiz = async () => {
     try {
-      const response = await quizzesApi.show(quizId);
+      const response = await quizzesApi.show(slug);
+      setQuizName(response.quiz.name);
       setEmailNotifications(response.quiz.email_notifications);
     } catch (error) {
       logger.error(error);
@@ -25,10 +27,10 @@ const QuizEmailNotifications = () => {
 
   useEffect(() => {
     fetchQuiz();
-  }, [quizId]);
+  }, [slug]);
 
   const handleSubmit = async values => {
-    await quizzesApi.update(quizId, {
+    await quizzesApi.update(slug, {
       quiz: { email_notifications: values.emailNotifications },
     });
     history.goBack();
@@ -36,9 +38,9 @@ const QuizEmailNotifications = () => {
 
   return (
     <div className="w-full">
-      <QuizHeader quizId={quizId} />
+      <QuizHeader quizName={quizName} quizSlug={slug} />
       <div className="m-auto w-[80%]">
-        <ConfigureSubHeader path="Email notifications" quizId={quizId} />
+        <ConfigureSubHeader path="Email notifications" slug={slug} />
         <div className="m-auto mt-12 w-[80%]">
           <Formik
             enableReinitialize

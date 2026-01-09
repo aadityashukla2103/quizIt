@@ -14,59 +14,88 @@ import Table from "./Table";
 import useDebounce from "../../../../hooks/useDebounce";
 
 const QuizSubmissions = () => {
-  const { quizId } = useParams();
+  const { slug } = useParams();
+  const history = useHistory();
+  const location = useLocation();
 
   const [submissions, setSubmissions] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(false);
+
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [quizName, setQuizName] = useState("");
+  const [nameSearch, setNameSearch] = useState("");
   const [filterPaneOpen, setFilterPaneOpen] = useState(false);
   const [filters, setFilters] = useState(INITIAL_FILTERS);
   const [visibleColumns, setVisibleColumns] = useState(INITIAL_VISIBLE_COLUMNS);
 
-  const debouncedSearch = useDebounce(searchTerm, 500);
+  const debouncedName = useDebounce(nameSearch, 500);
 
-  const history = useHistory();
-  const location = useLocation();
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
 
-  const updateUrl = (newFilters, searchValue) => {
-    const params = new URLSearchParams();
+    const newPage = Number(params.get("page")) || 1;
+    const newPageSize = Number(params.get("page_size")) || 10;
 
-    if (searchValue) params.set("search", searchValue);
-
-    if (newFilters.name) params.set("name", newFilters.name);
-
-    if (newFilters.email) params.set("email", newFilters.email);
-
-    if (newFilters.status) params.set("status", newFilters.status);
-
-    history.replace({
-      pathname: location.pathname,
-      search: params.toString(),
-    });
-  };
+    setPage(newPage);
+    setPageSize(newPageSize);
+  }, [location.search]);
 
   const fetchSubmissions = async () => {
     try {
-      const response = await submissionsApi.fetch(quizId, {
-        search: debouncedSearch,
-        name: filters.name,
+      setLoading(true);
+
+      const response = await submissionsApi.fetch(slug, {
+        name: debouncedName || filters.name,
         email: filters.email,
         status: filters.status,
+        page,
+        page_size: pageSize,
       });
-
-      setSubmissions(response.data);
+      setQuizName(response.data.quiz_name);
+      setSubmissions(response.data.submissions || []);
+      setTotalCount(response.data.total_count || 0);
     } catch {
       logger.log("Error fetching submissions");
+    } finally {
+      setLoading(false);
     }
   };
 
+  useEffect(() => {
+    fetchSubmissions();
+  }, [slug, debouncedName, filters, page, pageSize]);
+
+  const handlePageChange = (currentPage, newPageSize) => {
+    const params = new URLSearchParams(location.search);
+    params.set("page", currentPage);
+    params.set("page_size", newPageSize);
+
+    history.replace({ search: params.toString() });
+  };
+
   const handleFilter = newFilters => {
-    updateUrl(newFilters, searchTerm);
     setFilters(newFilters);
+
+    const params = new URLSearchParams(location.search);
+    params.set("page", 1);
+    params.set("page_size", pageSize);
+    history.push({ search: params.toString() });
   };
 
   const handleSearch = value => {
-    setSearchTerm(value);
-    updateUrl(filters, value);
+    setNameSearch(value);
+
+    const params = new URLSearchParams(location.search);
+    if (value) {
+      params.set("name", value);
+    } else {
+      params.delete("name");
+    }
+    params.set("page", 1);
+    params.set("page_size", pageSize);
+    history.push({ search: params.toString() });
   };
 
   const toggleColumnVisibility = columnKey => {
@@ -75,10 +104,6 @@ const QuizSubmissions = () => {
       [columnKey]: !prev[columnKey],
     }));
   };
-
-  useEffect(() => {
-    fetchSubmissions();
-  }, [quizId, debouncedSearch, filters]);
 
   return (
     <Container className="w-full">
@@ -89,20 +114,28 @@ const QuizSubmissions = () => {
       />
       <QuizHeader
         isQuestionBuilder
-        questionCount={submissions.length}
-        quizId={quizId}
+        questionCount={totalCount}
+        quizName={quizName}
+        quizSlug={slug}
       />
-      <SubmissionsHeader searchTerm={searchTerm} onSearch={handleSearch} />
+      <SubmissionsHeader searchTerm={nameSearch} onSearch={handleSearch} />
       <SubmissionsSubHeader
         filters={filters}
-        quizId={quizId}
+        quizId={slug}
         setFilterPaneOpen={setFilterPaneOpen}
-        submissionsCount={submissions.length}
+        submissionsCount={totalCount}
         toggleColumnVisibility={toggleColumnVisibility}
         visibleColumns={visibleColumns}
-        onFilter={handleFilter}
       />
-      <Table Submissions={submissions} visibleColumns={visibleColumns} />
+      <Table
+        Submissions={submissions}
+        currentPageNumber={page}
+        defaultPageSize={pageSize}
+        handlePageChange={handlePageChange}
+        loading={loading}
+        totalSubmissionsCount={totalCount}
+        visibleColumns={visibleColumns}
+      />
     </Container>
   );
 };

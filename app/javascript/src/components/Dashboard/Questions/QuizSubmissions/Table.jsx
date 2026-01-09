@@ -3,7 +3,15 @@ import React from "react";
 import { Table as NeetoUITable, Tag } from "neetoui";
 import { Link } from "react-router-dom";
 
-const Table = ({ Submissions = [], visibleColumns }) => {
+const Table = ({
+  Submissions = [],
+  visibleColumns,
+  loading,
+  currentPageNumber,
+  defaultPageSize,
+  handlePageChange,
+  totalSubmissionsCount,
+}) => {
   const allColumns = [
     {
       title: "Name",
@@ -14,6 +22,8 @@ const Table = ({ Submissions = [], visibleColumns }) => {
         record.status === "completed" ? (
           <Link
             className="text-blue-600 hover:underline"
+            rel="noopener noreferrer"
+            target="_blank"
             to={`/public/quizzes/${record.quiz_id}/submissions/${record.id}/result`}
           >
             {text}
@@ -49,7 +59,6 @@ const Table = ({ Submissions = [], visibleColumns }) => {
     },
     {
       title: "Unanswered",
-      dataIndex: "total_questions",
       key: "unanswered",
       width: "10%",
       render: (_, record) =>
@@ -77,7 +86,15 @@ const Table = ({ Submissions = [], visibleColumns }) => {
 
   return (
     <div className="w-full">
-      <NeetoUITable columnData={filteredColumns} rowData={Submissions} />
+      <NeetoUITable
+        columnData={filteredColumns}
+        currentPageNumber={currentPageNumber}
+        defaultPageSize={defaultPageSize}
+        handlePageChange={handlePageChange}
+        loading={loading}
+        rowData={Submissions}
+        totalCount={totalSubmissionsCount}
+      />
     </div>
   );
 };

@@ -11,6 +11,9 @@ class Quiz < ApplicationRecord
 
   validates :name, presence: true, uniqueness: { scope: :organization_id }, length: { maximum: 30 }
   validates :status, presence: true
+  validates :slug, presence: true, uniqueness: true
+
+  before_validation :generate_slug, on: :create
 
   def clone_with_questions!
     cloned_quiz = self.deep_clone include: { questions: :options }
@@ -31,5 +34,9 @@ class Quiz < ApplicationRecord
 
     cloned_quiz.save!
     cloned_quiz
+  end
+
+  def generate_slug
+    self.slug ||= name.parameterize if name.present?
   end
 end
