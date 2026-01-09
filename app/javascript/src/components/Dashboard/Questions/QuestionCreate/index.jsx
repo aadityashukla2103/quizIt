@@ -7,38 +7,15 @@ import QuestionBuilderNeetoUI from "components/Dashboard/Questions/QuestionBuild
 import { useParams, useHistory } from "react-router-dom";
 
 const QuestionCreate = () => {
-  const { id: quizId } = useParams();
+  const { slug } = useParams();
   const history = useHistory();
   const [quizName, setQuizName] = useState("");
   const [loading, setLoading] = useState(true);
   const [questionsCount, setQuestionsCount] = useState(0);
-  const handleSave = async values => {
-    try {
-      const payload = {
-        question: {
-          content: values.question,
-          options: values.options,
-        },
-      };
-      await questionsApi.create(quizId, payload);
-      history.push(`/quizzes/${quizId}/questions`);
-    } catch (err) {
-      logger.log(err);
-    }
-  };
-
-  const updateQuizName = async newName => {
-    try {
-      await quizzesApi.update(quizId, { quiz: { name: newName } });
-      setQuizName(prev => ({ ...prev, name: newName }));
-    } catch (error) {
-      logger.error(error);
-    }
-  };
 
   const fetchQuiz = async () => {
     try {
-      const response = await quizzesApi.show(quizId);
+      const response = await quizzesApi.show(slug);
       setQuestionsCount(response.questions.length);
       setQuizName(response.quiz.name);
     } catch (error) {
@@ -48,17 +25,12 @@ const QuestionCreate = () => {
     }
   };
 
-  const AddQuestionAndNext = async values => {
+  const updateQuizName = async newName => {
     try {
-      const payload = {
-        content: values.question,
-        options: values.options,
-      };
-      await questionsApi.create(quizId, payload);
-      setQuestionsCount(prev => prev + 1);
-      history.replace(`/quizzes/${quizId}/questions/new`);
-    } catch (err) {
-      logger.log(err);
+      await quizzesApi.update(slug, { quiz: { name: newName } });
+      setQuizName(newName);
+    } catch (error) {
+      logger.error(error);
     }
   };
 
@@ -68,8 +40,25 @@ const QuestionCreate = () => {
         content: values.question,
         options: values.options,
       };
-      await questionsApi.create(quizId, payload);
-      history.push(`/quizzes/${quizId}/questions`);
+      await questionsApi.create(slug, payload);
+      history.push(`/quizzes/${slug}/questions`);
+    } catch (err) {
+      logger.log(err);
+    }
+  };
+
+  const AddQuestionAndNext = async (values, resetForm) => {
+    try {
+      const payload = {
+        content: values.question,
+        options: values.options,
+      };
+
+      await questionsApi.create(slug, payload);
+
+      setQuestionsCount(prev => prev + 1);
+
+      resetForm();
     } catch (err) {
       logger.log(err);
     }
@@ -77,7 +66,8 @@ const QuestionCreate = () => {
 
   useEffect(() => {
     fetchQuiz();
-  }, []);
+  }, [slug]);
+
   if (loading) return null;
 
   return (
@@ -85,8 +75,8 @@ const QuestionCreate = () => {
       <div className="w-full">
         <QuizHeader
           isQuestionBuilder
-          quizId={quizId}
           quizName={quizName}
+          quizSlug={slug}
           onTitleChange={updateQuizName}
         />
       </div>
@@ -95,16 +85,16 @@ const QuestionCreate = () => {
           <button
             className="text-indigo-500 hover:underline"
             type="button"
-            onClick={() => history.push(`/quizzes/${quizId}/questions`)}
+            onClick={() => history.push(`/quizzes/${slug}/questions`)}
           >
             All Questions
           </button>
           <span className="mx-2">{">"}</span>
-          <span className="font-medium text-gray-700">{`Question ${questionsCount}`}</span>
+          <span className="font-medium text-gray-700">
+            {`Question ${questionsCount}`}
+          </span>
         </div>
         <QuestionBuilderNeetoUI
-          quizId={quizId}
-          onSave={handleSave}
           onSubmit={AddQuestion}
           onSubmitAndNew={AddQuestionAndNext}
         />

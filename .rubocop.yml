@@ -1,6 +1,8 @@
 # cspell:Disable
-require:
+plugins:
   - rubocop-rails
+# require:
+#   - rubocop-rails
 
 AllCops:
   TargetRubyVersion: 3.3.5

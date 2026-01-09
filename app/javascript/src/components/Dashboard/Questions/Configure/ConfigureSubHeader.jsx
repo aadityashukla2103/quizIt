@@ -2,17 +2,17 @@ import React from "react";
 
 import { Header } from "neetoui/layouts";
 
-const ConfigureHeader = ({ path, quizId }) => (
+const ConfigureHeader = ({ path, slug }) => (
   <Header
     className="mb-4 py-3"
-    title={`${path}`}
+    title={path}
     breadcrumbs={[
       {
-        link: `/quizzes/${quizId}/configure`,
+        link: `/quizzes/${slug}/configure`,
         text: "Configure",
       },
       {
-        text: `${path}`,
+        text: path,
       },
     ]}
   />

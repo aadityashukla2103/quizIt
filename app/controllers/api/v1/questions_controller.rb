@@ -37,7 +37,7 @@ class Api::V1::QuestionsController < Api::V1::BaseController
   private
 
     def set_quiz
-      @quiz = Quiz.find(params[:quiz_id])
+      @quiz = Quiz.find_by!(slug: params[:quiz_slug])
     end
 
     def set_question

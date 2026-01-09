@@ -9,14 +9,17 @@ import { useParams, useHistory } from "react-router-dom";
 import ConfigureSubHeader from "../ConfigureSubHeader";
 
 const QuizVisibility = () => {
-  const { quizId } = useParams();
+  const { slug } = useParams();
+  const history = useHistory();
+
   const [quizVisibility, setQuizVisibility] = useState(false);
   const [quizStatus, setQuizStatus] = useState("");
-  const history = useHistory();
+  const [quizName, setQuizName] = useState("");
 
   const fetchQuiz = async () => {
     try {
-      const response = await quizzesApi.show(quizId);
+      const response = await quizzesApi.show(slug);
+      setQuizName(response.quiz.name);
       setQuizStatus(response.quiz.status);
       setQuizVisibility(response.quiz.show_on_homepage);
     } catch (error) {
@@ -26,10 +29,10 @@ const QuizVisibility = () => {
 
   useEffect(() => {
     fetchQuiz();
-  }, [quizId]);
+  }, [slug]);
 
   const handleSubmit = async values => {
-    await quizzesApi.update(quizId, {
+    await quizzesApi.update(slug, {
       quiz: { show_on_homepage: values.visibility },
     });
     history.goBack();
@@ -37,9 +40,9 @@ const QuizVisibility = () => {
 
   return (
     <div className="w-full">
-      <QuizHeader quizId={quizId} />
+      <QuizHeader quizName={quizName} quizSlug={slug} />
       <div className="m-auto w-[80%]">
-        <ConfigureSubHeader path="Quiz visibility" quizId={quizId} />
+        <ConfigureSubHeader path="Quiz visibility" slug={slug} />
         <div className="m-auto mt-12 w-[80%]">
           <Formik
             enableReinitialize

@@ -1,10 +1,9 @@
 import axios from "axios";
 
-const generatePdf = quizId =>
-  axios.post(`/api/v1/quizzes/${quizId}/report`, {});
+const generatePdf = slug => axios.post(`/api/v1/quizzes/${slug}/report`, {});
 
-const download = quizId =>
-  axios.get(`/api/v1/quizzes/${quizId}/report/download`, {
+const download = slug =>
+  axios.get(`/api/v1/quizzes/${slug}/report/download`, {
     responseType: "blob",
   });
 

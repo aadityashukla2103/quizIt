@@ -15,7 +15,7 @@ class Api::V1::SubmissionAnswersController < Api::V1::BaseController
 
   def create
     result = SubmissionAnswers::CreateService.new(submission_answer_params).call
-    render_message(result[:message], result[:status], result[:data])
+    render_json(result[:data], result[:status])
   end
 
   def update

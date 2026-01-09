@@ -9,9 +9,10 @@ import { useParams, useHistory } from "react-router-dom";
 import ConfigureSubHeader from "../ConfigureSubHeader";
 
 const QuizQuestionsOptions = () => {
-  const { quizId } = useParams();
+  const { slug } = useParams();
   const history = useHistory();
 
+  const [quizName, setQuizName] = useState("");
   const [initialValues, setInitialValues] = useState({
     randomizeQuestions: false,
     randomizeOptions: false,
@@ -19,7 +20,8 @@ const QuizQuestionsOptions = () => {
 
   const fetchQuiz = async () => {
     try {
-      const response = await quizzesApi.show(quizId);
+      const response = await quizzesApi.show(slug);
+      setQuizName(response.quiz.name);
       setInitialValues({
         randomizeQuestions: response.quiz.randomize_questions,
         randomizeOptions: response.quiz.randomize_options,
@@ -31,10 +33,10 @@ const QuizQuestionsOptions = () => {
 
   useEffect(() => {
     fetchQuiz();
-  }, [quizId]);
+  }, [slug]);
 
   const handleSubmit = async values => {
-    await quizzesApi.update(quizId, {
+    await quizzesApi.update(slug, {
       quiz: {
         randomize_questions: values.randomizeQuestions,
         randomize_options: values.randomizeOptions,
@@ -46,9 +48,9 @@ const QuizQuestionsOptions = () => {
 
   return (
     <div className="w-full">
-      <QuizHeader quizId={quizId} />
+      <QuizHeader quizName={quizName} quizSlug={slug} />
       <div className="m-auto w-[80%]">
-        <ConfigureSubHeader path="Questions & options" quizId={quizId} />
+        <ConfigureSubHeader path="Questions & options" slug={slug} />
         <div className="m-auto mt-12 w-[80%]">
           <Formik
             enableReinitialize
@@ -64,8 +66,8 @@ const QuizQuestionsOptions = () => {
                       <div>
                         <Typography style="h3">Randomize choices</Typography>
                         <Typography>
-                          Questions shown will be randomly shuffled each a new
-                          candidate take the quiz.
+                          Questions shown will be randomly shuffled each time a
+                          new candidate takes the quiz.
                         </Typography>
                       </div>
                     }
@@ -81,8 +83,8 @@ const QuizQuestionsOptions = () => {
                       <div>
                         <Typography style="h3">Randomize questions</Typography>
                         <Typography>
-                          Questions shown will be randomly shuffled each a new
-                          candidate take the quiz.
+                          Questions shown will be randomly shuffled each time a
+                          new candidate takes the quiz.
                         </Typography>
                       </div>
                     }

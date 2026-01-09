@@ -33,11 +33,6 @@ class Api::V1::SubmissionsController < Api::V1::BaseController
     render_message(result[:message], result[:status], result[:data])
   end
 
-  def quiz_submissions
-    submissions = Submissions::QuizSubmissionsService.new(params).call
-    render_json(submissions)
-  end
-
   private
 
     def set_submission

@@ -10,9 +10,9 @@ const register = payload =>
 const finalizeSubmission = submissionId =>
   axios.post(`/api/v1/submissions/${submissionId}/finalize`);
 
-const fetch = async (quizId, payload = {}) =>
-  await axios.get("/api/v1/submissions/quiz_submissions", {
-    params: { quiz_id: quizId, ...payload },
+const fetch = async (slug, payload = {}) =>
+  axios.get(`/api/v1/quizzes/${slug}/quiz_submissions`, {
+    params: payload,
   });
 
 const submissionsApi = { register, finalizeSubmission, show, fetch };

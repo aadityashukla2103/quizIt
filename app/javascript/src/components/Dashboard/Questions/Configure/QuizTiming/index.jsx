@@ -9,21 +9,27 @@ import { useParams, useHistory } from "react-router-dom";
 import ConfigureSubHeader from "../ConfigureSubHeader";
 
 const QuizTiming = () => {
-  const { quizId } = useParams();
+  const { slug } = useParams();
   const history = useHistory();
 
   const [quizStatus, setQuizStatus] = useState("");
   const [timeLimit, setTimeLimit] = useState(null);
+  const [quizName, setQuizName] = useState("");
 
   useEffect(() => {
     const fetchQuiz = async () => {
-      const response = await quizzesApi.show(quizId);
-      setQuizStatus(response.status);
-      setTimeLimit(response.quiz.time_limit);
+      try {
+        const response = await quizzesApi.show(slug);
+        setQuizName(response.quiz.name);
+        setQuizStatus(response.quiz.status);
+        setTimeLimit(response.quiz.time_limit);
+      } catch (error) {
+        logger.error(error);
+      }
     };
 
     fetchQuiz();
-  }, [quizId]);
+  }, [slug]);
 
   const getInitialValues = () => {
     if (!timeLimit || timeLimit === 0) {
@@ -54,7 +60,7 @@ const QuizTiming = () => {
       updatedTimeLimit = values.hours * 60 + values.minutes;
     }
 
-    await quizzesApi.update(quizId, {
+    await quizzesApi.update(slug, {
       quiz: {
         time_limit: updatedTimeLimit,
       },
@@ -65,9 +71,9 @@ const QuizTiming = () => {
 
   return (
     <div className="w-full">
-      <QuizHeader quizId={quizId} />
+      <QuizHeader quizName={quizName} quizSlug={slug} />
       <div className="m-auto w-[80%]">
-        <ConfigureSubHeader path="Quiz timing" quizId={quizId} />
+        <ConfigureSubHeader path="Quiz timing" slug={slug} />
         <div className="m-auto mt-12 w-[80%]">
           <Formik
             enableReinitialize

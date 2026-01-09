@@ -4,7 +4,10 @@ module Public
   module Quizzes
     class ShowService
       def initialize(id)
-        @quiz = Quiz.includes(questions: :options).find(id)
+          @quiz = Quiz
+          .includes(questions: :options)
+          .where(show_on_homepage: true, status: :published)
+          .find_by!(slug: id)
       end
 
       def call
@@ -21,7 +24,7 @@ module Public
         end
 
         {
-          message: "",
+          message: "Quiz Started",
           status: :ok,
           data: {
             quiz: public_quiz_json,

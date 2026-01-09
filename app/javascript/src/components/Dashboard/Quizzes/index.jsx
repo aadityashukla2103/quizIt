@@ -46,7 +46,7 @@ const Quizzes = () => {
   const [pageSize, setPageSize] = useState(urlPageSize);
 
   const [filtersApplied, setFiltersApplied] = useState(
-    Boolean(urlQuery || urlStatus !== "all" || urlCategory.length)
+    Boolean(urlStatus !== "all" || urlCategory.length)
   );
 
   const [selectedFilters, setSelectedFilters] = useState({
@@ -95,9 +95,7 @@ const Quizzes = () => {
     });
 
     setSelectedQuizIds([]);
-    setFiltersApplied(
-      Boolean(urlQuery || urlStatus !== "all" || urlCategory.length)
-    );
+    setFiltersApplied(Boolean(urlStatus !== "all" || urlCategory.length));
   }, [location.search]);
 
   useEffect(() => {

@@ -8,7 +8,7 @@ import { useHistory } from "react-router-dom";
 
 const QuizHeader = ({
   quizName,
-  quizId,
+  quizSlug,
   lastSavedAt,
   status,
   reloadQuizData,
@@ -30,7 +30,7 @@ const QuizHeader = ({
 
   const handleQuizNameChange = async newName => {
     try {
-      await quizzesApi.update(quizId, { quiz: { name: newName } });
+      await quizzesApi.update(quizSlug, { quiz: { name: newName } });
       reloadQuizData();
     } catch (error) {
       logger.log(error);
@@ -38,13 +38,13 @@ const QuizHeader = ({
   };
 
   const onPublish = async () => {
-    await quizzesApi.update(quizId, { quiz: { status: "published" } });
+    await quizzesApi.update(quizSlug, { quiz: { status: "published" } });
     setLocalStatus("published");
     reloadQuizData();
   };
 
   const onCopyLink = () => {
-    const publicLink = `${window.location.origin}/publicdashboard/register/${quizId}`;
+    const publicLink = `${window.location.origin}/publicdashboard/register/${quizSlug}`;
     navigator.clipboard.writeText(publicLink);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -60,20 +60,20 @@ const QuizHeader = ({
         <div className="col-span-1 m-auto flex justify-center gap-4">
           <Tab noUnderline>
             <Tab.Item
-              active={path.includes("questions")}
-              onClick={() => history.push(`/quizzes/${quizId}/questions`)}
+              active={path.includes("questions") && !path.includes("configure")}
+              onClick={() => history.push(`/quizzes/${quizSlug}/questions`)}
             >
               Questions
             </Tab.Item>
             <Tab.Item
               active={path.includes("submissions")}
-              onClick={() => history.push(`/quizzes/${quizId}/submissions`)}
+              onClick={() => history.push(`/quizzes/${quizSlug}/submissions`)}
             >
               Submissions
             </Tab.Item>
             <Tab.Item
               active={path.includes("configure")}
-              onClick={() => history.push(`/quizzes/${quizId}/configure`)}
+              onClick={() => history.push(`/quizzes/${quizSlug}/configure`)}
             >
               Configure
             </Tab.Item>

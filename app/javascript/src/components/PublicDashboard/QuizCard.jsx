@@ -15,7 +15,7 @@ const QuizCard = ({ quiz }) => (
       <span className="mb-2 block text-sm text-gray-600">
         {quiz.question_count} Questions
       </span>
-      <Link className="block" to={`/publicdashboard/register/${quiz.id}`}>
+      <Link className="block" to={`/publicdashboard/register/${quiz.slug}`}>
         <Button
           className="w-full"
           label="Start Quiz"

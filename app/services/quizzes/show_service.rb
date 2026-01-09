@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 class Quizzes::ShowService
-  def initialize(id)
-    @quiz = Quiz.includes(questions: :options).find(id)
-  end
+  def initialize(quiz)
+    @quiz = quiz
+   end
 
   def call
     questions = @quiz.questions.to_a

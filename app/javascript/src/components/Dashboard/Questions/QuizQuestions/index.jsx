@@ -10,7 +10,7 @@ import { useParams, Link, useHistory } from "react-router-dom";
 import QuestionCard from "../QuestionCard";
 
 const QuizQuestions = () => {
-  const { id: quizId } = useParams();
+  const { slug } = useParams();
   const history = useHistory();
 
   const [quiz, setQuiz] = useState({});
@@ -23,7 +23,7 @@ const QuizQuestions = () => {
 
   const fetchQuiz = async () => {
     try {
-      const response = await quizzesApi.show(quizId);
+      const response = await quizzesApi.show(slug);
       setQuiz(response.quiz || {});
       setQuestions(response.questions || []);
       setLastUpdatedQuiz(response.last_saved_at || "");
@@ -34,7 +34,7 @@ const QuizQuestions = () => {
 
   const updateQuizName = async newName => {
     try {
-      await quizzesApi.update(quizId, { quiz: { name: newName } });
+      await quizzesApi.update(slug, { quiz: { name: newName } });
       setQuiz(prev => ({ ...prev, name: newName }));
     } catch (error) {
       logger.log(error);
@@ -43,7 +43,7 @@ const QuizQuestions = () => {
 
   const handleDeleteQuestion = async () => {
     try {
-      await questionsApi.destroy(quizId, selectedPostIds);
+      await questionsApi.destroy(slug, selectedPostIds);
       fetchQuiz();
       setSelectedPostIds([]);
     } catch (error) {
@@ -51,14 +51,14 @@ const QuizQuestions = () => {
     }
   };
 
-  const handleEditQuestion = (quizId, questionId) => {
-    history.push(`/quizzes/${quizId}/question/${questionId}/edit`);
+  const handleEditQuestion = (slug, questionId) => {
+    history.push(`/quizzes/${slug}/question/${questionId}/edit`);
     fetchQuiz();
   };
 
   const handleCloneQuestion = async questionId => {
     try {
-      const cloned = await questionsApi.clone(quizId, questionId);
+      const cloned = await questionsApi.clone(slug, questionId);
       const clonedData = cloned.data;
       setQuestions(prev => [...prev, clonedData]);
     } catch (error) {
@@ -74,13 +74,7 @@ const QuizQuestions = () => {
     };
 
     loadData();
-
-    const unlisten = history.listen(() => {
-      loadData();
-    });
-
-    return () => unlisten();
-  }, [quizId]);
+  }, [slug]);
 
   if (loading) return <PageLoader />;
 
@@ -100,21 +94,28 @@ const QuizQuestions = () => {
         <QuizHeader
           lastSavedAt={lastUpdatedQuiz}
           questionCount={questions.length}
-          quizId={quizId}
           quizName={quiz.name}
+          quizSlug={slug}
           status={quiz.status}
           onTitleChange={updateQuizName}
         />
         <SubHeader
           className="px-0 py-3 md:px-0"
           rightActionBlock={
-            <Link to={`/quizzes/${quizId}/questions/new`}>
+            <Link to={`/quizzes/${slug}/questions/new`}>
               <Button primary label="Add Question" />
             </Link>
           }
         />
         {Array.isArray(questions) && questions.length > 0 ? (
-          <Scrollable className="m-auto w-[80%]">
+          <Scrollable
+            className="m-auto w-[80%]"
+            style={{
+              overflowY: "auto",
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
+          >
             <Header
               isHeaderFixed
               className="w-full px-0 md:px-0"
@@ -129,7 +130,7 @@ const QuizQuestions = () => {
                   options={q.options}
                   question={q.content}
                   onClone={() => handleCloneQuestion(q.id)}
-                  onEdit={() => handleEditQuestion(quizId, q.id)}
+                  onEdit={() => handleEditQuestion(slug, q.id)}
                   onDelete={() => {
                     setSelectedPostIds([q.id]);
                     setIsDeleteAlertOpen(true);
