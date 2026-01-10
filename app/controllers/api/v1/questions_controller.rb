@@ -17,7 +17,7 @@ class Api::V1::QuestionsController < Api::V1::BaseController
   def create
     result = Questions::CreateService.new(@quiz, question_params).call
 
-    if result[:success]
+    if result[:status] == :created
       render_message(result[:message], result[:status] || :created, result[:data])
     else
       render_error(result[:data][:errors], result[:status])
@@ -27,10 +27,10 @@ class Api::V1::QuestionsController < Api::V1::BaseController
   def update
     result = Questions::UpdateService.new(@question, question_params).call
 
-    if result[:success]
+    if result[:status] == :ok
       render_message(result[:message], result[:status] || :ok, result[:data])
-    else
-      render_error(result[:data][:errors], result[:status])
+        else
+          render_error(result[:data][:errors], result[:status])
     end
   end
 

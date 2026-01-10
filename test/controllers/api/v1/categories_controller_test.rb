@@ -7,7 +7,6 @@ class Api::V1::CategoriesControllerTest < ActionDispatch::IntegrationTest
     @admin = create(:user, :admin)
     sign_in @admin
     @headers = headers(@admin)
-
     @category = create(:category)
   end
 
@@ -22,14 +21,12 @@ class Api::V1::CategoriesControllerTest < ActionDispatch::IntegrationTest
     get api_v1_category_url(@category), headers: @headers
 
     assert_response :success
-    assert_equal @category.id, response_body["id"]
+    assert_equal @category.id, response_body["category"]["id"]
   end
 
   def test_create_valid_category
     payload = {
-      category: {
-        name: "New Category"
-      }
+      category: { name: "New Category" }
     }
 
     assert_difference "Category.count", 1 do
@@ -37,7 +34,7 @@ class Api::V1::CategoriesControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :created
-    assert_equal "New Category", response_body["name"]
+    assert_equal "New Category", response_body["category"]["name"]
   end
 
   def test_create_invalid_category
@@ -50,7 +47,7 @@ class Api::V1::CategoriesControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :unprocessable_entity
-    assert_includes response_body["errors"].join, "Name can't be blank"
+    assert_includes response_body["error"], "can't be blank"
   end
 
   def test_update_valid_category
@@ -61,7 +58,7 @@ class Api::V1::CategoriesControllerTest < ActionDispatch::IntegrationTest
     patch api_v1_category_url(@category), params: payload, headers: @headers
 
     assert_response :success
-    assert_equal "Updated Name", response_body["name"]
+    assert_equal "Updated Name", response_body["category"]["name"]
   end
 
   def test_update_invalid_category
@@ -72,7 +69,7 @@ class Api::V1::CategoriesControllerTest < ActionDispatch::IntegrationTest
     patch api_v1_category_url(@category), params: payload, headers: @headers
 
     assert_response :unprocessable_entity
-    assert_includes response_body["errors"].join, "Name can't be blank"
+    assert_includes response_body["error"], "can't be blank"
   end
 
   def test_destroy_category
@@ -80,6 +77,7 @@ class Api::V1::CategoriesControllerTest < ActionDispatch::IntegrationTest
       delete api_v1_category_url(@category), headers: @headers
     end
 
-    assert_response :no_content
+    assert_response :ok
+    assert_equal "Category deleted successfully", response_body["notice"]
   end
 end

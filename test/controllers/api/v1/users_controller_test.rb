@@ -9,7 +9,8 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
   end
 
   def test_show_for_a_valid_user
-    get api_v1_user_url(@admin), params: { format: :json },
+    get api_v1_user_url(@admin),
+      params: { format: :json },
       headers: headers(@admin)
 
     assert_response :success
@@ -24,16 +25,19 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
     ]
 
     assert_equal expected_keys.sort, json.keys.sort
- end
+  end
 
   def test_show_when_email_is_not_present
-    an_invalid_email = { "X-Auth-Email" => "this_email_is_not_present_in_db@example.com" }
+    invalid_email_header = {
+      "X-Auth-Email" => "this_email_is_not_present_in_db@example.com"
+    }
 
-    get api_v1_user_url(@admin), params: { format: :json },
-      headers: headers(@admin, an_invalid_email)
+    get api_v1_user_url(@admin),
+      params: { format: :json },
+      headers: headers(@admin, invalid_email_header)
 
     assert_response :unauthorized
-    assert_equal response_body["error"], t("invalid_credentials")
+    assert_equal t("invalid_credentials"), response_body["error"]
   end
 
   def test_create_user_with_valid_info
@@ -49,21 +53,19 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
       organization_id: @organization.id
     }
 
-    # Ensure that there are no users with this email in db
     User.where(email: valid_email).delete_all
 
     assert_difference "User.count", 1 do
-      post api_v1_users_url, params: { user: valid_user_json, format: :json }
+      post api_v1_users_url,
+        params: { user: valid_user_json, format: :json }
 
       assert_response :success
     end
   end
 
   def test_create_user_should_return_error_for_invalid_data
-    valid_email = "john@example.com"
-
     invalid_user_json = {
-      email: valid_email,
+      email: "john@example.com",
       first_name: "John",
       last_name: "Smith",
       password: nil,
@@ -71,25 +73,27 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
       organization_id: @organization.id
     }
 
-    # Ensure that there are no users with this email in db
-    User.where(email: valid_email).delete_all
-
-    post api_v1_users_url, params: { user: invalid_user_json, format: :json }
+    post api_v1_users_url,
+      params: { user: invalid_user_json, format: :json }
 
     assert_response :unprocessable_entity
-    assert_equal "Password can't be blank and Password confirmation can't be blank", response_body["error"]
+    assert_equal(
+      "Password can't be blank and Password confirmation can't be blank",
+      response_body["error"]
+    )
   end
 
   def test_destroy_should_not_be_invokable_without_authentication
-    delete api_v1_user_url(@admin.email), params: { id: @admin.email, format: :json }
+    delete api_v1_user_url(@admin), params: { format: :json }
 
     assert_response :unauthorized
-    assert_equal response_body["error"], t("invalid_credentials")
+    assert_equal t("invalid_credentials"), response_body["error"]
   end
 
   def test_destroy_should_destroy_user
     assert_difference "User.count", -1 do
-      delete api_v1_user_url(@admin), params: { format: :json },
+      delete api_v1_user_url(@admin),
+        params: { format: :json },
         headers: headers(@admin)
 
       assert_response :success
@@ -97,11 +101,15 @@ class Api::V1::UsersControllerTest < ActionDispatch::IntegrationTest
   end
 
   def test_destroy_should_return_error_if_email_is_not_present_in_database
-    email = { "X-Auth-Email" => "this_email_is_not_present_in_db@example.com" }
+    invalid_email_header = {
+      "X-Auth-Email" => "this_email_is_not_present_in_db@example.com"
+    }
 
-    delete api_v1_user_url(@admin), params: { format: :json }, headers: headers(@admin, email)
+    delete api_v1_user_url(@admin),
+      params: { format: :json },
+      headers: headers(@admin, invalid_email_header)
 
     assert_response :unauthorized
-    assert_equal response_body["error"], t("invalid_credentials")
+    assert_equal t("invalid_credentials"), response_body["error"]
   end
 end
