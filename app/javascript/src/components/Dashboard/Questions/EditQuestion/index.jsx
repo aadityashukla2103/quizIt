@@ -31,11 +31,10 @@ const EditQuestion = () => {
   const fetchQuestion = async () => {
     try {
       const response = await questionsApi.show(slug, questionId);
-      const data = response.data;
 
       setQuestionData({
-        question: data.content,
-        options: data.options.map(opt => ({
+        question: response.content,
+        options: response.options.map(opt => ({
           content: opt.content,
           isCorrect: opt.is_correct,
         })),

@@ -5,53 +5,38 @@ class Api::V1::RedirectionsController < Api::V1::BaseController
   before_action :set_redirection, only: [:update, :destroy]
 
   def index
-    redirections = Redirection.order(created_at: :asc)
-    render_message(
-      "",
-      :ok,
-      { redirections: redirections }
-    )
+    result = Redirections::IndexService.new.call
+    render_json(result[:data], result[:status])
   end
 
   def create
-    redirection = Redirection.new(redirection_params)
+    result = Redirections::CreateService.new(redirection_params).call
 
-    if redirection.save
-      render_message(
-        "Redirection created",
-        :created,
-        { redirection: redirection }
-      )
+    if result[:success]
+      render_message(result[:message], result[:status], result[:data])
     else
-      render_error(
-        redirection.errors.full_messages.join(", "),
-        :unprocessable_entity
-      )
+      render_error(result[:message], result[:status], result[:data])
     end
   end
 
   def update
-    if @redirection.update(redirection_params)
-      render_message(
-        "Redirection updated",
-        :ok,
-        { redirection: @redirection }
-      )
+    result = Redirections::UpdateService.new(@redirection, redirection_params).call
+
+    if result[:success]
+      render_message(result[:message], result[:status], result[:data])
     else
-      render_error(
-        @redirection.errors.full_messages.join(", "),
-        :unprocessable_entity
-      )
+      render_error(result[:message], result[:status], result[:data])
     end
   end
 
   def destroy
-    @redirection.destroy
-    render_message(
-      "Redirection deleted",
-      :ok,
-      {}
-    )
+    result = Redirections::DestroyService.new(@redirection).call
+
+    if result[:success]
+      render_message(result[:message], result[:status], result[:data])
+    else
+      render_error(result[:message], result[:status], result[:data])
+    end
   end
 
   private

@@ -9,7 +9,7 @@ import { useHistory } from "react-router-dom";
 
 import { QUIZZES_FORM_VALIDATION_SCHEMA } from "../constants";
 
-const Form = ({ refetchQuizzes, onClose, quiz }) => {
+const Form = ({ onClose, quiz }) => {
   const [categories, setCategories] = useState([]);
   const history = useHistory();
 
@@ -33,10 +33,9 @@ const Form = ({ refetchQuizzes, onClose, quiz }) => {
         status: "draft",
       };
 
-      await quizzesApi.create(payload);
-      await refetchQuizzes();
-      history.push("/quizzes");
-      onClose();
+      const response = await quizzesApi.create(payload);
+      const slug = response.quiz.slug;
+      history.push(`/quizzes/${slug}/questions`);
     } catch (err) {
       logger.error(err);
     } finally {

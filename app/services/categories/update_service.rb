@@ -9,9 +9,19 @@ module Categories
 
     def call
       if @category.update(@params)
-        { success: true, category: @category }
+        {
+          success: true,
+          message: "Category updated successfully",
+          status: :ok,
+          data: { category: @category }
+        }
       else
-        { success: false, errors: @category.errors.full_messages }
+        {
+          success: false,
+          message: "Category update failed",
+          status: :unprocessable_entity,
+          data: { errors: @category.errors.full_messages }
+        }
       end
     end
   end

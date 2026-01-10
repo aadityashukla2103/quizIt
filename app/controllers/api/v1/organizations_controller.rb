@@ -5,12 +5,12 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
 
   def index
     result = Organizations::IndexService.new.call
-    render_message(result[:message], :ok, result[:data])
+    render_json(result[:data], :ok)
   end
 
   def show
     result = Organizations::ShowService.new(@organization).call
-    render_message(result[:message], result[:status], result[:data])
+    render_json(result[:data], result[:status])
   end
 
   def create
@@ -21,7 +21,7 @@ class Api::V1::OrganizationsController < Api::V1::BaseController
   def update
     result = Organizations::UpdateService.new(current_user, organization_params).call
     render_message(result[:message], result[:status], result[:data])
- end
+  end
 
   def destroy
     result = Organizations::DestroyService.new(@organization).call

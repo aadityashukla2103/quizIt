@@ -1,27 +1,27 @@
 # frozen_string_literal: true
 
-module Categories
+module Redirections
   class CreateService
     def initialize(params)
       @params = params
     end
 
     def call
-      category = Category.new(@params)
+      redirection = Redirection.new(@params)
 
-      if category.save
+      if redirection.save
         {
           success: true,
-          message: "Category created successfully",
+          message: "Redirection created successfully",
           status: :created,
-          data: { category: category }
+          data: { redirection: redirection }
         }
       else
         {
           success: false,
-          message: "Category creation failed",
+          message: "Redirection creation failed",
           status: :unprocessable_entity,
-          data: { errors: category.errors.full_messages }
+          data: { errors: redirection.errors.full_messages }
         }
       end
     end

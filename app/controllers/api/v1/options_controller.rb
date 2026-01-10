@@ -5,11 +5,11 @@ class Api::V1::OptionsController < Api::V1::BaseController
   before_action :set_option, only: [:show, :update, :destroy]
 
   def index
-    render_json(@question.options)
+    render_json(@question.options, :ok)
   end
 
   def show
-    render_json(@option)
+    render_json(@option, :ok)
   end
 
   def create
@@ -17,22 +17,28 @@ class Api::V1::OptionsController < Api::V1::BaseController
     if result[:success]
       render_json(result[:option], result[:status])
     else
-      render json: { errors: result[:errors] }, status: result[:status]
+      render_error(result[:errors], result[:status])
     end
   end
 
   def update
     result = ::Options::UpdateService.new(@option, option_params).call
+
     if result[:success]
       render_json(result[:option], result[:status])
     else
-      render json: { errors: result[:errors] }, status: result[:status]
+      render_error(result[:errors], result[:status])
     end
   end
 
   def destroy
     result = ::Options::DestroyService.new(@option).call
-    head result[:status]
+
+    if result[:success]
+      head result[:status]
+    else
+      render_error(result[:errors], result[:status])
+    end
   end
 
   private

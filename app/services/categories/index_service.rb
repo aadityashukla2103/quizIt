@@ -2,8 +2,13 @@
 
 class Categories::IndexService
   def call
-    Category
-      .includes(:quizzes)
-      .order(:position)
+    {
+      success: true,
+      status: :ok,
+      data: Category
+        .includes(:quizzes)
+        .order(:position)
+        .as_json(include: { quizzes: { only: [:id] } })
+    }
   end
 end

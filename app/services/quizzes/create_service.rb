@@ -15,7 +15,7 @@ class Quizzes::CreateService
     if quiz.save
       {
         message: "Quiz created successfully",
-        status: :ok,
+        status: :created,
         data: { quiz: quiz }
       }
     else
