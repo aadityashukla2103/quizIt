@@ -4,14 +4,22 @@ module Questions
   class DestroyService
     def initialize(question)
       @question = question
+      @quiz = question.quiz
     end
 
     def call
-      @question.destroy
+      ActiveRecord::Base.transaction do
+        @question.destroy
+
+        if @quiz.questions.count.zero?
+          @quiz.update!(status: :draft)
+        end
+      end
+
       {
         message: "Question deleted successfully",
         data: {},
-        status: :no_content
+        status: :ok
       }
     rescue => e
       {

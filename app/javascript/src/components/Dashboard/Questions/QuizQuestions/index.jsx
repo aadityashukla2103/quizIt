@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import questionsApi from "apis/questions";
 import quizzesApi from "apis/quizzes";
 import QuizHeader from "components/commons/QuizHeader";
-import { Button, PageLoader, NoData, Alert } from "neetoui";
+import { Button, PageLoader, NoData, Alert, Typography } from "neetoui";
 import { SubHeader, Scrollable, Header } from "neetoui/layouts";
 import { useParams, Link, useHistory } from "react-router-dom";
 
@@ -59,8 +59,7 @@ const QuizQuestions = () => {
   const handleCloneQuestion = async questionId => {
     try {
       const cloned = await questionsApi.clone(slug, questionId);
-      const clonedData = cloned.data;
-      setQuestions(prev => [...prev, clonedData]);
+      setQuestions(prev => [...prev, cloned]);
     } catch (error) {
       logger.log(error);
     }
@@ -82,8 +81,16 @@ const QuizQuestions = () => {
     <div className="w-full">
       <Alert
         isOpen={isDeleteAlertOpen}
-        message={`Are you sure you want to delete "${selectedPostName}" Question? This action cannot be undone.`}
         title="Delete Question"
+        message={
+          <Typography style="body2">
+            Are you sure you want to delete
+            <Typography className="inline" style="h4">
+              "{selectedPostName}"
+            </Typography>
+            Question? This action cannot be undone.
+          </Typography>
+        }
         onClose={() => setIsDeleteAlertOpen(false)}
         onSubmit={() => {
           handleDeleteQuestion();

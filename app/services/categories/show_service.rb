@@ -7,7 +7,11 @@ module Categories
     end
 
     def call
-      @category
+      {
+        success: true,
+        status: :ok,
+        data: { category: @category }
+      }
     end
   end
 end

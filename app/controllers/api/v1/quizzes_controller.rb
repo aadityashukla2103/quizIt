@@ -7,22 +7,30 @@ class Api::V1::QuizzesController < Api::V1::BaseController
 
   def index
     result = Quizzes::IndexService.new(@current_user, params).call
-    render_message(result[:message], :ok, result[:data])
+    render_json(result[:data], result[:status])
   end
 
   def show
     result = Quizzes::ShowService.new(@quiz).call
-    render_message(result[:message], :ok, result[:data])
+    render_json(result[:data], result[:status])
   end
 
   def create
     result = Quizzes::CreateService.new(@current_user, quiz_params).call
-    render_message(result[:message], result[:status], result[:data])
+    render_json(result[:data], result[:status])
   end
 
   def update
     result = Quizzes::UpdateService.new(@quiz, quiz_params).call
-    render_message(result[:message], result[:status], result[:data])
+
+    if result[:status] == :ok
+      render_json(result[:data], :ok)
+    else
+      render_error(
+        result[:data][:errors] || result[:message],
+        result[:status]
+      )
+    end
   end
 
   def destroy

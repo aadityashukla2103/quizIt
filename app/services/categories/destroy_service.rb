@@ -8,7 +8,13 @@ module Categories
 
     def call
       @category.destroy
-      { success: true }
+
+      {
+        success: true,
+        message: "Category deleted successfully",
+        status: :ok,
+        data: {}
+      }
     end
   end
 end

@@ -13,6 +13,10 @@ class Api::V1::GuestRegistrationsController < Api::V1::BaseController
       quiz_id: quiz.id
     ).call
 
-    render_json(result[:data], result[:status])
+    if result[:success]
+      render_json(result[:data], result[:status])
+    else
+      render_error(result[:message], result[:status], result[:data])
+    end
   end
 end

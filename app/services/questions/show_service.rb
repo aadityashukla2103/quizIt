@@ -8,7 +8,6 @@ module Questions
 
     def call
       {
-        message: "Question fetched successfully",
         status: :ok,
         data: @question.as_json(include: :options)
       }

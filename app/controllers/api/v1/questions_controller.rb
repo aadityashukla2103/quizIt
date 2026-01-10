@@ -6,32 +6,42 @@ class Api::V1::QuestionsController < Api::V1::BaseController
 
   def index
     result = Questions::IndexService.new(@quiz).call
-    render_message(result[:message], result[:status] || :ok, result[:data] || {})
+    render_json(result[:data], result[:status] || :ok)
   end
 
   def show
     result = Questions::ShowService.new(@question).call
-    render_message("", :ok, result)
+    render_json(result[:data], result[:status] || :ok)
   end
 
   def create
     result = Questions::CreateService.new(@quiz, question_params).call
-    render_message(result[:message], result[:status] || :created, result[:data] || {})
+
+    if result[:success]
+      render_message(result[:message], result[:status] || :created, result[:data])
+    else
+      render_error(result[:data][:errors], result[:status])
+    end
   end
 
   def update
     result = Questions::UpdateService.new(@question, question_params).call
-    render_message("Question updated successfully", :ok, result)
+
+    if result[:success]
+      render_message(result[:message], result[:status] || :ok, result[:data])
+    else
+      render_error(result[:data][:errors], result[:status])
+    end
   end
 
   def destroy
-    Questions::DestroyService.new(@question).call
-    render_message("Question deleted successfully", :no_content, {})
+    result = Questions::DestroyService.new(@question).call
+    render_message(result[:message], :ok, result[:data] || {})
   end
 
   def clone
     result = Questions::CloneService.new(@question).call
-    render_message("Question cloned successfully", :created, result)
+    render_message(result[:message], result[:status] || :ok, result[:data])
   end
 
   private
@@ -45,6 +55,9 @@ class Api::V1::QuestionsController < Api::V1::BaseController
     end
 
     def question_params
-      params.require(:question).permit(:content, options: [:content, :isCorrect])
+      params.require(:question).permit(
+        :content,
+        options: [:content, :isCorrect]
+      )
     end
 end

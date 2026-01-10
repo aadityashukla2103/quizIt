@@ -9,6 +9,7 @@ import {
   Dropdown,
   Alert,
   Tooltip,
+  Typography,
 } from "neetoui";
 import { Link } from "react-router-dom";
 
@@ -28,37 +29,33 @@ const Table = ({
   visibleColumns,
 }) => {
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
-  const [selectedQuizId, setSelectedQuizId] = useState(null);
+  const [selectedQuizSlug, setSelectedQuizSlug] = useState("");
+  const [selectedQuizName, setSelectedQuizName] = useState("");
 
-  const handleStatusChange = async (id, status) => {
+  const handleStatusChange = async (slug, status) => {
     try {
-      await quizzesApi.update(id, { quiz: { status } });
-      setQuizzes(prev => prev.map(q => (q.id === id ? { ...q, status } : q)));
+      await quizzesApi.update(slug, { quiz: { status } });
+      setQuizzes(prev =>
+        prev.map(q => (q.slug === slug ? { ...q, status } : q))
+      );
     } catch (err) {
       logger.error(err);
     }
   };
 
-  const handleDelete = async id => {
+  const handleDelete = async slug => {
     try {
-      await quizzesApi.destroy(id);
-      setQuizzes(prev => prev.filter(q => q.id !== id));
+      await quizzesApi.destroy(slug);
+      setQuizzes(prev => prev.filter(q => q.slug !== slug));
     } catch (err) {
       logger.error(err);
     }
   };
 
-  const handleClone = async id => {
+  const handleClone = async slug => {
     try {
-      const quiz = await quizzesApi.cloneQuiz(id);
-
-      setQuizzes(prev => [
-        {
-          ...quiz,
-          submission_count: 0,
-        },
-        ...prev,
-      ]);
+      const quiz = await quizzesApi.cloneQuiz(slug);
+      setQuizzes(prev => [{ ...quiz, submission_count: 0 }, ...prev]);
     } catch (err) {
       logger.error(err);
     }
@@ -151,20 +148,21 @@ const Table = ({
               <MenuItemButton
                 onClick={() =>
                   handleStatusChange(
-                    record.id,
+                    record.slug,
                     record.status === "draft" ? "published" : "draft"
                   )
                 }
               >
                 {record.status === "draft" ? "Publish" : "Unpublish"}
               </MenuItemButton>
-              <MenuItemButton onClick={() => handleClone(record.id)}>
+              <MenuItemButton onClick={() => handleClone(record.slug)}>
                 Clone
               </MenuItemButton>
               <MenuItemButton
                 onClick={() => {
                   setIsDeleteAlertOpen(true);
-                  setSelectedQuizId(record.id);
+                  setSelectedQuizSlug(record.slug);
+                  setSelectedQuizName(record.name);
                 }}
               >
                 Delete
@@ -180,11 +178,19 @@ const Table = ({
     <div className="w-full">
       <Alert
         isOpen={isDeleteAlertOpen}
-        message="Are you sure you want to delete this quiz? This action cannot be undone."
         title="Delete Quiz"
+        message={
+          <Typography style="body2">
+            Are you sure you want to delete{" "}
+            <Typography as="span" className="inline" style="h5">
+              "{selectedQuizName}"
+            </Typography>
+            ? This action cannot be undone.
+          </Typography>
+        }
         onClose={() => setIsDeleteAlertOpen(false)}
         onSubmit={() => {
-          handleDelete(selectedQuizId);
+          handleDelete(selectedQuizSlug);
           setIsDeleteAlertOpen(false);
         }}
       />

@@ -13,8 +13,7 @@ module Questions
             options: q.options.as_json(only: [:id, :content, :is_correct])
           )
         end,
-        message: "Questions fetched successfully",
-        status: "ok"
+        status: :ok
       }
     end
   end

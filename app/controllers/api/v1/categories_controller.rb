@@ -1,25 +1,25 @@
 # frozen_string_literal: true
 
-class Api::V1::CategoriesController < ApplicationController
+class Api::V1::CategoriesController < Api::V1::BaseController
   before_action :set_category, only: [:show, :update, :destroy]
 
   def index
     result = Categories::IndexService.new.call
-    render json: result, include: :quizzes, status: :ok
+    render_json(result[:data], result[:status])
   end
 
   def show
     result = Categories::ShowService.new(@category.id).call
-    render json: result, status: :ok
+    render_json(result[:data], result[:status])
   end
 
   def create
     result = Categories::CreateService.new(category_params).call
 
     if result[:success]
-      render json: result[:category], status: :created
+      render_message(result[:message], result[:status], result[:data])
     else
-      render json: { errors: result[:errors] }, status: :unprocessable_entity
+      render_error(result[:data][:errors], result[:status])
     end
   end
 
@@ -27,15 +27,15 @@ class Api::V1::CategoriesController < ApplicationController
     result = Categories::UpdateService.new(@category, category_params).call
 
     if result[:success]
-      render json: @category, status: :ok
+      render_message(result[:message], result[:status], result[:data])
     else
-      render json: { errors: result[:errors] }, status: :unprocessable_entity
+      render_error(result[:data][:errors], result[:status])
     end
   end
 
   def destroy
-    Categories::DestroyService.new(@category).call
-    head :no_content
+    result = Categories::DestroyService.new(@category).call
+    render_message(result[:message], result[:status], result[:data])
   end
 
   def reorder
@@ -43,7 +43,7 @@ class Api::V1::CategoriesController < ApplicationController
       Category.find(id).set_list_position(index + 1)
     end
 
-    head :ok
+    render_message("Categories reordered successfully", :ok)
   end
 
   private
