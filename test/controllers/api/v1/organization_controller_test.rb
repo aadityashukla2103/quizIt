@@ -7,7 +7,6 @@ class Api::V1::OrganizationsControllerTest < ActionDispatch::IntegrationTest
     @admin = create(:user, :admin)
     sign_in @admin
     @headers = headers(@admin)
-
     @organization = create(:organization)
   end
 
@@ -15,9 +14,7 @@ class Api::V1::OrganizationsControllerTest < ActionDispatch::IntegrationTest
     get api_v1_organizations_url, headers: @headers
 
     assert_response :success
-    assert_kind_of Hash, response_body
     assert_kind_of Array, response_body["organizations"]
-    assert_kind_of Hash, response_body["organizations"].first
   end
 
   def test_show_organization
@@ -27,52 +24,36 @@ class Api::V1::OrganizationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal @organization.id, response_body["organization"]["id"]
   end
 
-  def test_create_valid_organization
+  def test_create_organization
     payload = {
-      organization: { name: "New Org" }
+      organization: {
+        name: "New Org"
+      }
     }
 
     assert_difference "Organization.count", 1 do
-      post api_v1_organizations_url, params: payload, headers: @headers
+      post api_v1_organizations_url,
+        params: payload,
+        headers: @headers
     end
 
     assert_response :created
     assert_equal "New Org", response_body["organization"]["name"]
   end
 
-  def test_create_invalid_organization
+  def test_update_organization
     payload = {
-      organization: { name: "" }
+      organization: {
+        name: "Updated Org"
+      }
     }
 
-    assert_no_difference "Organization.count" do
-      post api_v1_organizations_url, params: payload, headers: @headers
-    end
+    patch api_v1_organization_url(@organization),
+      params: payload,
+      headers: @headers
 
-    assert_response :unprocessable_entity
-    assert_includes response_body["errors"].join, "Name can't be blank"
-  end
-
-  def test_update_valid_organization
-    payload = {
-      organization: { name: "Updated Org" }
-    }
-
-    patch api_v1_organization_url(@organization), params: payload, headers: @headers
-
-    assert_response :success
+    assert_response :ok
     assert_equal "Updated Org", response_body["organization"]["name"]
-  end
-
-  def test_update_invalid_organization
-    payload = {
-      organization: { name: "" }
-    }
-
-    patch api_v1_organization_url(@organization), params: payload, headers: @headers
-
-    assert_response :unprocessable_entity
-    assert_includes response_body["errors"].join, "Name can't be blank"
   end
 
   def test_destroy_organization

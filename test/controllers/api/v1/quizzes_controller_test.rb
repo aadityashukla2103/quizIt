@@ -25,6 +25,7 @@ class Api::V1::QuizzesControllerTest < ActionDispatch::IntegrationTest
     expected_keys = %w[
       id
       name
+      slug
       status
       created_at
       updated_at
@@ -47,14 +48,14 @@ class Api::V1::QuizzesControllerTest < ActionDispatch::IntegrationTest
 
   def test_show_single_quiz
     quiz = @quizzes.first
-    get api_v1_quiz_url(quiz), headers: @headers_admin
+    get api_v1_quiz_url(slug: quiz.slug), headers: @headers_admin
 
     assert_response :success
     assert_equal quiz.id, response_body["quiz"]["id"]
-  end
+ end
 
   def test_show_non_existent_quiz
-    get api_v1_quiz_url(id: "invalid"), headers: @headers_admin
+    get api_v1_quiz_url(slug: "invalid"), headers: @headers_admin
     assert_response :not_found
   end
 
@@ -63,7 +64,6 @@ class Api::V1::QuizzesControllerTest < ActionDispatch::IntegrationTest
       quiz: {
         name: "Sample Quiz",
         status: "draft",
-        organization_id: @organization.id,
         category_id: @category.id
       }
     }
@@ -72,7 +72,7 @@ class Api::V1::QuizzesControllerTest < ActionDispatch::IntegrationTest
       post api_v1_quizzes_url, params: payload, headers: @headers_admin
     end
 
-    assert_response :success
+    assert_response :created
     assert_equal "Sample Quiz", response_body["quiz"]["name"]
   end
 
@@ -81,7 +81,6 @@ class Api::V1::QuizzesControllerTest < ActionDispatch::IntegrationTest
       quiz: {
         name: "",
         status: "draft",
-        organization_id: @organization.id,
         category_id: @category.id
       }
     }
@@ -98,7 +97,6 @@ class Api::V1::QuizzesControllerTest < ActionDispatch::IntegrationTest
       quiz: {
         name: "Test Quiz",
         status: "draft",
-        organization_id: @organization.id,
         category_id: @category.id
       }
     }
@@ -113,7 +111,7 @@ class Api::V1::QuizzesControllerTest < ActionDispatch::IntegrationTest
   def test_admin_can_update_quiz
     quiz = @quizzes.first
 
-    patch api_v1_quiz_url(quiz),
+    patch api_v1_quiz_url(slug: quiz.slug),
       params: { quiz: { name: "Updated Name" } },
       headers: @headers_admin
 
@@ -124,7 +122,7 @@ class Api::V1::QuizzesControllerTest < ActionDispatch::IntegrationTest
   def test_update_quiz_with_blank_name
     quiz = @quizzes.first
 
-    patch api_v1_quiz_url(quiz),
+    patch api_v1_quiz_url(slug: quiz.slug),
       params: { quiz: { name: "" } },
       headers: @headers_admin
 
@@ -132,7 +130,7 @@ class Api::V1::QuizzesControllerTest < ActionDispatch::IntegrationTest
   end
 
   def test_update_non_existent_quiz
-    patch api_v1_quiz_url(id: "invalid"),
+    patch api_v1_quiz_url(slug: "invalid"),
       params: { quiz: { name: "New" } },
       headers: @headers_admin
 
@@ -142,7 +140,7 @@ class Api::V1::QuizzesControllerTest < ActionDispatch::IntegrationTest
   def test_non_admin_cannot_update_quiz
     quiz = @quizzes.first
 
-    patch api_v1_quiz_url(quiz),
+    patch api_v1_quiz_url(slug: quiz.slug),
       params: { quiz: { name: "Fail Update" } },
       headers: @headers_user
 
@@ -155,7 +153,7 @@ class Api::V1::QuizzesControllerTest < ActionDispatch::IntegrationTest
     quiz = @quizzes.first
 
     assert_difference "Quiz.count", -1 do
-      delete api_v1_quiz_url(quiz), headers: @headers_admin
+      delete api_v1_quiz_url(slug: quiz.slug), headers: @headers_admin
     end
 
     assert_response :success
@@ -165,14 +163,14 @@ class Api::V1::QuizzesControllerTest < ActionDispatch::IntegrationTest
     quiz = @quizzes.first
 
     assert_no_difference "Quiz.count" do
-      delete api_v1_quiz_url(quiz), headers: @headers_user
+      delete api_v1_quiz_url(slug: quiz.slug), headers: @headers_user
     end
 
     assert_response :forbidden
   end
 
   def test_delete_non_existent_quiz
-    delete api_v1_quiz_url(id: "invalid"), headers: @headers_admin
+    delete api_v1_quiz_url(slug: "invalid"), headers: @headers_admin
     assert_response :not_found
   end
 end

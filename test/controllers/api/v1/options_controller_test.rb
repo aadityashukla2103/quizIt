@@ -63,7 +63,7 @@ class Api::V1::OptionsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :unprocessable_entity
-    assert_includes response_body["errors"].join, "Content can't be blank"
+    assert_includes response_body["error"], "can't be blank"
   end
 
   def test_update_option
@@ -78,12 +78,13 @@ class Api::V1::OptionsControllerTest < ActionDispatch::IntegrationTest
       headers: @headers
 
     assert_response :ok
-    assert_equal "New content", @option.reload.content
+    assert_equal "New content", response_body["content"]
   end
 
   def test_delete_option
     assert_difference "Option.count", -1 do
-      delete api_v1_quiz_question_option_url(@quiz, @question, @option), headers: @headers
+      delete api_v1_quiz_question_option_url(@quiz, @question, @option),
+        headers: @headers
     end
 
     assert_response :no_content

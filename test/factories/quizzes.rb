@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :quiz do
-    name { Faker::Lorem.sentence }
+    name { Faker::Lorem.characters(number: 20) }
     status { :draft }
     association :organization
     association :category

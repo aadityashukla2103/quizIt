@@ -8,7 +8,7 @@ class Api::V1::SubmissionsControllerTest < ActionDispatch::IntegrationTest
     sign_in @user
     @headers = headers(@user)
 
-    @quiz = create(:quiz)
+    @quiz = create(:quiz, organization: @user.organization)
     @submission = create(:submission, user: @user, quiz: @quiz)
   end
 
@@ -40,7 +40,9 @@ class Api::V1::SubmissionsControllerTest < ActionDispatch::IntegrationTest
     }
 
     assert_difference "Submission.count", 1 do
-      post api_v1_submissions_url, params: payload, headers: @headers
+      post api_v1_submissions_url,
+        params: payload,
+        headers: @headers
     end
 
     assert_response :success
@@ -54,9 +56,11 @@ class Api::V1::SubmissionsControllerTest < ActionDispatch::IntegrationTest
       }
     }
 
-    # API still creates record, so count increases
+    # current API allows creation
     assert_difference "Submission.count", 1 do
-      post api_v1_submissions_url, params: payload, headers: @headers
+      post api_v1_submissions_url,
+        params: payload,
+        headers: @headers
     end
 
     assert_response :success
@@ -69,7 +73,9 @@ class Api::V1::SubmissionsControllerTest < ActionDispatch::IntegrationTest
       }
     }
 
-    patch api_v1_submission_url(@submission), params: payload, headers: @headers
+    patch api_v1_submission_url(@submission),
+      params: payload,
+      headers: @headers
 
     assert_response :success
     assert_equal 5, @submission.reload.correct_answers
@@ -82,14 +88,17 @@ class Api::V1::SubmissionsControllerTest < ActionDispatch::IntegrationTest
       }
     }
 
-    patch api_v1_submission_url(@submission), params: payload, headers: @headers
+    patch api_v1_submission_url(@submission),
+      params: payload,
+      headers: @headers
 
     assert_response :unprocessable_entity
   end
 
   def test_delete_submission
     assert_difference "Submission.count", -1 do
-      delete api_v1_submission_url(@submission), headers: @headers
+      delete api_v1_submission_url(@submission),
+        headers: @headers
     end
 
     assert_response :success
