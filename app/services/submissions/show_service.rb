@@ -11,7 +11,7 @@ module Submissions
     def call
       {
         id: @submission.id,
-        total_questions: @quiz.questions.count,
+        total_questions: @submission.total_questions,
         correct_answers: @submission.correct_answers,
         wrong_answers: @submission.wrong_answers,
         submission_answers: build_answers,
@@ -23,10 +23,11 @@ module Submissions
     private
 
       def build_answers
-        answers_map = @submission.submission_answers.index_by(&:question_id)
+        @submission.submission_answers
+          .includes(question: :options)
+          .map do |answer|
 
-        @quiz.questions.order(:position).map do |question|
-          answer = answers_map[question.id]
+          question = answer.question
 
           {
             question: {
@@ -40,9 +41,9 @@ module Submissions
                 }
               end
             },
-            selected_option: answer&.selected_option,
-            is_correct: answer&.is_correct,
-            attempted: answer.present?
+            selected_option: answer.selected_option,
+            is_correct: answer.is_correct,
+            attempted: true
           }
         end
       end
@@ -50,7 +51,12 @@ module Submissions
       def remaining_time
         return nil unless @quiz.time_limit && @submission.started_at
 
-        remaining = (@submission.started_at + @quiz.time_limit.minutes - Time.current).to_i
+        remaining = (
+          @submission.started_at +
+          @quiz.time_limit.minutes -
+          Time.current
+        ).to_i
+
         [remaining, 0].max
       end
   end
