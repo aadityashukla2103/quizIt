@@ -48,7 +48,7 @@ const Main = props => {
 
   if (loading) {
     return (
-      <div className="h-screen">
+      <div className="m-auto h-screen">
         <PageLoader />
       </div>
     );

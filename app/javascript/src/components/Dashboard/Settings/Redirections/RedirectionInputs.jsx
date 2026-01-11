@@ -2,7 +2,14 @@ import React, { useState } from "react";
 
 import redirectionsApi from "apis/redirections";
 import { MenuHorizontal, Check, Close } from "neetoicons";
-import { Input, Dropdown, ActionDropdown, Alert, Tooltip } from "neetoui";
+import {
+  Input,
+  Dropdown,
+  ActionDropdown,
+  Alert,
+  Tooltip,
+  PageLoader,
+} from "neetoui";
 
 const { Menu, MenuItem } = ActionDropdown;
 const { Button: MenuItemButton } = MenuItem;
@@ -64,8 +71,13 @@ const RedirectionsInput = ({
     setIsDeleteAlertOpen(false);
     onDelete(redirection.id);
   };
+
   if (loading) {
-    <div>Loading..</div>;
+    return (
+      <div className="m-auto h-screen">
+        <PageLoader />
+      </div>
+    );
   }
 
   return (

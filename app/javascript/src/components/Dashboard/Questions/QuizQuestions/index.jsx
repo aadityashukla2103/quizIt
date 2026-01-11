@@ -75,7 +75,13 @@ const QuizQuestions = () => {
     loadData();
   }, [slug]);
 
-  if (loading) return <PageLoader />;
+  if (loading) {
+    return (
+      <div className="m-auto h-screen">
+        <PageLoader />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">

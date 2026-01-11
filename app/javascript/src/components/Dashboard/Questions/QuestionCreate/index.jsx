@@ -4,6 +4,7 @@ import questionsApi from "apis/questions";
 import quizzesApi from "apis/quizzes";
 import QuizHeader from "components/commons/QuizHeader";
 import QuestionBuilderNeetoUI from "components/Dashboard/Questions/QuestionBuilder";
+import { PageLoader } from "neetoui";
 import { useParams, useHistory } from "react-router-dom";
 
 const QuestionCreate = () => {
@@ -68,7 +69,13 @@ const QuestionCreate = () => {
     fetchQuiz();
   }, [slug]);
 
-  if (loading) return null;
+  if (loading) {
+    return (
+      <div className="m-auto h-screen">
+        <PageLoader />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full bg-white px-4 md:bg-transparent md:px-8">

@@ -4,6 +4,7 @@ import questionsApi from "apis/questions";
 import quizzesApi from "apis/quizzes";
 import QuizHeader from "components/commons/QuizHeader";
 import QuestionBuilderUI from "components/Dashboard/Questions/QuestionBuilder";
+import { PageLoader } from "neetoui";
 import { useParams, useHistory } from "react-router-dom";
 
 const EditQuestion = () => {
@@ -73,7 +74,11 @@ const EditQuestion = () => {
   }, [slug, questionId]);
 
   if (quizLoading || questionLoading || !questionData || quizName === "") {
-    return <div>Loading...</div>;
+    return (
+      <div className="m-auto h-screen">
+        <PageLoader />
+      </div>
+    );
   }
 
   return (
