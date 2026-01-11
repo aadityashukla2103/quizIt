@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import organizationApi from "apis/organization";
 import usersApi from "apis/users";
 import { Form, Formik } from "formik";
-import { Button, Typography } from "neetoui";
+import { Button, Typography, PageLoader } from "neetoui";
 import { Input } from "neetoui/formik";
 
 import { ORGANIZATION_FORM_VALIDATION_SCHEMA } from "./constants";
@@ -52,7 +52,11 @@ const Organization = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="m-auto h-screen">
+        <PageLoader />
+      </div>
+    );
   }
 
   return (

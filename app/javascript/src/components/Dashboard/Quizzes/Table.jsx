@@ -47,6 +47,7 @@ const Table = ({
     try {
       await quizzesApi.destroy(slug);
       setQuizzes(prev => prev.filter(q => q.slug !== slug));
+      setSelectedQuizIds([]);
     } catch (err) {
       logger.error(err);
     }
@@ -56,6 +57,7 @@ const Table = ({
     try {
       const quiz = await quizzesApi.cloneQuiz(slug);
       setQuizzes(prev => [{ ...quiz, submission_count: 0 }, ...prev]);
+      setSelectedQuizIds([]);
     } catch (err) {
       logger.error(err);
     }

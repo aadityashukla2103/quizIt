@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import quizzesApi from "apis/quizzes";
 import submissionAnswersApi from "apis/submissionAnswers";
 import submissionsApi from "apis/submissions";
+import { PageLoader } from "neetoui";
 import { useHistory, useParams } from "react-router-dom";
 
 import ActionButtons from "./ActionButtons";
@@ -141,8 +142,8 @@ const PublicQuizQuestions = () => {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center text-xl">
-        Loading....
+      <div className="m-auto h-screen">
+        <PageLoader />
       </div>
     );
   }

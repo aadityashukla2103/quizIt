@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import submissionsApi from "apis/submissions";
+import { PageLoader } from "neetoui";
 import { useHistory, useParams } from "react-router-dom";
 
 import CalloutMessage from "./CalloutMessage";
@@ -35,8 +36,8 @@ const PublicQuizResult = () => {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        Loading...
+      <div className="m-auto h-screen">
+        <PageLoader />
       </div>
     );
   }

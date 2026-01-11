@@ -12,7 +12,7 @@ import QuizCard from "./QuizCard";
 
 import useDebounce from "../../hooks/useDebounce";
 
-const Hero = () => {
+const PublicDashboard = () => {
   const { slug } = useParams();
   const location = useLocation();
   const history = useHistory();
@@ -95,6 +95,14 @@ const Hero = () => {
     loadQuizzes();
   }, [debouncedQuery, category, slug]);
 
+  if (loading) {
+    return (
+      <div className="m-auto h-screen">
+        <PageLoader />
+      </div>
+    );
+  }
+
   return (
     <div className="mt-8 flex min-h-screen flex-col bg-gray-50">
       <header className="flex items-center justify-between px-8 py-4 text-white">
@@ -136,9 +144,7 @@ const Hero = () => {
             </div>
           </div>
         </div>
-        {loading ? (
-          <PageLoader />
-        ) : quizzes.length === 0 ? (
+        {quizzes.length === 0 ? (
           <EmptyState
             image={<EmptyQuizzesListImage />}
             title="No quiz found!"
@@ -155,4 +161,4 @@ const Hero = () => {
   );
 };
 
-export default Hero;
+export default PublicDashboard;
