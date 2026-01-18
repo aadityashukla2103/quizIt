@@ -53,6 +53,7 @@ export const REDIRECTIONS_SETTINGS_PATH = "/settings/redirections";
 export const LOGIN_PATH = "/login";
 export const SIGNUP_PATH = "/signup";
 export const RESET_PASSWORD_PATH = "/my/password/new";
+export const NOT_FOUND_PATH = "/page_not_found";
 
 export const AUTH_ROUTES = [
   {

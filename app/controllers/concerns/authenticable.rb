@@ -31,6 +31,9 @@ module Authenticable
       (controller_name == "guest_registrations" &&
         action_name == "create") ||
 
+      (controller_name == "categories" &&
+    action_name == "index") ||
+
       (controller_name == "submissions" &&
         ["show", "update", "finalize"].include?(action_name)) ||
 

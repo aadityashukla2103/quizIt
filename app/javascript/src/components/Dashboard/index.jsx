@@ -5,6 +5,7 @@ import {
   DASHBOARD_ROUTES,
   QUIZZES_PATH,
   DASHBOARD_PATH,
+  NOT_FOUND_PATH,
 } from "components/routeConstants";
 import { Route, Redirect, Switch } from "react-router-dom";
 
@@ -15,7 +16,8 @@ const Dashboard = () => (
       {DASHBOARD_ROUTES.map(({ path, component }) => (
         <Route exact component={component} key={path} path={path} />
       ))}
-      <Redirect from={DASHBOARD_PATH} to={QUIZZES_PATH} />
+      <Redirect exact from={DASHBOARD_PATH} to={QUIZZES_PATH} />
+      <Redirect to={NOT_FOUND_PATH} />
     </Switch>
   </div>
 );
