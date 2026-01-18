@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import submissionsApi from "apis/submissions";
 import QuizHeader from "components/commons/QuizHeader";
+import { NoData } from "neetoui";
 import { Container } from "neetoui/layouts";
 import { useParams, useHistory, useLocation } from "react-router-dom";
 
@@ -105,6 +106,11 @@ const QuizSubmissions = () => {
     }));
   };
 
+  const isFilterPaneApplied = Boolean(
+    filters.name || filters.email || filters.status
+  );
+  const isAnythingApplied = Boolean(debouncedName || isFilterPaneApplied);
+
   return (
     <Container className="w-full">
       <SubmissionsFilterPane
@@ -126,16 +132,25 @@ const QuizSubmissions = () => {
         submissionsCount={totalCount}
         toggleColumnVisibility={toggleColumnVisibility}
         visibleColumns={visibleColumns}
+        onFilter={handleFilter}
       />
-      <Table
-        Submissions={submissions}
-        currentPageNumber={page}
-        defaultPageSize={pageSize}
-        handlePageChange={handlePageChange}
-        loading={loading}
-        totalSubmissionsCount={totalCount}
-        visibleColumns={visibleColumns}
-      />
+      {!loading && submissions.length === 0 && isAnythingApplied ? (
+        <div className="flex h-[60vh] w-full items-center justify-center">
+          <div className="flex w-full justify-center">
+            <NoData title="No results found" />
+          </div>
+        </div>
+      ) : (
+        <Table
+          Submissions={submissions}
+          currentPageNumber={page}
+          defaultPageSize={pageSize}
+          handlePageChange={handlePageChange}
+          loading={loading}
+          totalSubmissionsCount={totalCount}
+          visibleColumns={visibleColumns}
+        />
+      )}
     </Container>
   );
 };
