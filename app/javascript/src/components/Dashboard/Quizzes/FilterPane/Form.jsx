@@ -32,9 +32,8 @@ const Form = ({ refetchQuizzes, onClose }) => {
     try {
       const filters = {
         query: values.name || "",
-        category: values.category.map(c => c.value),
-        category_name: values.category.map(c => c.label),
-        status: values.status || "all",
+        category: values.category.map(c => c.label),
+        status: values.status || "",
       };
       await refetchQuizzes(filters);
       onClose();
@@ -57,6 +56,7 @@ const Form = ({ refetchQuizzes, onClose }) => {
               label="Name"
               name="name"
               placeholder="Search by name"
+              onChange={e => setFieldValue("name", e.target.value)}
             />
             <Select
               isMulti

@@ -22,8 +22,20 @@ export const INITIAL_VISIBLE_COLUMNS = {
   status: true,
 };
 
-export const validationSchema = Yup.object().shape({
-  name: Yup.string().required("Name is required"),
-  email: Yup.string().required("Email is required"),
-  status: Yup.string().required("Status is required"),
-});
+export const validationSchema = Yup.object()
+  .shape({
+    name: Yup.string().nullable(),
+    email: Yup.string().nullable(),
+    status: Yup.string().nullable(),
+  })
+  .test(
+    "at-least-one",
+    "Please fill at least one filter (Name, Email or Status).",
+    values => {
+      const name = values?.name?.trim();
+      const email = values?.email?.trim();
+      const status = values?.status;
+
+      return Boolean(name || email || status);
+    }
+  );

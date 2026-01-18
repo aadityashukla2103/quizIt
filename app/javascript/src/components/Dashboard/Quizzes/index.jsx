@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import quizzesApi from "apis/quizzes";
 import EmptyQuizzesListImage from "assets/images/EmptyQuizzesList";
 import EmptyState from "components/commons/EmptyState";
-import { Button, PageLoader, Typography } from "neetoui";
+import { Button, NoData, PageLoader, Typography } from "neetoui";
 import { Container, Header, SubHeader } from "neetoui/layouts";
 import { useHistory, useLocation } from "react-router-dom";
 
@@ -29,6 +29,9 @@ const Quizzes = () => {
   const [searchTerm, setSearchTerm] = useState(queryParams.get("query") || "");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
+  const appliedFilterName = queryParams.get("filterQuery") || "";
+  const appliedSearchQuery = queryParams.get("query") || "";
+
   const [filters, setFilters] = useState({
     status: queryParams.get("status") || "",
     category: queryParams.get("category")
@@ -36,8 +39,15 @@ const Quizzes = () => {
       : [],
   });
 
-  const [filtersApplied, setFiltersApplied] = useState(
-    Boolean(filters.status || filters.category.length > 0)
+  const isFilterPaneApplied = Boolean(
+    appliedFilterName || filters.status || filters.category.length > 0
+  );
+
+  const isAnythingApplied = Boolean(
+    appliedFilterName ||
+      appliedSearchQuery ||
+      filters.status ||
+      filters.category.length > 0
   );
 
   const [selectedQuizIds, setSelectedQuizIds] = useState([]);
@@ -55,10 +65,14 @@ const Quizzes = () => {
   const fetchQuizzes = useCallback(async () => {
     const params = new URLSearchParams(location.search);
 
+    const filterQuery = params.get("filterQuery") || "";
+    const searchQuery = params.get("query") || "";
+    const finalQuery = filterQuery || searchQuery;
+
     setLoading(true);
     try {
       const { data } = await quizzesApi.fetch({
-        query: params.get("query") || "",
+        query: finalQuery,
         status: params.get("status") || "",
         category: params.get("category")
           ? params.get("category").split(",")
@@ -70,9 +84,6 @@ const Quizzes = () => {
       setQuizzes(data.quizzes || []);
       setTotalQuizCount(data.totalCount || 0);
       setSelectedQuizIds([]);
-      setFiltersApplied(
-        Boolean(params.get("status") || params.get("category"))
-      );
     } finally {
       setLoading(false);
     }
@@ -113,12 +124,16 @@ const Quizzes = () => {
   const handleFilterSubmit = newFilters => {
     const params = new URLSearchParams(location.search);
 
+    newFilters.query
+      ? params.set("filterQuery", newFilters.query)
+      : params.delete("filterQuery");
+
     newFilters.status
       ? params.set("status", newFilters.status)
       : params.delete("status");
 
-    newFilters.category_name?.length
-      ? params.set("category", newFilters.category_name.join(","))
+    newFilters.category?.length
+      ? params.set("category", newFilters.category.join(","))
       : params.delete("category");
 
     params.set("page", 1);
@@ -130,6 +145,7 @@ const Quizzes = () => {
 
   const handleClearFilters = () => {
     const params = new URLSearchParams(location.search);
+    params.delete("filterQuery");
     params.delete("status");
     params.delete("category");
     params.delete("page");
@@ -165,7 +181,7 @@ const Quizzes = () => {
         <div className="m-auto h-screen">
           <PageLoader />
         </div>
-      ) : quizzes.length || filtersApplied ? (
+      ) : quizzes.length || isAnythingApplied ? (
         <>
           <TableHeader
             quizzesLength={quizzes.length}
@@ -176,10 +192,18 @@ const Quizzes = () => {
             visibleColumns={visibleColumns}
             onFilterClick={() => setShowFilterPane(true)}
           />
-          {filtersApplied && (
+          {isFilterPaneApplied && (
             <SubHeader
               leftActionBlock={
                 <div className="flex items-center gap-4">
+                  {appliedFilterName && (
+                    <div className="flex items-center gap-1">
+                      <Typography style="h5">Name:</Typography>
+                      <Typography className="text-gray-600">
+                        {appliedFilterName}
+                      </Typography>
+                    </div>
+                  )}
                   {filters.category.length > 0 && (
                     <div className="flex items-center gap-1">
                       <Typography style="h5">Category:</Typography>
@@ -206,17 +230,24 @@ const Quizzes = () => {
             />
           )}
           <div className="w-full overflow-x-auto px-4">
-            <Table
-              currentPageNumber={currentPage}
-              defaultPageSize={currentPageSize}
-              handlePageChange={handlePageChange}
-              quizzes={quizzes}
-              selectedQuizIds={selectedQuizIds}
-              setQuizzes={setQuizzes}
-              setSelectedQuizIds={setSelectedQuizIds}
-              totalQuizCount={totalQuizCount}
-              visibleColumns={visibleColumns}
-            />
+            {!loading && quizzes.length === 0 && isAnythingApplied ? (
+              <NoData
+                className="flex min-h-[60vh] items-center justify-center px-0"
+                title="No results found"
+              />
+            ) : (
+              <Table
+                currentPageNumber={currentPage}
+                defaultPageSize={currentPageSize}
+                handlePageChange={handlePageChange}
+                quizzes={quizzes}
+                selectedQuizIds={selectedQuizIds}
+                setQuizzes={setQuizzes}
+                setSelectedQuizIds={setSelectedQuizIds}
+                totalQuizCount={totalQuizCount}
+                visibleColumns={visibleColumns}
+              />
+            )}
           </div>
         </>
       ) : (

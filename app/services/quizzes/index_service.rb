@@ -64,8 +64,8 @@ class Quizzes::IndexService
     def filter_category(quizzes)
       return quizzes unless @params[:category].present?
 
-      quizzes.where(category_id: @params[:category])
- end
+      quizzes.joins(:category).where(categories: { name: @params[:category] })
+    end
 
     def filter_status(quizzes)
       return quizzes unless @current_user
