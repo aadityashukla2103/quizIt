@@ -2,12 +2,14 @@ import React, { useEffect, useState } from "react";
 
 import { setAuthHeaders, registerIntercepts } from "apis/axios";
 import { initializeLogger } from "common/logger";
+import ErrorPage from "components/commons/ErrorPage";
 import PrivateRoute from "components/commons/PrivateRoute";
 import {
   AUTH_ROUTES,
   PRIVATE_ROUTES,
   LOGIN_PATH,
   PUBLIC_ROUTES,
+  NOT_FOUND_PATH,
 } from "components/routeConstants";
 import { useAuthState, useAuthDispatch } from "contexts/auth";
 import { useUserDispatch, useUserState } from "contexts/user";
@@ -74,15 +76,18 @@ const Main = props => {
             path={route.path}
           />
         ))}
+        <Route exact component={ErrorPage} path={NOT_FOUND_PATH} />
         {PRIVATE_ROUTES.map(route => (
           <PrivateRoute
             component={route.component}
             condition={isLoggedIn}
+            exact={route.exact}
             key={route.path}
             path={route.path}
             redirectRoute={LOGIN_PATH}
           />
         ))}
+        <Route component={ErrorPage} />
       </Switch>
     </BrowserRouter>
   );

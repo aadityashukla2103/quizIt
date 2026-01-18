@@ -11,6 +11,15 @@ class Api::V1::UsersController < Api::V1::BaseController
   end
 
   def create
+    email = user_params[:email]&.downcase
+
+    if Submission.exists?(guest_email: email)
+      return render_error(
+        "You already attempted quiz as guest. Signup not allowed.",
+        :unprocessable_entity
+      )
+    end
+
     organization = Organization.first || Organization.create!(name: "Default Organization")
     user = User.new(user_params)
     user.organization = organization

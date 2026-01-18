@@ -9,6 +9,7 @@ module Submissions
     def call
       submission = Submission.new(@params)
       submission.submitted_at ||= Time.current
+      submission.guest_email = submission.guest_email&.downcase
 
       if submission.save
         {

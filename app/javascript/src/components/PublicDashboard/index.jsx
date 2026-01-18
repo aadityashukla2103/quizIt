@@ -109,7 +109,7 @@ const PublicDashboard = () => {
         <h1 className="text-2xl font-semibold">
           {quizzes[0]?.organization_name || slug}
         </h1>
-        <Button label="Login as admin" to="/login" />
+        <Button label="Login as admin" to="/quizzes" />
       </header>
       <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-6 py-10">
         <div className="mb-8 flex items-center justify-center">
