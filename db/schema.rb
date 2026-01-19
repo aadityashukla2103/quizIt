@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_01_08_195132) do
+ActiveRecord::Schema[7.1].define(version: 2026_01_19_034127) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -122,7 +122,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_08_195132) do
     t.string "to_path"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "organization_id", null: false
     t.index ["from_path"], name: "index_redirections_on_from_path", unique: true
+    t.index ["organization_id"], name: "index_redirections_on_organization_id"
   end
 
   create_table "submission_answers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -179,5 +181,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_08_195132) do
   add_foreign_key "quizzes", "categories"
   add_foreign_key "quizzes", "organizations"
   add_foreign_key "quizzes", "users", column: "creator_id"
+  add_foreign_key "redirections", "organizations"
   add_foreign_key "users", "organizations"
 end

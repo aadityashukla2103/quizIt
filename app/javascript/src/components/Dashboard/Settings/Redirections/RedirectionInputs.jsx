@@ -11,8 +11,8 @@ import {
   PageLoader,
 } from "neetoui";
 
-const { Menu, MenuItem } = ActionDropdown;
-const { Button: MenuItemButton } = MenuItem;
+const { Menu } = ActionDropdown;
+const { Button: MenuItemButton } = ActionDropdown.MenuItem;
 
 const RedirectionsInput = ({
   redirection,
@@ -74,11 +74,15 @@ const RedirectionsInput = ({
 
   if (loading) {
     return (
-      <div className="m-auto h-screen">
+      <div className="m-auto flex h-screen items-center justify-center">
         <PageLoader />
       </div>
     );
   }
+
+  const commonInputStyles = `rounded-md border bg-white px-3 py-2 font-semibold transition
+    focus:border-gray-400`;
+  const viewModeStyles = `border-transparent bg-gray-50 overflow-hidden truncate whitespace-nowrap`;
 
   return (
     <div className="flex items-center gap-4 rounded-lg border border-gray-100 bg-white p-3 shadow-md">
@@ -89,33 +93,39 @@ const RedirectionsInput = ({
         onClose={() => setIsDeleteAlertOpen(false)}
         onSubmit={deleteRedirection}
       />
-      <div className="flex-1">
-        <Tooltip content={fromPath} position="top">
-          <Input
-            nakedInput
-            placeholder="Enter from path"
-            readOnly={!isEditing}
-            value={fromPath}
-            className={`font-semibold ${
-              !isEditing ? "overflow-hidden truncate whitespace-nowrap" : ""
-            }`}
-            onChange={e => setFromPath(e.target.value)}
-          />
-        </Tooltip>
+      <div className="flex flex-1 items-center gap-2">
+        <div className="h-9 w-1 rounded-full bg-sky-500" />
+        <div className="w-full">
+          <Tooltip content={fromPath} position="top">
+            <Input
+              nakedInput
+              placeholder="Enter from path"
+              readOnly={!isEditing}
+              value={fromPath}
+              className={`${commonInputStyles} ${
+                isEditing ? "border-gray-200" : viewModeStyles
+              }`}
+              onChange={e => setFromPath(e.target.value)}
+            />
+          </Tooltip>
+        </div>
       </div>
-      <div className="flex-1">
-        <Tooltip content={toPath} position="top">
-          <Input
-            nakedInput
-            placeholder="Enter to path"
-            readOnly={!isEditing}
-            value={toPath}
-            className={`font-semibold ${
-              !isEditing ? "overflow-hidden truncate whitespace-nowrap" : ""
-            }`}
-            onChange={e => setToPath(e.target.value)}
-          />
-        </Tooltip>
+      <div className="flex flex-1 items-center gap-2">
+        <div className="h-9 w-1 rounded-full bg-emerald-500" />
+        <div className="w-full">
+          <Tooltip content={toPath} position="top">
+            <Input
+              nakedInput
+              placeholder="Enter to path"
+              readOnly={!isEditing}
+              value={toPath}
+              className={`${commonInputStyles} ${
+                isEditing ? "border-gray-200" : viewModeStyles
+              }`}
+              onChange={e => setToPath(e.target.value)}
+            />
+          </Tooltip>
+        </div>
       </div>
       {isEditing ? (
         <div className="flex gap-2">

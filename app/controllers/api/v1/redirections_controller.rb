@@ -5,12 +5,12 @@ class Api::V1::RedirectionsController < Api::V1::BaseController
   before_action :set_redirection, only: [:update, :destroy]
 
   def index
-    result = Redirections::IndexService.new.call
+    result = Redirections::IndexService.new(current_user.organization).call
     render_json(result[:data], result[:status])
   end
 
   def create
-    result = Redirections::CreateService.new(redirection_params).call
+    result = Redirections::CreateService.new(redirection_params, current_user.organization).call
 
     if result[:success]
       render_message(result[:message], result[:status], result[:data])
@@ -42,7 +42,7 @@ class Api::V1::RedirectionsController < Api::V1::BaseController
   private
 
     def set_redirection
-      @redirection = Redirection.find(params[:id])
+      @redirection = current_user.organization.redirections.find(params[:id])
     end
 
     def redirection_params

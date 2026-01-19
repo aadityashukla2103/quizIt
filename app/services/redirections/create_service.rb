@@ -2,13 +2,14 @@
 
 module Redirections
   class CreateService
-    def initialize(params)
+    def initialize(params, organization)
       @params = params
+      @organization = organization
     end
 
     def call
       redirection = Redirection.new(@params)
-
+      redirection.organization = @organization
       if redirection.save
         {
           success: true,
