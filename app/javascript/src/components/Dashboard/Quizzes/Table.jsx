@@ -11,7 +11,7 @@ import {
   Tooltip,
   Typography,
 } from "neetoui";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 const { Menu, MenuItem } = ActionDropdown;
 const { Button: MenuItemButton } = MenuItem;
@@ -31,6 +31,7 @@ const Table = ({
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
   const [selectedQuizSlug, setSelectedQuizSlug] = useState("");
   const [selectedQuizName, setSelectedQuizName] = useState("");
+  const history = useHistory();
 
   const handleStatusChange = async (slug, status) => {
     try {
@@ -56,6 +57,7 @@ const Table = ({
   const handleClone = async slug => {
     try {
       const quiz = await quizzesApi.cloneQuiz(slug);
+      history.push(`/quizzes/${quiz.slug}/questions`);
       setQuizzes(prev => [{ ...quiz, submission_count: 0 }, ...prev]);
       setSelectedQuizIds([]);
     } catch (err) {
