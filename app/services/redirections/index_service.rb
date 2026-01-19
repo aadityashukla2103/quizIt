@@ -2,12 +2,16 @@
 
 module Redirections
   class IndexService
+    def initialize(organization)
+      @organization = organization
+    end
+
     def call
       {
         success: true,
         status: :ok,
         data: {
-          redirections: Redirection.order(created_at: :asc)
+          redirections: @organization.redirections.order(created_at: :asc)
         }
       }
     end

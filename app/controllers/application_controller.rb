@@ -21,6 +21,6 @@ class ApplicationController < ActionController::Base
       redirection = Redirection.find_by(from_path: request.path)
       return unless redirection
 
-      redirect_to redirection.to_path, status: :moved_permanently
+      redirect_to redirection.to_path, status: :moved_permanently, allow_other_host: true
     end
 end
