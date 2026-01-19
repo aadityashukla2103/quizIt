@@ -9,7 +9,8 @@ class Api::V1::Public::QuizzesController < Api::V1::BaseController
         show_on_homepage: true,
         status: :published,
         organizations: { slug: params[:organization_slug] }
-      ).limit(20)
+      ).order("categories.position ASC")
+      .limit(20)
 
     if params[:query].present?
       quizzes = quizzes.where(
