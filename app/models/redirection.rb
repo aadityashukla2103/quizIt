@@ -2,31 +2,50 @@
 
 class Redirection < ApplicationRecord
   belongs_to :organization
-  validates :from_path, presence: true, uniqueness: true
+
+  validates :from_path, presence: true, uniqueness: { scope: :organization_id }
   validates :to_path, presence: true
+
   validate :from_and_to_not_same
   validate :prevent_cyclic_redirect
-  before_validation :add_prefix_to_from_path
-  before_validation :handle_to_path
+
+  before_validation :normalize_from_path
+  before_validation :normalize_to_path
 
   private
 
-    def add_prefix_to_from_path
+    def normalize_from_path
       return if from_path.blank?
 
-      self.from_path = "/#{from_path}" unless from_path.start_with?("/")
-    end
+      value = from_path.strip
 
-    def handle_to_path
+      value = value.gsub(/\s+/, "")
+      value = value.sub(/\A\//, "") if value.start_with?("/http://", "/https://")
+
+      if value.start_with?("http://", "https://")
+        uri = URI.parse(value)
+        self.from_path = uri.path.presence || "/"
+        return
+      end
+
+      self.from_path = value.start_with?("/") ? value : "/#{value}"
+   end
+
+    def normalize_to_path
       return if to_path.blank?
 
+      value = to_path.strip
+
       is_full_url =
-        to_path.start_with?("http://", "https://") ||
-        to_path.match?(/\A[a-z0-9-]+\./i)
+        value.start_with?("http://", "https://") ||
+        value.match?(/\A[a-z0-9-]+\./i)
 
-      return if is_full_url
+      if is_full_url
+        self.to_path = value
+        return
+      end
 
-      self.to_path = "/#{to_path}" unless to_path.start_with?("/")
+      self.to_path = "/#{value}" unless value.start_with?("/")
     end
 
     def from_and_to_not_same
@@ -34,9 +53,7 @@ class Redirection < ApplicationRecord
     end
 
     def prevent_cyclic_redirect
-      existing = Redirection.find_by(from_path: to_path)
-      if existing&.to_path == from_path
-        errors.add(:base, "Cyclic redirection not allowed")
-      end
+      existing = Redirection.find_by(from_path: to_path, organization_id: organization_id)
+      errors.add(:base, "Cyclic redirection not allowed") if existing&.to_path == from_path
     end
 end
