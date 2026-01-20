@@ -28,22 +28,80 @@ const RedirectionsInput = ({
   const [fromPath, setFromPath] = useState(redirection.from_path || "");
   const [toPath, setToPath] = useState(redirection.to_path || "");
 
+  const baseUrl = window.location.origin;
+
+  const normalizeFromPath = value => {
+    const v = (value || "").trim();
+    if (!v) return "";
+
+    if (v.startsWith("http://") || v.startsWith("https://")) {
+      try {
+        return new URL(v).pathname || "/";
+      } catch {
+        return v.startsWith("/") ? v : `/${v}`;
+      }
+    }
+
+    return v.startsWith("/") ? v : `/${v}`;
+  };
+
+  const normalizeToPath = value => {
+    const v = (value || "").trim();
+    if (!v) return "";
+
+    if (v.startsWith("http://") || v.startsWith("https://")) return v;
+
+    return v.startsWith("/") ? v : `/${v}`;
+  };
+
+  const buildFullUrl = value => {
+    const v = (value || "").trim();
+    if (!v) return "";
+
+    if (v.startsWith("http://") || v.startsWith("https://")) return v;
+
+    const path = v.startsWith("/") ? v : `/${v}`;
+
+    return `${baseUrl}${path}`;
+  };
+
+  const splitUrlParts = value => {
+    const v = (value || "").trim();
+    if (!v) return { host: "", path: "" };
+
+    if (v.startsWith("http://") || v.startsWith("https://")) {
+      try {
+        const url = new URL(v);
+
+        return {
+          host: url.origin,
+          path: `${url.pathname}${url.search}${url.hash}`,
+        };
+      } catch {
+        return { host: "", path: v };
+      }
+    }
+
+    const path = v.startsWith("/") ? v : `/${v}`;
+
+    return { host: baseUrl, path };
+  };
+
   const handleSave = async () => {
     if (!fromPath.trim() || !toPath.trim()) return;
 
     setLoading(true);
 
+    const payload = {
+      from_path: normalizeFromPath(fromPath),
+      to_path: normalizeToPath(toPath),
+    };
+
     if (isNew) {
-      const res = await redirectionsApi.create({
-        from_path: fromPath,
-        to_path: toPath,
-      });
+      const res = await redirectionsApi.create(payload);
       onCreate(res.redirection);
     } else {
-      await redirectionsApi.update(redirection.id, {
-        from_path: fromPath,
-        to_path: toPath,
-      });
+      await redirectionsApi.update(redirection.id, payload);
     }
 
     setLoading(false);
@@ -80,51 +138,78 @@ const RedirectionsInput = ({
     );
   }
 
-  const commonInputStyles = `rounded-md border bg-white px-3 py-2 font-semibold transition
-    focus:border-gray-400`;
-  const viewModeStyles = `border-transparent bg-gray-50 overflow-hidden truncate whitespace-nowrap`;
+  const commonBoxStyles =
+    "rounded-md border bg-white px-3 py-2 transition focus:border-gray-400";
+
+  const viewModeStyles =
+    "border-transparent bg-gray-50 overflow-hidden truncate whitespace-nowrap";
+
+  const fromParts = splitUrlParts(fromPath);
+  const toParts = splitUrlParts(toPath);
 
   return (
     <div className="flex items-center gap-4 rounded-lg border border-gray-100 bg-white p-3 shadow-md">
       <Alert
         isOpen={isDeleteAlertOpen}
-        message={`Are you sure you want to delete "${fromPath}" to "${toPath}"?`}
         title="Delete redirection"
+        message={`Are you sure you want to delete "${buildFullUrl(
+          normalizeFromPath(fromPath)
+        )}" to "${buildFullUrl(normalizeToPath(toPath))}"?`}
         onClose={() => setIsDeleteAlertOpen(false)}
         onSubmit={deleteRedirection}
       />
       <div className="flex flex-1 items-center gap-2">
         <div className="h-9 w-1 rounded-full bg-sky-500" />
-        <div className="w-full">
-          <Tooltip content={fromPath} position="top">
+        <div className="w-[420px]">
+          {isEditing ? (
             <Input
               nakedInput
+              className={`${commonBoxStyles} border-gray-200 font-semibold`}
               placeholder="Enter from path"
-              readOnly={!isEditing}
               value={fromPath}
-              className={`${commonInputStyles} ${
-                isEditing ? "border-gray-200" : viewModeStyles
-              }`}
               onChange={e => setFromPath(e.target.value)}
             />
-          </Tooltip>
+          ) : (
+            <Tooltip content={buildFullUrl(fromPath)} position="top">
+              <div
+                className={`${commonBoxStyles} ${viewModeStyles} flex min-w-0 font-mono`}
+              >
+                <span className="shrink-0 font-normal text-gray-500">
+                  {fromParts.host}
+                </span>
+                <span className="min-w-0 truncate font-semibold text-gray-900">
+                  {fromParts.path}
+                </span>
+              </div>
+            </Tooltip>
+          )}
         </div>
       </div>
       <div className="flex flex-1 items-center gap-2">
         <div className="h-9 w-1 rounded-full bg-emerald-500" />
-        <div className="w-full">
-          <Tooltip content={toPath} position="top">
+        <div className="w-[420px]">
+          {isEditing ? (
             <Input
               nakedInput
+              className={`${commonBoxStyles} border-gray-200 font-semibold`}
               placeholder="Enter to path"
-              readOnly={!isEditing}
               value={toPath}
-              className={`${commonInputStyles} ${
-                isEditing ? "border-gray-200" : viewModeStyles
-              }`}
               onChange={e => setToPath(e.target.value)}
             />
-          </Tooltip>
+          ) : (
+            <Tooltip content={buildFullUrl(toPath)} position="top">
+              <div
+                className={`${commonBoxStyles} ${viewModeStyles} flex min-w-0 font-serif`}
+              >
+                <span className="shrink-0 font-normal text-gray-500">
+                  {toParts.host}
+                </span>
+                <span className="min-w-0 truncate font-semibold text-gray-900">
+                  {toParts.path}
+                </span>
+              </div>
+            </Tooltip>
+          )}
         </div>
       </div>
       {isEditing ? (
